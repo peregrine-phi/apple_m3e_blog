@@ -57,10 +57,10 @@ const buttonType = href ? null : "button";
 
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    height: 32px;
+    gap: var(--chip-gap);
+    height: var(--chip-height);
     padding: 0 16px;
-    border-radius: 8px;
+    border-radius: var(--chip-radius);
     border: 1px solid var(--blog-color-outline, var(--blog-color-border));
     font-family: var(--blog-font-sans);
     font-size: var(--blog-typescale-label-large-size);
@@ -146,8 +146,8 @@ const buttonType = href ? null : "button";
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: var(--chip-icon-size-large);
+    height: var(--chip-icon-size-large);
     border-radius: 50%;
     margin-left: -4px;
     cursor: pointer;
@@ -172,8 +172,8 @@ const buttonType = href ? null : "button";
   .chip-icon {
     display: inline-flex;
     align-items: center;
-    width: 18px;
-    height: 18px;
+    width: var(--chip-icon-size);
+    height: var(--chip-icon-size);
     flex-shrink: 0;
   }
 
@@ -182,7 +182,7 @@ const buttonType = href ? null : "button";
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;
+    max-width: var(--chip-max-width);
   }
 
   /* ── Dark theme ── */

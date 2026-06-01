@@ -76,8 +76,8 @@ const {
   .md-switch-track {
     position: relative;
     display: inline-block;
-    width: 52px;
-    height: 32px;
+    width: var(--switch-track-width);
+    height: var(--switch-track-height);
     border-radius: var(--blog-radius-full, 9999px);
     background-color: var(--blog-color-surface-container-highest);
     border: 2px solid var(--blog-color-outline);
@@ -96,8 +96,8 @@ const {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
-    height: 16px;
+    width: var(--switch-thumb-size);
+    height: var(--switch-thumb-size);
     border-radius: 50%;
     background-color: var(--blog-color-outline);
     box-sizing: border-box;
@@ -114,8 +114,8 @@ const {
     align-items: center;
     justify-content: center;
     position: absolute;
-    width: 12px;
-    height: 12px;
+    width: var(--switch-icon-size);
+    height: var(--switch-icon-size);
     color: var(--blog-color-primary);
     opacity: 0;
     transform: scale(0.5);
@@ -142,8 +142,8 @@ const {
 
   .md-switch-input:checked + .md-switch-track .md-switch-thumb {
     left: 24px;
-    width: 24px;
-    height: 24px;
+    width: var(--switch-thumb-checked-size);
+    height: var(--switch-thumb-checked-size);
     background-color: var(--blog-color-on-primary);
   }
 
@@ -163,7 +163,7 @@ const {
 
   /* Scale thumb slightly on active press (tactile squish) */
   .md-switch-container:active .md-switch-thumb {
-    width: 28px;
+    width: var(--switch-thumb-dragging-width);
   }
 
   /* ── Focus State ── */

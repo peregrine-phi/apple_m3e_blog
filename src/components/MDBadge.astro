@@ -36,25 +36,25 @@ const {
     justify-content: center;
     box-sizing: border-box;
     font-family: var(--blog-font-sans);
-    line-height: 1;
+    line-height: var(--badge-line-height);
     user-select: none;
   }
 
   /* ── 1. Type: Large (standard badge with text) ── */
   .md-badge--large {
-    height: 16px;
-    min-width: 16px;
+    height: var(--badge-height);
+    min-width: var(--badge-min-width);
     padding: 0 4px;
     border-radius: var(--blog-radius-full, 9999px);
     font-size: var(--blog-typescale-label-small-size, 11px);
     font-weight: var(--blog-font-weight-semibold, 600);
-    letter-spacing: var(--blog-typescale-label-small-tracking, 0.5px);
+    letter-spacing: var(--badge-letter-spacing);
   }
 
   /* ── 2. Type: Dot (small visual dot) ── */
   .md-badge--dot {
-    width: 6px;
-    height: 6px;
+    width: var(--badge-dot-size);
+    height: var(--badge-dot-size);
     border-radius: 50%;
     padding: 0;
   }

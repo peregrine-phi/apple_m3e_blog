@@ -38,17 +38,17 @@ const inputId = name ?? label.toLowerCase().replace(/s+/g, "-");
 </div>
 
 <style>
-  .text-field { display: flex; flex-direction: column; gap: 4px; font-family: var(--blog-font-sans); }
-  .text-field-container { position: relative; display: flex; align-items: center; min-height: 56px; border-radius: 4px 4px 0 0; background-color: var(--blog-color-surface-container-highest, var(--blog-color-surface-variant)); border-bottom: 1px solid var(--blog-color-on-surface-variant, var(--blog-color-text-secondary)); transition: background-color 150ms, border-color 150ms; }
+  .text-field { display: flex; flex-direction: column; gap: var(--textfield-gap); font-family: var(--blog-font-sans); }
+  .text-field-container { position: relative; display: flex; align-items: center; min-height: var(--textfield-min-height); border-radius: var(--textfield-radius) var(--textfield-radius) 0 0; background-color: var(--blog-color-surface-container-highest, var(--blog-color-surface-variant)); border-bottom: 1px solid var(--blog-color-on-surface-variant, var(--blog-color-text-secondary)); transition: background-color 150ms, border-color 150ms; }
   .text-field-container:hover { border-bottom-color: var(--blog-color-on-surface); }
   .text-field:focus-within .text-field-container { border-bottom: 2px solid var(--blog-color-primary); }
-  .text-field--outlined .text-field-container { background-color: transparent; border-bottom: none; border-radius: 4px; }
-  .text-field-outline { position: absolute; inset: 0; border: 1px solid var(--blog-color-outline, var(--blog-color-border)); border-radius: 4px; pointer-events: none; margin: 0; padding: 0; transition: border-color 150ms; }
+  .text-field--outlined .text-field-container { background-color: transparent; border-bottom: none; border-radius: var(--textfield-radius); }
+  .text-field-outline { position: absolute; inset: 0; border: 1px solid var(--blog-color-outline, var(--blog-color-border)); border-radius: var(--textfield-radius); pointer-events: none; margin: 0; padding: 0; transition: border-color 150ms; }
   .text-field:focus-within.text-field--outlined .text-field-outline { border: 2px solid var(--blog-color-primary); }
   .text-field--outlined .text-field-container:hover .text-field-outline { border-color: var(--blog-color-on-surface); }
-  .text-field-input-wrapper { position: relative; flex: 1; display: flex; align-items: flex-end; height: 100%; padding: 24px 16px 8px; }
-  .text-field--outlined .text-field-input-wrapper { padding: 16px; }
-  .text-field-input { width: 100%; border: none; outline: none; background: transparent; font-family: inherit; font-size: var(--blog-typescale-body-large-size); line-height: 1.5; color: var(--blog-color-on-surface); caret-color: var(--blog-color-primary); padding: 0; }
+  .text-field-input-wrapper { position: relative; flex: 1; display: flex; align-items: flex-end; height: 100%; padding: var(--textfield-padding-top) var(--textfield-padding-x) var(--textfield-padding-bottom); }
+  .text-field--outlined .text-field-input-wrapper { padding: var(--textfield-padding-x); }
+  .text-field-input { width: 100%; border: none; outline: none; background: transparent; font-family: inherit; font-size: var(--blog-typescale-body-large-size); line-height: var(--textfield-line-height); color: var(--blog-color-on-surface); caret-color: var(--blog-color-primary); padding: 0; }
   .text-field-input::placeholder { color: transparent; transition: color 150ms var(--blog-motion-easing-standard); }
   .text-field-input:focus::placeholder { color: var(--blog-color-text-tertiary); }
   .text-field-input:disabled { color: var(--blog-color-text-tertiary); cursor: not-allowed; }
@@ -66,7 +66,7 @@ const inputId = name ?? label.toLowerCase().replace(/s+/g, "-");
   .text-field--outlined .text-field-input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 1000px var(--blog-color-background, var(--blog-color-surface)) inset !important;
   }
-  .text-field-label { position: absolute; top: 16px; left: 16px; font-size: var(--blog-typescale-body-large-size); line-height: 1.5; color: var(--blog-color-on-surface-variant, var(--blog-color-text-secondary)); pointer-events: none; transform-origin: left top; transition: transform 150ms, font-size 150ms, color 150ms, background-color 150ms, padding 150ms; z-index: 1; }
+  .text-field-label { position: absolute; top: 16px; left: 16px; font-size: var(--blog-typescale-body-large-size); line-height: var(--textfield-line-height); color: var(--blog-color-on-surface-variant, var(--blog-color-text-secondary)); pointer-events: none; transform-origin: left top; transition: transform 150ms, font-size 150ms, color 150ms, background-color 150ms, padding 150ms; z-index: 1; }
   .text-field-input:focus ~ .text-field-label, .text-field-input:not(:placeholder-shown) ~ .text-field-label { transform: translateY(-8px) scale(0.75); color: var(--blog-color-primary); }
   .text-field--outlined .text-field-label { background-color: transparent; padding: 0; }
   .text-field--outlined .text-field-input:focus ~ .text-field-label, .text-field--outlined .text-field-input:not(:placeholder-shown) ~ .text-field-label { transform: translate(-4px, -24px) scale(0.75); color: var(--blog-color-primary); background-color: var(--blog-color-background, var(--blog-color-surface)); padding: 0 6px; }
@@ -75,7 +75,7 @@ const inputId = name ?? label.toLowerCase().replace(/s+/g, "-");
   .text-field--error .text-field-label, .text-field--error .text-field-input:focus ~ .text-field-label { color: var(--blog-color-error); }
   .text-field-error { padding: 0 16px; color: var(--blog-color-error); }
   .text-field-supporting { padding: 0 16px; }
-  .text-field-icon { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; color: var(--blog-color-on-surface-variant); flex-shrink: 0; }
+  .text-field-icon { display: inline-flex; align-items: center; justify-content: center; width: var(--textfield-icon-size); height: var(--textfield-icon-size); color: var(--blog-color-on-surface-variant); flex-shrink: 0; }
   .text-field-icon--leading { margin-left: 12px; }
   .text-field-icon--trailing { margin-right: 12px; }
   .text-field-counter { position: absolute; right: 16px; bottom: 4px; pointer-events: none; }

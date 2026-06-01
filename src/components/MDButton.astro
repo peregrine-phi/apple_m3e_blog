@@ -58,8 +58,8 @@ const isAnchor = href != null;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    height: 40px;
+    gap: var(--btn-gap);
+    height: var(--btn-height);
     padding: 0 24px;
     border-radius: var(--blog-radius-full, 9999px);
     font-family: var(--blog-font-sans);
@@ -189,8 +189,8 @@ const isAnchor = href != null;
 
   /* ── 6. Variant: FAB (Floating Action Button) ── */
   .md-btn--fab {
-    height: 56px;
-    min-width: 56px;
+    height: var(--btn-height-fab);
+    min-width: var(--btn-min-width-fab);
     padding: 0;
     border-radius: var(--blog-radius-xl, 16px);
     background-color: var(--blog-color-primary-container);
@@ -217,7 +217,7 @@ const isAnchor = href != null;
   /* Extended FAB support */
   .md-btn--fab:has(.md-btn-label:not(:empty)) {
     padding: 0 20px;
-    gap: 8px;
+    gap: var(--btn-gap);
   }
   .md-btn--fab:has(.md-btn-label:not(:empty)) .md-btn-label {
     display: inline;

@@ -17,10 +17,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
-    min-width: 344px;
-    max-width: 568px;
-    padding: 14px 16px;
+    gap: var(--snackbar-gap);
+    min-width: var(--snackbar-min-width);
+    max-width: var(--snackbar-max-width);
+    padding: var(--snackbar-padding-y) var(--snackbar-padding-x);
     border-radius: var(--blog-radius-md, 8px);
     background-color: var(--blog-color-inverse-surface);
     color: var(--blog-color-inverse-on-surface);
@@ -28,7 +28,7 @@
     box-shadow: var(--blog-elevation-3);
     font-family: var(--blog-font-sans);
     font-size: var(--blog-typescale-body-medium-size, 14px);
-    letter-spacing: var(--blog-typescale-body-medium-tracking, 0.25px);
+    letter-spacing: var(--snackbar-letter-spacing);
     opacity: 0;
     transition: 
       transform var(--blog-motion-duration-slow, 350ms) var(--blog-motion-easing-emphasized),
