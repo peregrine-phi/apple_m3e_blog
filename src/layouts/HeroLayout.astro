@@ -19,7 +19,7 @@ const { title, description, transparentHeader = true } = Astro.props;
   <section class="hero-layout-hero">
     <slot name="hero" />
   </section>
-  <main class="hero-layout-content">
+  <main class="container-wide hero-layout-content">
     <slot />
   </main>
 </BaseLayout>
@@ -31,10 +31,6 @@ const { title, description, transparentHeader = true } = Astro.props;
   }
 
   .hero-layout-content {
-    width: 100%;
-    max-width: 1200px;
-    margin-inline: auto;
-    padding-inline: var(--blog-space-page-inline);
     padding-block-end: var(--blog-space-16);
   }
 </style>

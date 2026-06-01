@@ -18,12 +18,12 @@ interface Props {
 const { titleKey, badgeVariant, filterType, items, config, allLabelKey } = Astro.props;
 ---
 
-<div class={`${filterType}s-container`} style={filterType === "stage" ? "margin-top: 12px; display: flex; flex-direction: column; gap: 8px;" : ""}>
-  <span class="tags-label text-label-large text-secondary" style="display: flex; align-items: center; gap: 8px;">
+<div class={`${filterType}s-container`} style={filterType === "stage" ? "margin-top: var(--blog-space-3); display: flex; flex-direction: column; gap: var(--blog-space-2);" : ""}>
+  <span class="tags-label text-label-large text-secondary" style="display: flex; align-items: center; gap: var(--blog-space-2);">
     <MDBadge variant={badgeVariant} type="dot" />
     <I18n tKey={titleKey} />
   </span>
-  <div class={`${filterType}s-chips`} style={filterType === "stage" ? "display: flex; flex-wrap: wrap; gap: 8px;" : ""}>
+  <div class={`${filterType}s-chips`} style={filterType === "stage" ? "display: flex; flex-wrap: wrap; gap: var(--blog-space-2);" : ""}>
     <!-- The fallback "All" reset chip -->
     <button class="filter-chip active" data-tag={filterType === "tag" ? "all" : undefined} data-stage={filterType === "stage" ? "all" : undefined} type="button">
       <span class="chip-label"><I18n tKey={allLabelKey} /></span>

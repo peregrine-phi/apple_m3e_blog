@@ -30,17 +30,17 @@ const { quote, cite, variant = "classic" } = Astro.props;
 
   .pull-quote p {
     font-family: "SF Pro Display", var(--blog-font-sans);
-    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-size: var(--blog-typescale-display-small-size);
     font-weight: var(--blog-font-weight-semibold);
-    line-height: 1.2;
-    letter-spacing: -0.012em;
+    line-height: var(--blog-typescale-display-small-leading);
+    letter-spacing: var(--blog-typescale-headline-medium-tracking);
     color: var(--blog-color-text-primary);
     margin: 0;
   }
 
   /* ── Classic variant: Apple News editorial ── */
   .pull-quote--classic {
-    max-width: 540px;
+    max-width: var(--pullquote-classic-max-width, 540px);
     padding-left: var(--blog-space-5);
     border-left: 3px solid var(--blog-color-primary);
   }
@@ -51,7 +51,7 @@ const { quote, cite, variant = "classic" } = Astro.props;
 
   /* ── Brutalist variant: bold color block ── */
   .pull-quote--brutal {
-    max-width: 640px;
+    max-width: var(--pullquote-brutal-max-width, 640px);
     padding: var(--blog-space-6) var(--blog-space-8);
     background: var(--blog-brutal-accent);
     border: var(--blog-brutal-border-width, 3px) solid var(--blog-brutal-border-color);
@@ -61,7 +61,7 @@ const { quote, cite, variant = "classic" } = Astro.props;
     color: var(--blog-brutal-on-accent);
     font-weight: var(--blog-font-weight-heavy);
     text-transform: uppercase;
-    letter-spacing: -0.02em;
+    letter-spacing: var(--blog-typescale-headline-small-tracking);
   }
 
   /* Citation */
@@ -74,7 +74,7 @@ const { quote, cite, variant = "classic" } = Astro.props;
     font-family: "SF Pro Text", var(--blog-font-sans);
     font-size: var(--blog-typescale-label-large-size);
     font-weight: var(--blog-font-weight-regular);
-    letter-spacing: 0.02em;
+    letter-spacing: var(--blog-typescale-label-large-tracking);
     color: var(--blog-color-text-secondary);
     font-style: normal;
   }
@@ -90,7 +90,7 @@ const { quote, cite, variant = "classic" } = Astro.props;
     }
 
     .pull-quote p {
-      font-size: 1.375rem;
+      font-size: var(--blog-typescale-title-large-size);
     }
 
     .pull-quote--brutal {

@@ -35,7 +35,7 @@ const hasHero = leadStory != null;
           <!-- Lead Story — dominates 2/3 width -->
           <article class="hero-lead">
             <div class="hero-lead-content">
-              <p class="hero-kicker text-kicker" style="display: flex; align-items: center; gap: 8px;">
+              <p class="hero-kicker text-kicker" style="display: flex; align-items: center; gap: var(--blog-space-2);">
                 <MDBadge variant="primary" type="dot" style="flex-shrink: 0;" />
                 {leadStory.data.tags?.[0] ?? <I18n tKey="home.featured" />}
               </p>
@@ -87,7 +87,7 @@ const hasHero = leadStory != null;
       /* Fallback: text-only Hero when no featured posts */
       <section class="hero-fallback">
         <div class="container-narrow hero-fallback-content">
-          <p class="text-kicker" style="display: flex; align-items: center; gap: 8px;">
+          <p class="text-kicker" style="display: flex; align-items: center; gap: var(--blog-space-2);">
             <MDBadge variant="primary" type="dot" style="flex-shrink: 0;" />
             <I18n tKey="home.welcome" />
           </p>
@@ -115,7 +115,7 @@ const hasHero = leadStory != null;
     <div class="container-wide">
       <div class="section-header">
         <div>
-          <p class="text-kicker" style="display: flex; align-items: center; gap: 8px;">
+          <p class="text-kicker" style="display: flex; align-items: center; gap: var(--blog-space-2);">
             <MDBadge variant="primary" type="dot" style="flex-shrink: 0;" />
             <I18n tKey="home.latest" />
           </p>

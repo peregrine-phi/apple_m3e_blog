@@ -43,7 +43,7 @@
   border-radius: var(--blog-radius-full);
   border: 1px solid transparent;
   text-transform: capitalize;
-  line-height: 1.2;
+  line-height: var(--blog-typescale-label-medium-leading);
 }
 
 .blog-card-stage,
@@ -55,7 +55,7 @@
 .post-stage--seedling,
 .blog-card-stage--seedling,
 .backlink-stage--seedling {
-  background-color: rgba(128, 128, 128, 0.06);
+  background-color: var(--blog-color-surface-variant-alpha, rgba(128, 128, 128, 0.06));
   border-color: var(--blog-color-outline-variant);
   color: var(--blog-color-text-secondary);
 }
@@ -84,7 +84,7 @@
   border-radius: var(--blog-radius-full);
   background-color: var(--blog-color-tertiary-container);
   color: var(--blog-color-on-tertiary-container);
-  line-height: 1.2;
+  line-height: var(--blog-typescale-label-medium-leading);
 }
 
 /* ── Blog Card Stage Layout Wrapper ── */
@@ -111,8 +111,8 @@
 }
 
 .backlinks-title-dot {
-  width: 8px;
-  height: 8px;
+  width: var(--backlink-dot-size, 8px);
+  height: var(--backlink-dot-size, 8px);
   border-radius: var(--blog-radius-full);
   background-color: var(--blog-color-tertiary);
   box-shadow: 0 0 0 2.5px var(--blog-color-background), 0 0 0 4px var(--blog-color-tertiary);
@@ -160,8 +160,8 @@
 }
 
 .badge-emoji {
-  font-size: 11px;
-  line-height: 1;
+  font-size: var(--blog-typescale-label-small-size);
+  line-height: var(--blog-typescale-label-small-leading);
 }
 
 .backlink-card-title {
@@ -183,7 +183,7 @@
 .wiki-popover {
   position: absolute;
   z-index: 300;
-  width: 280px;
+  width: var(--garden-tooltip-width, 280px);
   padding: var(--blog-space-4);
   background: var(--blog-color-surface-container-high, rgba(255, 255, 255, 0.85));
   backdrop-filter: blur(20px) saturate(190%);
@@ -209,7 +209,7 @@
 
 [data-theme="dark"] .wiki-popover {
   background: var(--blog-color-surface-container-high, rgba(30, 30, 35, 0.85));
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--blog-color-border-dark-alpha, rgba(255, 255, 255, 0.08));
   box-shadow: 
     0 12px 30px -6px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -223,8 +223,8 @@
 }
 
 .wiki-popover-dot {
-  width: 6px;
-  height: 6px;
+  width: var(--garden-dot-size, 6px);
+  height: var(--garden-dot-size, 6px);
   border-radius: var(--blog-radius-full);
   background-color: var(--blog-color-primary);
 }
@@ -234,7 +234,7 @@
   font-weight: var(--blog-font-weight-semibold);
   color: var(--blog-color-text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--blog-typescale-label-medium-tracking);
 }
 
 .wiki-popover-title {
@@ -242,14 +242,14 @@
   font-size: var(--blog-typescale-title-medium-size);
   font-weight: var(--blog-font-weight-bold);
   margin: 0 0 var(--blog-space-1) 0;
-  line-height: 1.3;
+  line-height: var(--blog-typescale-title-medium-leading);
 }
 
 .wiki-popover-desc {
   color: var(--blog-color-text-secondary);
   font-size: var(--blog-typescale-body-small-size);
   margin: 0;
-  line-height: 1.4;
+  line-height: var(--blog-typescale-body-small-leading);
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;

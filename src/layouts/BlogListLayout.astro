@@ -16,7 +16,7 @@ const { title, description } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
-  <div class="blog-list-layout">
+  <div class="container-wide blog-list-layout">
     <header class="blog-list-hero">
       <p class="text-kicker"><I18n tKey="blog.overline" /></p>
       <h1 class="text-display-small"><I18n tKey="blog.heading" /></h1>
@@ -31,10 +31,6 @@ const { title, description } = Astro.props;
 
 <style>
   .blog-list-layout {
-    width: 100%;
-    max-width: 1200px;
-    margin-inline: auto;
-    padding-inline: var(--blog-space-page-inline);
     padding-block: var(--blog-space-12) var(--blog-space-16);
   }
 

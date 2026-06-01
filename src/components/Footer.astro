@@ -55,7 +55,7 @@ import I18n from "./I18n.astro";
   }
 
   .footer-brand {
-    max-width: 280px;
+    max-width: var(--footer-brand-max-width, 280px);
     display: flex;
     flex-direction: column;
     gap: var(--blog-space-3);
@@ -71,8 +71,8 @@ import I18n from "./I18n.astro";
   }
 
   .logo-dot {
-    width: 10px;
-    height: 10px;
+    width: var(--logo-dot-size, 10px);
+    height: var(--logo-dot-size, 10px);
     border-radius: var(--blog-radius-full);
     background: linear-gradient(
       135deg,

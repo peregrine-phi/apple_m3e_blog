@@ -118,7 +118,7 @@ const hasToc = tocItems.length > 0;
   .toc-sidebar {
     position: sticky;
     top: 5.5rem;
-    width: 220px;
+    width: var(--toc-width, 220px);
     flex-shrink: 0;
     max-height: calc(100vh - 5.5rem - var(--blog-space-16));
     overflow-y: auto;
@@ -139,7 +139,7 @@ const hasToc = tocItems.length > 0;
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--blog-space-0-5);
   }
 
   /* ── Shared TOC items ── */
@@ -154,9 +154,9 @@ const hasToc = tocItems.length > 0;
 
   .toc-link {
     display: block;
-    padding: 4px 0;
+    padding: var(--blog-space-1) 0;
     font-size: var(--blog-typescale-body-small-size);
-    line-height: 1.45;
+    line-height: var(--blog-typescale-body-small-leading);
     color: var(--blog-color-text-tertiary);
     text-decoration: none;
     border-radius: var(--blog-radius-xs);

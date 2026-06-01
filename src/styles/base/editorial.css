@@ -109,8 +109,8 @@
   position: absolute;
   top: -30%;
   right: -15%;
-  width: 700px;
-  height: 700px;
+  width: var(--hero-blob-size, 700px);
+  height: var(--hero-blob-size, 700px);
   border-radius: 50%;
   background: radial-gradient(
     circle,
@@ -167,8 +167,8 @@
   position: absolute;
   top: -40%;
   right: -20%;
-  width: 800px;
-  height: 800px;
+  width: var(--hero-blob-size-large, 800px);
+  height: var(--hero-blob-size-large, 800px);
   border-radius: 50%;
   background: radial-gradient(
     circle,
@@ -223,7 +223,7 @@
   }
 
   .hero-side-card {
-    min-width: 260px;
+    min-width: var(--hero-side-card-min-width, 260px);
     scroll-snap-align: start;
     padding-bottom: 0;
     border-bottom: none;

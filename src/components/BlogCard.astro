@@ -4,19 +4,24 @@
 import type { CollectionEntry } from "astro:content";
 import Chip from "./Chip.astro";
 
+import { stageConfig } from "../content/filter-config";
+ 
 interface Props {
   post: CollectionEntry<"blog">;
   variant?: "default" | "brutal";
   showImage?: boolean;
 }
-
+ 
 const { post, variant = "default", showImage = false } = Astro.props;
 const { title, description, publishedAt, tags, image, growthStage } = post.data;
-const formattedDate = publishedAt.toLocaleDateString("en-US", {
+
+const locale = Astro.url.pathname.startsWith("/zh") ? "zh-CN" : "en-US";
+const formattedDate = publishedAt.toLocaleDateString(locale, {
   year: "numeric",
   month: "long",
   day: "numeric",
 });
+const stageEmoji = stageConfig[growthStage]?.emoji ?? "🌱";
 const hasImage = showImage && image != null;
 
 // i18n tag classification
@@ -41,7 +46,7 @@ const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase()
             <p class="blog-card-kicker text-kicker">{displayTags[0]}</p>
           )
         }
-        <div class="blog-card-meta-chips" style="display: flex; align-items: center; gap: 6px;">
+        <div class="blog-card-meta-chips" style="display: flex; align-items: center; gap: var(--blog-space-1-5);">
           {
             langTag && (
               <span class={`blog-card-lang blog-card-lang--${langTag.toLowerCase()}`} title={`Language: ${langTag.toUpperCase()}`}>
@@ -50,7 +55,7 @@ const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase()
             )
           }
           <span class={`blog-card-stage blog-card-stage--${growthStage}`} title={`Growth stage: ${growthStage}`}>
-            <span class="stage-emoji">{growthStage === "evergreen" ? "🌳" : growthStage === "budding" ? "🌿" : "🌱"}</span>
+            <span class="stage-emoji">{stageEmoji}</span>
             <span class="stage-label">{growthStage}</span>
           </span>
         </div>
@@ -203,11 +208,11 @@ const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase()
   .blog-card-lang {
     display: inline-flex;
     align-items: center;
-    padding: 2px 8px;
-    border-radius: var(--blog-radius-badge, 12px);
-    font-size: 11px;
+    padding: var(--blog-space-0-5) var(--blog-space-2);
+    border-radius: var(--blog-radius-badge);
+    font-size: var(--blog-typescale-label-small-size);
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--blog-typescale-label-small-tracking);
     text-transform: uppercase;
     box-sizing: border-box;
     transition: background-color var(--blog-motion-duration-fast), color var(--blog-motion-duration-fast);

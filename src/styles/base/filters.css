@@ -12,7 +12,7 @@
 }
 
 .search-container {
-  max-width: 480px;
+  max-width: var(--filter-section-max-width, 480px);
   width: 100%;
 }
 
@@ -34,7 +34,7 @@
   display: inline-flex;
   align-items: center;
   position: relative;
-  height: 32px;
+  height: var(--chip-height);
   padding: 0 16px;
   border-radius: var(--blog-radius-sm, 8px);
   border: 1px solid var(--chip-border-color, var(--blog-color-outline));
@@ -153,8 +153,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 14px;
-  height: 14px;
+  width: var(--chip-state-icon-size, 14px);
+  height: var(--chip-state-icon-size, 14px);
   margin-left: 6px;
   overflow: hidden;
   transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
