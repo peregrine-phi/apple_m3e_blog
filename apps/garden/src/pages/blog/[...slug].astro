@@ -2,7 +2,7 @@
 // blog/[...slug].astro — Individual blog post page
 import { getCollection, type CollectionEntry } from "astro:content";
 import BlogPostLayout from "@m3e/layouts/BlogPostLayout.astro";
-import { siteConfig } from "../../config/site";
+import { siteConfig, getMusicApiEndpoint } from "../../config/site";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
@@ -57,7 +57,7 @@ const { Content, headings } = await post.render();
   siteName={siteConfig.name}
   siteCopyright={siteConfig.copyright}
   musicMode={siteConfig.music?.mode}
-  musicApiEndpoint={siteConfig.music?.mode === 'api' ? `${siteConfig.music.metingApi}?server=${siteConfig.music.server}&type=${siteConfig.music.type}&id=${siteConfig.music.id}` : ''}
+  musicApiEndpoint={getMusicApiEndpoint()}
 >
   <Content />
 </BlogPostLayout>

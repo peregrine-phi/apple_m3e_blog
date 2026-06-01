@@ -19,3 +19,9 @@ export const siteConfig = {
   },
   defaultLanguage: "en",
 };
+
+export function getMusicApiEndpoint(): string {
+  if (siteConfig.music?.mode !== 'api') return '';
+  const { metingApi, server, type, id } = siteConfig.music;
+  return `${metingApi}?server=${server}&type=${type}&id=${id}`;
+}

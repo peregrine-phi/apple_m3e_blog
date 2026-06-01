@@ -52,9 +52,45 @@
   let loading = $state(true);             // 载入指示
 
   // ════════════════════════════════════════════
+  // 国际化 (i18n) 支持
+  // ════════════════════════════════════════════
+  let lang = $state('en');
+  
+  function handleLangChange(e) {
+    lang = e.detail.lang;
+  }
+
+  const dict = $derived({
+    unknownTrack: lang === 'zh' ? '未知曲目' : 'Unknown Track',
+    unknownArtist: lang === 'zh' ? '未知艺术家' : 'Unknown Artist',
+    unknown: lang === 'zh' ? '未知' : 'Unknown',
+    fallbackLoaded: lang === 'zh' ? '在线歌单不可用，已载入兜底音乐' : 'Online playlist unavailable, fallback loaded',
+    loadFailed: lang === 'zh' ? '播放源加载失败，请检查网络' : 'Failed to load audio source, check network',
+    musicBox: lang === 'zh' ? '音乐盒' : 'MUSIC BOX',
+    playlist: lang === 'zh' ? '播放列表' : 'PLAYLIST',
+    loading: lang === 'zh' ? '载入中' : 'Loading',
+    play: lang === 'zh' ? '播放' : 'Play',
+    pause: lang === 'zh' ? '暂停' : 'Pause',
+    collapse: lang === 'zh' ? '折叠' : 'Collapse',
+    prev: lang === 'zh' ? '上一首' : 'Previous',
+    next: lang === 'zh' ? '下一首' : 'Next',
+    mute: lang === 'zh' ? '静音' : 'Mute',
+    unmute: lang === 'zh' ? '取消静音' : 'Unmute',
+    volume: lang === 'zh' ? '音量' : 'Volume',
+  });
+
+  // ════════════════════════════════════════════
   // 生命周期：挂载
   // ════════════════════════════════════════════
   onMount(async () => {
+    // 0. 初始化语言状态
+    if (typeof document !== 'undefined') {
+      lang = document.documentElement.getAttribute('lang') || 'en';
+    }
+    if (typeof window !== 'undefined') {
+      window.addEventListener('lang-change', handleLangChange);
+    }
+
     // 1. 初始化 Audio
     audio = new Audio();
     audio.preload = 'metadata';
@@ -86,6 +122,9 @@
   // 销毁清理
   import { onDestroy } from 'svelte';
   onDestroy(() => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('lang-change', handleLangChange);
+    }
     if (audio) {
       audio.pause();
       audio.src = '';
@@ -128,8 +167,8 @@
       
       // 转换为播放器标准格式
       const formatted = data.map(item => ({
-        name: item.title || item.name || '未知曲目',
-        artist: item.author || item.artist || '未知艺术家',
+        name: item.title || item.name || dict.unknownTrack,
+        artist: item.author || item.artist || dict.unknownArtist,
         src: item.url,
         cover: item.pic || '',
       }));
@@ -144,7 +183,7 @@
       error = '';
     } catch (err) {
       console.warn('[Music] Meting API 加载失败，启用高可用兜底:', err.message);
-      error = '在线歌单不可用，已载入兜底音乐';
+      error = dict.fallbackLoaded;
       tracks = fallbackTracks;
     } finally {
       loading = false;
@@ -229,7 +268,7 @@
   function handleLoadedMetadata() {
     duration = audio.duration;
     consecutiveErrors = 0; // 加载成功，重置错误次数
-    if (error && error !== '在线歌单不可用，已载入兜底音乐') {
+    if (error && error !== dict.fallbackLoaded) {
       error = '';
     }
   }
@@ -250,7 +289,7 @@
     if (consecutiveErrors >= tracks.length) {
       consecutiveErrors = 0;
       playing = false;
-      error = '播放源加载失败，请检查网络';
+      error = dict.loadFailed;
       return;
     }
 
@@ -341,7 +380,7 @@
 {#if loading}
   <!-- 加载状态 -->
   <div class="player-container loading-state">
-    <div class="md-progress" role="progressbar" aria-label="载入中">
+    <div class="md-progress" role="progressbar" aria-label={dict.loading}>
       <div class="md-progress__primary"><div class="md-progress__bar-inner"></div></div>
       <div class="md-progress__secondary"><div class="md-progress__bar-inner"></div></div>
     </div>
@@ -375,7 +414,7 @@
           />
           <div class="capsule-pulse {playing ? 'is-playing' : ''}"></div>
         </div>
-        <button class="capsule-play-btn" onclick={(e) => { e.stopPropagation(); togglePlay(); }} aria-label={playing ? '暂停' : '播放'}>
+        <button class="capsule-play-btn" onclick={(e) => { e.stopPropagation(); togglePlay(); }} aria-label={playing ? dict.pause : dict.play}>
           {#if playing}
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
@@ -396,9 +435,9 @@
         <div class="card-header">
           <div class="header-logo-group">
             <span class="pulse-dot {playing ? 'is-active' : ''}"></span>
-            <span class="card-header-tag">MUSIC BOX</span>
+            <span class="card-header-tag">{dict.musicBox}</span>
           </div>
-          <button class="card-close-btn" onclick={() => expanded = false} aria-label="折叠">
+          <button class="card-close-btn" onclick={() => expanded = false} aria-label={dict.collapse}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="6 9 12 15 18 9" />
             </svg>
@@ -431,10 +470,10 @@
           <div class="track-details">
             <div class="title-scroller" bind:this={containerElement}>
               <span class="title-text" bind:this={titleElement} style="transform: translateX(-{offset}px)">
-                {tracks[currentIndex]?.name || '未知曲目'}
+                {tracks[currentIndex]?.name || dict.unknownTrack}
               </span>
             </div>
-            <span class="artist-text">{tracks[currentIndex]?.artist || '未知艺术家'}</span>
+            <span class="artist-text">{tracks[currentIndex]?.artist || dict.unknownArtist}</span>
           </div>
 
           <!-- 错误或警告通知条 -->
@@ -475,7 +514,7 @@
           <!-- 核心控制面板（上首、播放、下首、音量、列表） -->
           <div class="player-controls">
             <!-- 列表图标 -->
-            <button class="icon-btn {playlistOpen ? 'is-active' : ''}" onclick={() => playlistOpen = !playlistOpen} aria-label="播放列表">
+            <button class="icon-btn {playlistOpen ? 'is-active' : ''}" onclick={() => playlistOpen = !playlistOpen} aria-label={dict.playlist}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
                 <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
@@ -484,23 +523,23 @@
 
             <!-- 按钮组 -->
             <div class="playback-buttons">
-              <button class="control-btn prev" onclick={prev} aria-label="上一首">
+              <button class="control-btn prev" onclick={prev} aria-label={dict.prev}>
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
               </button>
-              <button class="control-btn play-pause" onclick={togglePlay} aria-label={playing ? '暂停' : '播放'}>
+              <button class="control-btn play-pause" onclick={togglePlay} aria-label={playing ? dict.pause : dict.play}>
                 {#if playing}
                   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                 {:else}
                   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 {/if}
               </button>
-              <button class="control-btn next" onclick={next} aria-label="下一首">
+              <button class="control-btn next" onclick={next} aria-label={dict.next}>
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
               </button>
             </div>
 
             <!-- 静音/音量 -->
-            <button class="icon-btn" onclick={toggleMute} aria-label={muted ? '取消静音' : '静音'}>
+            <button class="icon-btn" onclick={toggleMute} aria-label={muted ? dict.unmute : dict.mute}>
               {#if muted || volume === 0}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
@@ -528,7 +567,7 @@
               oninput={handleVolumeChange}
               class="volume-slider-input"
               style="background: linear-gradient(90deg, var(--blog-color-primary) {volume * 100}%, var(--blog-color-surface-variant) {volume * 100}%)"
-              aria-label="音量"
+              aria-label={dict.volume}
             />
           </div>
         </div>
@@ -537,7 +576,7 @@
         {#if playlistOpen}
           <div class="playlist-drawer" transition:slide={{ duration: 250 }}>
             <div class="drawer-header">
-              <span>PLAYLIST ({tracks.length})</span>
+              <span>{dict.playlist} ({tracks.length})</span>
               <button class="drawer-close" onclick={() => playlistOpen = false}>✕</button>
             </div>
             <div class="drawer-items">
@@ -556,7 +595,7 @@
                   <img class="drawer-row-cover" src={t.cover || '/music/default-cover.svg'} alt="" />
                   <div class="drawer-row-content">
                     <span class="drawer-row-title">{t.name}</span>
-                    <span class="drawer-row-artist">{t.artist || '未知'}</span>
+                    <span class="drawer-row-artist">{t.artist || dict.unknown}</span>
                   </div>
                   {#if idx === currentIndex && playing}
                     <div class="sound-wave-bars">
