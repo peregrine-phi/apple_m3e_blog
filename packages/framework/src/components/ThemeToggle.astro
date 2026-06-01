@@ -6,31 +6,45 @@ import Icon from "./Icon.astro";
 <button
   id="theme-toggle"
   class="btn btn-ghost"
-  aria-label="Toggle dark mode"
+  aria-label="Toggle theme"
   type="button"
 >
-  <!-- Sun icon (visible in dark mode) -->
+  <!-- Sun icon (visible in light mode) -->
   <Icon
     name="sun"
     size={20}
     class="theme-icon theme-icon-light"
   />
-  <!-- Moon icon (visible in light mode) -->
+  <!-- Moon icon (visible in dark mode) -->
   <Icon
     name="moon"
     size={20}
     class="theme-icon theme-icon-dark"
   />
+  <!-- System / Monitor icon (visible in system mode) -->
+  <Icon
+    name="system"
+    size={20}
+    class="theme-icon theme-icon-system"
+  />
 </button>
 
 <style>
-  /* Toggle icon visibility based on theme */
-  :root[data-theme="light"] .theme-icon-light,
-  :root:not([data-theme]) .theme-icon-light {
-    display: none;
+  :global(.theme-icon) {
+    display: none !important;
   }
-  :root[data-theme="dark"] .theme-icon-dark {
-    display: none;
+
+  :global(html[data-theme-mode="light"] .theme-icon-light) {
+    display: block !important;
+  }
+
+  :global(html[data-theme-mode="dark"] .theme-icon-dark) {
+    display: block !important;
+  }
+
+  :global(html:not([data-theme-mode="light"]):not([data-theme-mode="dark"]) .theme-icon-system),
+  :global(html[data-theme-mode="system"] .theme-icon-system) {
+    display: block !important;
   }
 
   #theme-toggle {
@@ -45,25 +59,71 @@ import Icon from "./Icon.astro";
 </style>
 
 <script>
-  function getTheme() {
-    const stored = localStorage.getItem("theme");
-    if (stored) return stored;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+  function getThemeMode() {
+    return localStorage.getItem("theme") || "system";
   }
 
-  function setTheme(theme: string) {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
+  function setThemeMode(mode: string) {
+    localStorage.setItem("theme", mode);
+    
+    let resolvedTheme = mode;
+    if (mode === "system") {
+      resolvedTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    }
+    
+    document.documentElement.setAttribute("data-theme", resolvedTheme);
+    document.documentElement.setAttribute("data-theme-mode", mode);
   }
 
-  // Apply theme on load to prevent flash
-  const theme = getTheme();
-  document.documentElement.setAttribute("data-theme", theme);
+  // Apply theme mode on load to prevent flash
+  const initialMode = getThemeMode();
+  setThemeMode(initialMode);
 
-  document.getElementById("theme-toggle")?.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme");
-    setTheme(current === "dark" ? "light" : "dark");
+  function initThemeToggle() {
+    const btns = document.querySelectorAll("#theme-toggle");
+    btns.forEach((btn) => {
+      const handleToggle = () => {
+        const currentMode = getThemeMode();
+        let nextMode = "system";
+        if (currentMode === "system") {
+          nextMode = "light";
+        } else if (currentMode === "light") {
+          nextMode = "dark";
+        } else if (currentMode === "dark") {
+          nextMode = "system";
+        }
+        setThemeMode(nextMode);
+      };
+
+      // Prevent duplicate event handlers on swaps
+      btn.removeEventListener("click", (btn as any)._themeHandler);
+      btn.addEventListener("click", handleToggle);
+      (btn as any)._themeHandler = handleToggle;
+    });
+  }
+
+  initThemeToggle();
+
+  // Listen to system prefers-color-scheme media query changes
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  try {
+    mediaQuery.addEventListener("change", () => {
+      if (getThemeMode() === "system") {
+        setThemeMode("system");
+      }
+    });
+  } catch (e) {
+    // Fallback for older browsers
+    mediaQuery.addListener(() => {
+      if (getThemeMode() === "system") {
+        setThemeMode("system");
+      }
+    });
+  }
+
+  // Support Astro view transitions / swaps
+  document.addEventListener("astro:after-swap", () => {
+    setThemeMode(getThemeMode());
+    initThemeToggle();
   });
 </script>

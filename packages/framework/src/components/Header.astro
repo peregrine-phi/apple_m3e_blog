@@ -26,22 +26,35 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     <div class="liquid-glass-bg-layer"></div>
     <div class="liquid-glass-inner">
       <a href="/" class="site-logo text-headline-small" aria-label="Home">
-        <span class="logo-dot" aria-hidden="true"></span>
-        {siteName}
+        <span class="logo-dot" aria-hidden="true">
+          <svg class="logo-sprout-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 20h10" />
+            <path d="M12 20V12" />
+            <path d="M12 12c2-2.67 5-2.67 7 0-2 2.67-5 2.67-7 0Z" />
+            <path d="M12 14c-2-2.67-5-2.67-7 0 2 2.67 5 2.67 7 0Z" />
+            <path d="M12 12c0-3.33 1.5-6 4-7-2.5 1-4 3.67-4 7Z" />
+          </svg>
+        </span>
+        <I18n tKey="nav.siteName" />
       </a>
 
-      <nav class="site-nav hide-mobile" aria-label="Main navigation">
-        {navItems.map((item) => (
-          <a href={item.href} class="nav-link text-label-large" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
-            {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
-          </a>
-        ))}
+      <nav class="site-nav" aria-label="Main navigation">
+        {navItems.map((item) => {
+          const isCurrent = Astro.url.pathname === item.href || (item.href !== "/" && Astro.url.pathname.startsWith(item.href));
+          return (
+            <a href={item.href} class="nav-link text-label-large" aria-current={isCurrent ? "page" : undefined} target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+              {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+            </a>
+          );
+        })}
       </nav>
 
       <div class="header-actions">
-        <MonetSwitcher />
-        <LanguageToggle />
-        <ThemeToggle />
+        <div class="hide-mobile" style="display: flex; gap: var(--blog-space-2);">
+          <MonetSwitcher />
+          <LanguageToggle />
+          <ThemeToggle />
+        </div>
         <!-- Mobile menu button -->
         <button
           class="btn btn-ghost hide-desktop"
@@ -56,242 +69,442 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
 
     <!-- Mobile menu -->
     <nav class="mobile-nav hide-desktop" id="mobile-nav" aria-label="Mobile navigation">
-      {navItems.map((item) => (
-        <a href={item.href} class="mobile-nav-link" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
-          {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
-        </a>
-      ))}
+      <div class="mobile-menu-actions">
+        <MonetSwitcher />
+        <LanguageToggle />
+        <ThemeToggle />
+      </div>
     </nav>
   </div>
 </header>
 
 <style>
-  /* ── Outer sticky wrapper ── */
+  /* Outer Sticky Wrapper */
   .site-header {
     position: sticky;
-    top: 0;
+    top: var(--blog-space-0);
     z-index: 100;
-    padding: var(--header-padding-y) var(--header-padding-x) 0;
-    pointer-events: none; /* clicks pass through the padding area */
-    transition: padding var(--blog-motion-duration-normal, 250ms)
-      var(--blog-motion-easing-standard);
+    padding: var(--header-padding-y) var(--header-padding-x) var(--blog-space-0);
+    pointer-events: none;
+    transition: padding var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
   }
 
-  /* ── The floating glass bar container ── */
+  /* ── The floating glass bar container (Now transparent layout wrapper) ── */
   .liquid-glass-bar {
     pointer-events: auto;
-    position: relative;
     max-width: var(--header-max-width);
-    margin: 0 auto;
-    border-radius: var(--header-radius);
-
-    /* ── High-Fidelity Frosted Liquid Glass ── */
-    background: var(--blog-glass-bg);
-    backdrop-filter: saturate(190%) blur(24px);
-    -webkit-backdrop-filter: saturate(190%) blur(24px);
-
-    /* Liquid glass borders — specular outer rim & bevels */
-    border: 1px solid var(--blog-glass-border);
-    box-shadow: var(--blog-glass-shadow);
-
-    transition:
-      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  /* ── Background clip layer for gloss sweep ── */
-  .liquid-glass-bg-layer {
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Liquid Glass Specular Sweep shine effect on hover */
-  .liquid-glass-bg-layer::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -150%;
-    width: 100%;
-    height: 100%;
-    background: var(--blog-glass-sweep-gradient);
-    transform: skewX(-25deg);
-    transition: left var(--blog-motion-duration-expressive, 0.75s) var(--blog-motion-easing-emphasized, cubic-bezier(0.16, 1, 0.3, 1));
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .liquid-glass-bar:hover {
-    transform: translateY(1px);
-    background: var(--blog-glass-bg-hover);
-    border-color: var(--blog-glass-border-hover);
-    box-shadow: var(--blog-glass-shadow-hover);
-  }
-
-  .liquid-glass-bar:hover .liquid-glass-bg-layer::before {
-    left: 150%;
-  }
-
-  /* ── Transparent state when scrolled to top (home page) ── */
-  .site-header--transparent:not(.scrolled) .liquid-glass-bar {
+    margin: var(--blog-space-0) auto;
     background: transparent;
-    border-color: transparent;
+    border: none;
     box-shadow: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
 
-  .site-header--transparent:not(.scrolled) .liquid-glass-bg-layer::before {
+  /* Background sweep is disabled to support flat styling */
+  .liquid-glass-bg-layer {
     display: none;
   }
 
-  /* ── Inner flex container ── */
   .liquid-glass-inner {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     height: var(--header-height);
-    padding: 0 var(--header-padding-x-inner);
+    padding: var(--blog-space-0);
     position: relative;
-    z-index: 1; /* keep contents on top of the sweep */
   }
 
-  /* ── Logo ── */
+  /* ── Brand Capsule (Left floating island) ── */
   .site-logo {
-    display: flex;
+    justify-self: start;
+    display: inline-flex;
     align-items: center;
-    gap: var(--blog-space-2);
-    color: var(--blog-color-text-primary);
-    font-weight: var(--blog-font-weight-bold);
-    text-decoration: none;
-    letter-spacing: var(--logo-letter-spacing);
-    border-radius: var(--blog-radius-xs);
-  }
-
-  .site-logo:focus-visible {
-    outline: 2px solid var(--blog-color-primary);
-    outline-offset: 2px;
-  }
-
-  .logo-dot {
-    width: var(--logo-dot-size);
-    height: var(--logo-dot-size);
+    height: var(--blog-space-11); /* 44px capsule height */
     border-radius: var(--blog-radius-full);
-    background: linear-gradient(
-      135deg,
-      var(--blog-color-primary),
-      var(--blog-color-tertiary)
-    );
+    padding: var(--blog-space-1) var(--blog-space-4) var(--blog-space-1) var(--blog-space-1);
+    background: var(--blog-glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--blog-space-px) solid var(--blog-glass-border);
+    box-shadow: var(--blog-glass-shadow);
+    text-decoration: none;
+    gap: var(--blog-space-2);
+    transition: 
+      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
   }
 
-  /* ── Navigation ── */
-  .site-nav {
+  .site-logo:hover {
+    transform: translateY(-1px);
+    background: var(--blog-glass-bg-hover);
+    border-color: var(--blog-glass-border-hover);
+    box-shadow: var(--blog-glass-shadow-hover);
+  }
+
+  /* Solid circular wrapper inside logo */
+  .logo-dot {
+    width: var(--blog-space-9); /* 36px circular wrapper */
+    height: var(--blog-space-9);
+    border-radius: var(--blog-radius-full);
+    background: var(--blog-color-primary-container);
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
+  }
+
+  .logo-sprout-svg {
+    width: 20px;
+    height: 20px;
+    color: var(--blog-color-on-primary-container);
+    flex-shrink: 0;
+  }
+
+  .site-logo:hover .logo-dot {
+    transform: scale(1.05);
+  }
+
+  /* ── Center Island: Navigation Tabs ── */
+  .site-nav {
+    justify-self: center;
+    display: flex;
+    align-items: center;
+    height: var(--blog-space-11); /* 44px capsule height */
+    border-radius: var(--blog-radius-full);
+    padding: var(--blog-space-1);
     gap: var(--blog-space-1);
+    background: var(--blog-glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--blog-space-px) solid var(--blog-glass-border);
+    box-shadow: var(--blog-glass-shadow);
+    transition: 
+      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
+  }
+
+  .site-nav:hover {
+    transform: translateY(-1px);
+    background: var(--blog-glass-bg-hover);
+    border-color: var(--blog-glass-border-hover);
+    box-shadow: var(--blog-glass-shadow-hover);
   }
 
   .nav-link {
-    padding: var(--blog-space-2) var(--blog-space-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--blog-space-9); /* 36px tab height */
+    padding: var(--blog-space-0) var(--blog-space-4);
+    font-family: var(--blog-font-sans, 'Inter', sans-serif);
+    font-size: var(--blog-typescale-label-large-size, 12px);
+    font-weight: var(--blog-font-weight-medium, 500);
     color: var(--blog-color-text-secondary);
-    border-radius: var(--nav-link-radius);
     text-decoration: none;
-    transition:
-      color var(--blog-space-2) var(--blog-motion-easing-standard),
-      background-color var(--blog-space-2) var(--blog-motion-easing-standard);
+    border-radius: var(--blog-radius-full);
+    transition: 
+      color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      background-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
   }
 
+  /* High contrast active selector backdrop using surface variant token */
   .nav-link:hover,
   .nav-link[aria-current="page"] {
-    color: var(--blog-color-text-primary);
     background-color: var(--blog-color-surface-variant);
+    color: var(--blog-color-primary);
+    font-weight: var(--blog-font-weight-semibold, 600);
   }
 
-  .nav-link:focus-visible {
-    outline: 2px solid var(--blog-color-primary);
-    outline-offset: 2px;
-  }
-
-  /* ── Header actions ── */
+  /* ── Right Island: Actions Group ── */
   .header-actions {
+    justify-self: end;
     display: flex;
     align-items: center;
     gap: var(--blog-space-2);
+  }
+
+  /* Style the circular action button capsules cleanly using ID specificity, avoiding !important */
+  .header-actions :global(#theme-toggle),
+  .header-actions :global(#lang-toggle),
+  .header-actions :global(.monet-toggle),
+  #mobile-menu-btn {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--blog-space-11); /* 44px circular capsule height */
+    border-radius: var(--blog-radius-full);
+    background: var(--blog-glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--blog-space-px) solid var(--blog-glass-border);
+    box-shadow: var(--blog-glass-shadow);
+    transition: 
+      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
+    cursor: pointer;
+    overflow: visible;
+  }
+
+  /* Specific overrides for buttons widths & paddings utilizing ID specificity */
+  .header-actions :global(#theme-toggle),
+  .header-actions :global(.monet-toggle) {
+    width: var(--blog-space-11); /* 44px strict circle */
+    padding: var(--blog-space-0);
+  }
+
+  .header-actions :global(#lang-toggle) {
+    min-width: var(--blog-space-11);
+    width: auto;
+    padding-inline: var(--blog-space-3); /* 12px dynamic padding */
+  }
+
+  #mobile-menu-btn {
+    width: var(--blog-space-11); /* 44px mobile menu circle */
+    padding: var(--blog-space-0);
+  }
+
+  .header-actions :global(#theme-toggle):hover,
+  .header-actions :global(#lang-toggle):hover,
+  .header-actions :global(.monet-toggle):hover,
+  #mobile-menu-btn:hover {
+    transform: translateY(-1px);
+    background: var(--blog-glass-bg-hover);
+    border-color: var(--blog-glass-border-hover);
+    box-shadow: var(--blog-glass-shadow-hover);
   }
 
   /* ── Mobile menu ── */
   .mobile-nav {
     display: none;
     flex-direction: column;
-    padding: var(--blog-space-3) var(--blog-space-4);
-    border-top: 1px solid var(--blog-glass-border);
+    margin-top: var(--blog-space-3);
+    padding: var(--blog-space-2);
+    background: var(--blog-glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: var(--blog-space-px) solid var(--blog-glass-border);
+    border-radius: var(--blog-radius-container);
+    box-shadow: var(--blog-glass-shadow);
+    pointer-events: auto;
   }
 
   .mobile-nav.open {
     display: flex;
+    animation: slideDown var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-emphasized);
   }
 
   .mobile-nav-link {
-    padding: var(--blog-space-3) var(--blog-space-4);
-    color: var(--blog-color-text-primary);
+    display: flex;
+    align-items: center;
+    height: var(--blog-space-11);
+    padding: var(--blog-space-0) var(--blog-space-4);
+    font-family: var(--blog-font-sans);
     font-size: var(--blog-typescale-title-medium-size);
     font-weight: var(--blog-font-weight-medium);
+    color: var(--blog-color-text-primary);
     text-decoration: none;
-    border-radius: var(--nav-link-radius);
+    border-radius: var(--blog-radius-card);
+    transition: background-color var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard);
   }
 
-  .mobile-nav-link:hover {
+  .mobile-nav-link:hover,
+  .mobile-nav-link[aria-current="page"] {
     background-color: var(--blog-color-surface-variant);
+    color: var(--blog-color-primary);
+    font-weight: var(--blog-font-weight-semibold);
   }
 
-  :global([data-theme="dark"]) .mobile-nav {
-    border-top-color: var(--blog-color-border);
+  @keyframes slideDown {
+    from {
+      opacity: var(--blog-space-0);
+      transform: translateY(calc(var(--blog-space-2) * -1));
+    }
+    to {
+      opacity: 1;
+      transform: translateY(var(--blog-space-0));
+    }
   }
 
-  /* ── Scrolled state: slightly reduce top padding ── */
+  /* ── Scrolled state: reduce padding ── */
   .site-header.scrolled {
     padding-top: var(--header-scrolled-padding-top);
   }
 
-  /* ── Responsive ── */
+  /* Responsiveness */
   @media (max-width: 768px) {
     .site-header {
-      padding: var(--blog-space-2) var(--blog-space-2-5) 0;
+      padding: var(--blog-space-3) var(--blog-space-4) var(--blog-space-0);
     }
- 
-    .liquid-glass-bar {
-      border-radius: var(--header-radius-mobile);
-    }
- 
+
     .liquid-glass-inner {
-      height: var(--header-height-mobile);
-      padding: 0 var(--blog-space-3-5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    /* Brand Logo Mobile Sizing & Alignment Tuning */
+    .site-logo {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      justify-self: auto;
+      white-space: nowrap;
+      height: var(--blog-space-11); /* Expanded to 44px premium capsule height matching navigation and player controls */
+      padding: var(--blog-space-1) var(--blog-space-5) var(--blog-space-1) var(--blog-space-1.5);
+      font-size: var(--blog-typescale-body-large-size) !important; /* Slightly larger text */
+    }
+
+    .site-logo:hover {
+      transform: translateX(-50%) translateY(-1px);
+    }
+
+    .logo-dot {
+      width: var(--blog-space-9); /* Standard 36px circular wrapper */
+      height: var(--blog-space-9);
+    }
+
+    .logo-sprout-svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .site-nav {
+      position: fixed;
+      bottom: var(--blog-space-5);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      justify-self: auto;
+      background: var(--blog-glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: var(--blog-space-px) solid var(--blog-glass-border);
+      box-shadow: var(--blog-glass-shadow);
+    }
+
+    .site-nav:hover {
+      transform: translateX(-50%) translateY(-1px);
+    }
+
+    .header-actions {
+      position: absolute;
+      right: 0;
+      justify-self: auto;
+    }
+
+    /* Settings drawer styles */
+    .mobile-menu-actions {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--blog-space-4);
+      padding: var(--blog-space-0);
+      width: 100%;
+    }
+
+    .mobile-nav {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: auto;
+      min-width: 180px;
+      margin-top: var(--blog-space-2);
+      padding: var(--blog-space-2) var(--blog-space-3);
+    }
+
+    /* Style the switchers inside the mobile menu drawer to look like beautiful floating capsules matching the top bar */
+    .mobile-menu-actions :global(#theme-toggle),
+    .mobile-menu-actions :global(#lang-toggle),
+    .mobile-menu-actions :global(.monet-toggle) {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: var(--blog-space-10); /* 40px mobile capsule height */
+      border-radius: var(--blog-radius-full);
+      background: var(--blog-glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: var(--blog-space-px) solid var(--blog-glass-border);
+      box-shadow: var(--blog-glass-shadow);
+      cursor: pointer;
+      transition: 
+        background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+        border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+        box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+        transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
+    }
+
+    .mobile-menu-actions :global(#theme-toggle),
+    .mobile-menu-actions :global(.monet-toggle) {
+      width: var(--blog-space-10); /* 40px circle */
+      padding: var(--blog-space-0);
+    }
+
+    .mobile-menu-actions :global(#lang-toggle) {
+      min-width: var(--blog-space-10);
+      width: auto;
+      padding-inline: var(--blog-space-3);
+    }
+
+    .mobile-menu-actions :global(#theme-toggle):hover,
+    .mobile-menu-actions :global(#lang-toggle):hover,
+    .mobile-menu-actions :global(.monet-toggle):hover {
+      transform: translateY(-1px);
+      background: var(--blog-glass-bg-hover);
+      border-color: var(--blog-glass-border-hover);
+      box-shadow: var(--blog-glass-shadow-hover);
     }
   }
 </style>
 
 <script>
-  // Mobile menu toggle
-  document.getElementById("mobile-menu-btn")?.addEventListener("click", () => {
-    document.getElementById("mobile-nav")?.classList.toggle("open");
-  });
+  document.addEventListener("astro:page-load", () => {
+    const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+    const mobileNav = document.getElementById("mobile-nav");
 
-  // Add scrolled class for subtle padding change on scroll
-  const header = document.querySelector(".site-header") as HTMLElement;
-  if (header) {
-    const onScroll = () => {
-      if (window.scrollY > 20) {
-        header.classList.add("scrolled");
-      } else {
-        header.classList.remove("scrolled");
-      }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll(); // initial state
-  }
+    if (mobileMenuBtn && mobileNav) {
+      // Toggle menu on button click
+      mobileMenuBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent immediate trigger of click-outside handler
+        mobileNav.classList.toggle("open");
+      });
+
+      // Collapse menu when clicking outside
+      document.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        if (
+          mobileNav.classList.contains("open") &&
+          !mobileNav.contains(target) &&
+          !mobileMenuBtn.contains(target)
+        ) {
+          mobileNav.classList.remove("open");
+        }
+      });
+    }
+
+    // Add scrolled class for subtle padding change on scroll
+    const header = document.querySelector(".site-header") as HTMLElement;
+    if (header) {
+      const onScroll = () => {
+        if (window.scrollY > 20) {
+          header.classList.add("scrolled");
+        } else {
+          header.classList.remove("scrolled");
+        }
+      };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      onScroll(); // initial state
+    }
+  });
 </script>

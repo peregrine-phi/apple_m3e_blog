@@ -10,6 +10,7 @@ export const defaultLang = "en";
 export const translations = {
   en: {
     // Nav
+    "nav.siteName": "Peregrine's Digital Garden",
     "nav.blog": "Blog",
     "nav.about": "About",
     "nav.home": "Home",
@@ -80,6 +81,7 @@ export const translations = {
   },
   zh: {
     // Nav
+    "nav.siteName": "悠道的数字花园",
     "nav.blog": "文章",
     "nav.about": "关于",
     "nav.home": "首页",

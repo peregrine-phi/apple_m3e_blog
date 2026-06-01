@@ -29,7 +29,7 @@ const { quote, cite, variant = "classic" } = Astro.props;
   }
 
   .pull-quote p {
-    font-family: "SF Pro Display", var(--blog-font-sans);
+    font-family: var(--blog-font-sans);
     font-size: var(--blog-typescale-display-small-size);
     font-weight: var(--blog-font-weight-semibold);
     line-height: var(--blog-typescale-display-small-leading);
@@ -71,7 +71,7 @@ const { quote, cite, variant = "classic" } = Astro.props;
 
   .pull-quote cite {
     display: block;
-    font-family: "SF Pro Text", var(--blog-font-sans);
+    font-family: var(--blog-font-sans);
     font-size: var(--blog-typescale-label-large-size);
     font-weight: var(--blog-font-weight-regular);
     letter-spacing: var(--blog-typescale-label-large-tracking);

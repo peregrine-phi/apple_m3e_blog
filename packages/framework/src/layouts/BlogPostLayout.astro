@@ -136,24 +136,21 @@ const displayTags = tags;
   /* Article typography — token-driven prose styles */
   .post-content {
     padding-block: var(--blog-space-8);
-    font-size: var(--blog-typescale-body-large-size);
-    line-height: var(--blog-typescale-body-large-leading);
+    font: var(--blog-typescale-body-large);
     color: var(--blog-color-text-primary);
   }
 
   .post-content :global(h2) {
-    font-size: var(--blog-typescale-headline-medium-size);
-    line-height: var(--blog-typescale-headline-medium-leading);
-    font-weight: var(--blog-font-weight-semibold);
+    font: var(--blog-typescale-headline-medium);
+    letter-spacing: var(--blog-typescale-headline-medium-tracking);
     color: var(--blog-color-text-primary);
     margin-top: var(--blog-space-10);
     margin-bottom: var(--blog-space-4);
   }
 
   .post-content :global(h3) {
-    font-size: var(--blog-typescale-headline-small-size);
-    line-height: var(--blog-typescale-headline-small-leading);
-    font-weight: var(--blog-font-weight-semibold);
+    font: var(--blog-typescale-headline-small);
+    letter-spacing: var(--blog-typescale-headline-small-tracking);
     color: var(--blog-color-text-primary);
     margin-top: var(--blog-space-8);
     margin-bottom: var(--blog-space-3);
@@ -167,7 +164,7 @@ const displayTags = tags;
   .post-content :global(li)  { margin-bottom: var(--blog-space-2); }
   .post-content :global(img)  { border-radius: var(--blog-radius-md); margin-block: var(--blog-space-6); }
   .post-content :global(pre)  { position: relative; margin-block: var(--blog-space-6); padding: var(--blog-space-5); padding-top: calc(var(--blog-space-5) + 16px); background-color: var(--blog-color-surface-variant); border: 1px solid var(--blog-color-border); border-radius: var(--blog-radius-md); }
-  .post-content :global(code) { font-family: var(--blog-font-mono); font-size: var(--blog-typescale-code-size); }
+  .post-content :global(code) { font: var(--blog-typescale-code); }
   .post-content :global(:not(pre) > code) { background-color: var(--blog-color-surface-variant); padding: 0.1em 0.3em; border-radius: var(--blog-radius-xs); border: 1px solid var(--blog-color-border); }
   .post-content :global(hr)   { border: none; border-top: 1px solid var(--blog-color-divider); margin-block: var(--blog-space-8); }
 

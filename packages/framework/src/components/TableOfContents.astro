@@ -187,6 +187,24 @@ const hasToc = tocItems.length > 0;
 
     .toc-mobile {
       display: block;
+      position: sticky;
+      top: 64px;
+      z-index: 80;
+      margin-inline: auto;
+      background: var(--blog-glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: var(--blog-space-px) solid var(--blog-glass-border);
+      border-radius: var(--blog-radius-container, 16px);
+      box-shadow: var(--blog-glass-shadow);
+      margin-bottom: var(--blog-space-4);
+    }
+
+    .toc-mobile .toc-toggle {
+      height: var(--blog-space-11);
+      padding: var(--blog-space-0) var(--blog-space-5);
+      font-size: var(--blog-typescale-label-medium-size);
+      gap: var(--blog-space-2);
     }
   }
 </style>
@@ -227,5 +245,22 @@ const hasToc = tocItems.length > 0;
     });
   }
 
-  initTocScrollSpy();
+  // Close mobile TOC details when a link is clicked
+  function initMobileTocCollapse() {
+    const mobileToc = document.querySelector('.toc-mobile') as HTMLDetailsElement;
+    if (!mobileToc) return;
+
+    const links = mobileToc.querySelectorAll('.toc-link');
+    links.forEach((link) => {
+      link.addEventListener('click', () => {
+        mobileToc.removeAttribute('open');
+      });
+    });
+  }
+
+  // Bind to both initial load and subsequent Astro view transition pages
+  document.addEventListener("astro:page-load", () => {
+    initTocScrollSpy();
+    initMobileTocCollapse();
+  });
 </script>

@@ -70,7 +70,9 @@ const {
     }
 
     .split-sidebar {
-      position: static;
+      position: sticky;
+      top: 60px; /* Stick below the floating mobile header actions */
+      z-index: 80;
       max-height: none;
       overflow: visible;
       order: -1;

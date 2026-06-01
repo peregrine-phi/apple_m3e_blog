@@ -1,6 +1,6 @@
 /* Header — 导航栏组件 Token */
 :root {
-  --header-max-width: 980px;
+  --header-max-width: 1200px;
   --header-height: 54px;
   --header-height-mobile: 48px;
   --header-padding-y: var(--blog-space-3);

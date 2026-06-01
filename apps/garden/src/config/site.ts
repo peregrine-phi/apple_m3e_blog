@@ -1,9 +1,9 @@
 export const siteConfig = {
-  name: "M3E",
+  name: "Peregrine's Digital Garden",
   tagline: "Design & Technology Blog",
   description: "A personal blog exploring the intersection of design, technology, and thoughtful living. Apple News editorial aesthetics meet Brutalist attitude.",
   url: "https://m3e.blog",
-  copyright: "M3E",
+  copyright: "Peregrine's Digital Garden",
   author: {
     name: "Author Name",
   },

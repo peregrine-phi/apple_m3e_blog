@@ -10,3 +10,44 @@
   --btn-font-size: var(--blog-typescale-label-large-size);
   --btn-letter-spacing: var(--blog-typescale-label-large-tracking);
 }
+
+/* ── Scroll to Top Button (Liquid Glass Style) ── */
+#scroll-to-top-btn {
+  width: var(--scroll-btn-size, 44px);
+  height: var(--scroll-btn-size, 44px);
+  min-width: var(--scroll-btn-size, 44px);
+  border-radius: 50%;
+  padding: 0;
+  background-color: var(--blog-glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: var(--blog-space-px) solid var(--blog-glass-border);
+  box-shadow: var(--blog-glass-shadow);
+  color: var(--blog-color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: 
+    background-color var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard),
+    border-color var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard),
+    box-shadow var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard),
+    transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-emphasized);
+}
+
+#scroll-to-top-btn:hover {
+  background-color: var(--blog-glass-bg-hover);
+  border-color: var(--blog-glass-border-hover);
+  box-shadow: var(--blog-glass-shadow-hover);
+  transform: translateY(-1px);
+}
+
+#scroll-to-top-btn:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  #scroll-to-top-btn {
+    --scroll-btn-size: 40px; /* Match 40px secondary controls (brand / action switchers) on mobile */
+  }
+}
+

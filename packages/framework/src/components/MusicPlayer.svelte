@@ -60,6 +60,12 @@
     lang = e.detail.lang;
   }
 
+  function handleOutsideClick(e) {
+    if (expanded) {
+      expanded = false;
+    }
+  }
+
   const dict = $derived({
     unknownTrack: lang === 'zh' ? '未知曲目' : 'Unknown Track',
     unknownArtist: lang === 'zh' ? '未知艺术家' : 'Unknown Artist',
@@ -89,6 +95,9 @@
     }
     if (typeof window !== 'undefined') {
       window.addEventListener('lang-change', handleLangChange);
+    }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', handleOutsideClick);
     }
 
     // 1. 初始化 Audio
@@ -124,6 +133,9 @@
   onDestroy(() => {
     if (typeof window !== 'undefined') {
       window.removeEventListener('lang-change', handleLangChange);
+    }
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', handleOutsideClick);
     }
     if (audio) {
       audio.pause();
@@ -389,7 +401,7 @@
   <!-- 无曲目不显示 -->
 {:else}
   <!-- 容器 -->
-  <div class="player-container {expanded ? 'is-expanded' : 'is-capsule'}">
+  <div class="player-container {expanded ? 'is-expanded' : 'is-capsule'}" onclick={(e) => e.stopPropagation()}>
     
     {#if !expanded}
       <!-- ==========================================

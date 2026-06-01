@@ -6,11 +6,11 @@
 
 :root {
   /* ── Font Families ── */
-  --blog-font-sans: "SF Pro Display", "SF Pro Text", "Inter",
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+  --blog-font-sans: -apple-system, BlinkMacSystemFont,
+    "Google Sans Flex", "Google Sans", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans SC", "Noto Sans TC", "Noto Sans TW", "Noto Sans JP", sans-serif;
   --blog-font-serif: "New York", "Iowan Old Style", "Apple Garamond",
-    "Noto Serif SC", Georgia, "Times New Roman", serif;
+    "Noto Serif SC", "Noto Serif TC", "Noto Serif TW", "Noto Serif JP", Georgia, "Times New Roman", serif;
   --blog-font-mono: "SF Mono", "JetBrains Mono", "Fira Code",
     "Cascadia Code", Menlo, Consolas, monospace;
 
@@ -119,6 +119,31 @@
   --blog-typescale-code-size: 0.875em;
   --blog-typescale-code-leading: 1.6;
   --blog-typescale-code-weight: var(--blog-font-weight-regular);
+
+  /* ── Composite Typescale Shorthands ── */
+  --blog-typescale-display-large: var(--blog-typescale-display-large-weight) var(--blog-typescale-display-large-size)/var(--blog-typescale-display-large-leading) var(--blog-font-sans);
+  --blog-typescale-display-medium: var(--blog-typescale-display-medium-weight) var(--blog-typescale-display-medium-size)/var(--blog-typescale-display-medium-leading) var(--blog-font-sans);
+  --blog-typescale-display-small: var(--blog-typescale-display-small-weight) var(--blog-typescale-display-small-size)/var(--blog-typescale-display-small-leading) var(--blog-font-sans);
+
+  --blog-typescale-headline-large: var(--blog-typescale-headline-large-weight) var(--blog-typescale-headline-large-size)/var(--blog-typescale-headline-large-leading) var(--blog-font-sans);
+  --blog-typescale-headline-medium: var(--blog-typescale-headline-medium-weight) var(--blog-typescale-headline-medium-size)/var(--blog-typescale-headline-medium-leading) var(--blog-font-sans);
+  --blog-typescale-headline-small: var(--blog-typescale-headline-small-weight) var(--blog-typescale-headline-small-size)/var(--blog-typescale-headline-small-leading) var(--blog-font-sans);
+
+  --blog-typescale-title-large: var(--blog-typescale-title-large-weight) var(--blog-typescale-title-large-size)/var(--blog-typescale-title-large-leading) var(--blog-font-sans);
+  --blog-typescale-title-medium: var(--blog-typescale-title-medium-weight) var(--blog-typescale-title-medium-size)/var(--blog-typescale-title-medium-leading) var(--blog-font-sans);
+  --blog-typescale-title-small: var(--blog-typescale-title-small-weight) var(--blog-typescale-title-small-size)/var(--blog-typescale-title-small-leading) var(--blog-font-sans);
+
+  --blog-typescale-body-large: var(--blog-typescale-body-large-weight) var(--blog-typescale-body-large-size)/var(--blog-typescale-body-large-leading) var(--blog-font-sans);
+  --blog-typescale-body-medium: var(--blog-typescale-body-medium-weight) var(--blog-typescale-body-medium-size)/var(--blog-typescale-body-medium-leading) var(--blog-font-sans);
+  --blog-typescale-body-small: var(--blog-typescale-body-small-weight) var(--blog-typescale-body-small-size)/var(--blog-typescale-body-small-leading) var(--blog-font-sans);
+
+  --blog-typescale-label-large: var(--blog-typescale-label-large-weight) var(--blog-typescale-label-large-size)/var(--blog-typescale-label-large-leading) var(--blog-font-sans);
+  --blog-typescale-label-medium: var(--blog-typescale-label-medium-weight) var(--blog-typescale-label-medium-size)/var(--blog-typescale-label-medium-leading) var(--blog-font-sans);
+  --blog-typescale-label-small: var(--blog-typescale-label-small-weight) var(--blog-typescale-label-small-size)/var(--blog-typescale-label-small-leading) var(--blog-font-sans);
+
+  --blog-typescale-kicker: var(--blog-typescale-kicker-weight) var(--blog-typescale-kicker-size)/var(--blog-typescale-kicker-leading) var(--blog-font-sans);
+  --blog-typescale-deck: var(--blog-typescale-deck-weight) var(--blog-typescale-deck-size)/var(--blog-typescale-deck-leading) var(--blog-font-sans);
+  --blog-typescale-code: var(--blog-typescale-code-weight) var(--blog-typescale-code-size)/var(--blog-typescale-code-leading) var(--blog-font-mono);
 
   /* ── Readable measure ── */
   --blog-measure-narrow: 45ch;

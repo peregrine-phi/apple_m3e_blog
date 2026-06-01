@@ -66,17 +66,28 @@ import Icon from "./Icon.astro";
   }
 
   function initLangToggle() {
-    const btn = document.getElementById("lang-toggle");
-    if (!btn) return;
+    const btns = document.querySelectorAll("#lang-toggle");
+    btns.forEach((btn) => {
+      const handleToggle = () => {
+        const current = getLang();
+        const next = current === "zh" ? "en" : "zh";
+        setLang(next);
+      };
 
-    btn.addEventListener("click", () => {
-      const current = getLang();
-      const next = current === "zh" ? "en" : "zh";
-      setLang(next);
+      // Prevent duplicate event handlers on swaps
+      btn.removeEventListener("click", (btn as any)._langHandler);
+      btn.addEventListener("click", handleToggle);
+      (btn as any)._langHandler = handleToggle;
     });
   }
 
   initLangToggle();
   // Support Astro view transitions / swaps
-  document.addEventListener("astro:after-swap", initLangToggle);
+  document.addEventListener("astro:after-swap", () => {
+    var navLang = navigator.language ? navigator.language.toLowerCase() : "";
+    var isSimplifiedChinese = navLang === "zh" || navLang.startsWith("zh-cn") || navLang.startsWith("zh-sg") || navLang.indexOf("zh-hans") !== -1;
+    var saved = localStorage.getItem("lang") || (isSimplifiedChinese ? "zh" : "en");
+    document.documentElement.setAttribute("lang", saved);
+    initLangToggle();
+  });
 </script>
