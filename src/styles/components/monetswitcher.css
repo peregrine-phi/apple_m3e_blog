@@ -1,6 +1,6 @@
 /* MonetSwitcher — 配色切换面板组件 Token */
 :root {
-  --monet-swatch-size: 36px;
-  --monet-icon-size: 14px;
-  --monet-dropdown-width: 256px;
+  --monet-swatch-size: 18px;
+  --monet-icon-size: 10px;
+  --monet-dropdown-width: 90px;
 }

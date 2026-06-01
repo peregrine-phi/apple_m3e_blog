@@ -114,7 +114,7 @@
 }
 
 .filter-chip.filter-chip--brutal.active:hover {
-  background-color: var(--chip-hover-color, var(--blog-brutal-accent, var(--blog-color-primary-container)));
+  background-color: var(--chip-hover-color, color-mix(in srgb, var(--chip-color, var(--blog-brutal-accent, var(--blog-color-primary-container))) 92%, var(--chip-on-color, var(--blog-brutal-on-accent, var(--blog-color-on-primary-container)))));
   color: var(--chip-on-color, var(--blog-brutal-on-accent, var(--blog-color-on-primary-container)));
   border-color: var(--chip-border-color, var(--blog-brutal-border-color));
 }

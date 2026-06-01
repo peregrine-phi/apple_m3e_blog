@@ -6,14 +6,14 @@ export const monetConfig = {
   defaultSeed: "#3B5CF6",
 
   presets: [
-    { name: "m3-default", seed: "#6750A4" },
-    { name: "ocean",      seed: "#006C52" },
-    { name: "coral",      seed: "#BA1A1A" },
-    { name: "sapphire",   seed: "#3B5CF6" },
-    { name: "amber",      seed: "#825500" },
-    { name: "rose",       seed: "#A0004B" },
-    { name: "mint",       seed: "#006C4C" },
-    { name: "plum",       seed: "#7A0065" },
+    { name: "monet", seed: "#6750A4", secondary: "#9575CD" },
+    { name: "ocean",      seed: "#006C52", secondary: "#26A69A" },
+    { name: "coral",      seed: "#BA1A1A", secondary: "#FF5252" },
+    { name: "sapphire",   seed: "#3B5CF6", secondary: "#64B5F6" },
+    { name: "amber",      seed: "#825500", secondary: "#FFB74D" },
+    { name: "rose",       seed: "#A0004B", secondary: "#F06292" },
+    { name: "mint",       seed: "#006C4C", secondary: "#81C784" },
+    { name: "plum",       seed: "#7A0065", secondary: "#BA68C8" },
   ],
 
   variants: [
