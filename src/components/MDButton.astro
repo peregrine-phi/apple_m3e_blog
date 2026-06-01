@@ -1,0 +1,235 @@
+---
+// MDButton.astro — Material Design 3 Button Component
+// Supports variants: filled | elevated | tonal | outlined | text | fab
+// Also supports icon slots: "icon" (leading) and "icon-trailing"
+
+interface Props {
+  variant?: "filled" | "elevated" | "tonal" | "outlined" | "text" | "fab";
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  class?: string;
+  id?: string;
+  [key: string]: any;
+}
+
+const {
+  variant = "filled",
+  href,
+  type = "button",
+  disabled = false,
+  class: className = "",
+  id,
+  ...attrs
+} = Astro.props;
+
+const Tag = href ? "a" : "button";
+const isAnchor = href != null;
+---
+
+<Tag
+  id={id}
+  href={href}
+  type={isAnchor ? undefined : type}
+  disabled={isAnchor ? undefined : disabled}
+  aria-disabled={isAnchor && disabled ? "true" : undefined}
+  class:list={[
+    "md-btn",
+    `md-btn--${variant}`,
+    { "md-btn--disabled": disabled },
+    className
+  ]}
+  {...attrs}
+>
+  <slot name="icon" />
+  <span class="md-btn-label"><slot /></span>
+  <slot name="icon-trailing" />
+</Tag>
+
+<style>
+  /* Base button styling */
+  .md-btn {
+    --md-btn-r: 0;
+    --md-btn-g: 0;
+    --md-btn-b: 0;
+    --md-btn-opacity: 0;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 24px;
+    border-radius: var(--blog-radius-full, 9999px);
+    font-family: var(--blog-font-sans);
+    font-size: var(--blog-typescale-label-large-size, 14px);
+    font-weight: var(--blog-font-weight-medium, 500);
+    letter-spacing: var(--blog-typescale-label-large-tracking, 0.1px);
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    box-sizing: border-box;
+    transition: 
+      box-shadow var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard),
+      background-color var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard),
+      color var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard),
+      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-emphasized);
+  }
+
+  /* M3 State layer overlay using pseudo-element */
+  .md-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background-color: rgb(var(--md-btn-r), var(--md-btn-g), var(--md-btn-b));
+    opacity: var(--md-btn-opacity);
+    transition: opacity var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard);
+  }
+
+  /* Hover state */
+  .md-btn:hover {
+    --md-btn-opacity: var(--blog-state-hover-opacity, 0.08);
+  }
+
+  /* Focus state */
+  .md-btn:focus-visible {
+    --md-btn-opacity: var(--blog-state-focus-opacity, 0.12);
+    outline: 2px solid var(--blog-color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Pressed state */
+  .md-btn:active {
+    --md-btn-opacity: var(--blog-state-press-opacity, 0.12);
+    transform: scale(0.97);
+  }
+
+  /* Adjust padding when icons are present */
+  .md-btn:has([slot="icon"]) {
+    padding-left: 16px;
+  }
+  .md-btn:has([slot="icon-trailing"]) {
+    padding-right: 16px;
+  }
+
+  /* ── 1. Variant: Filled ── */
+  .md-btn--filled {
+    background-color: var(--blog-color-primary);
+    color: var(--blog-color-on-primary);
+    --md-btn-r: 255;
+    --md-btn-g: 255;
+    --md-btn-b: 255;
+  }
+
+  /* ── 2. Variant: Elevated ── */
+  .md-btn--elevated {
+    background-color: var(--blog-color-surface-container-low);
+    color: var(--blog-color-primary);
+    box-shadow: var(--blog-elevation-1);
+    --md-btn-r: 59;
+    --md-btn-g: 92;
+    --md-btn-b: 246;
+  }
+  .md-btn--elevated:hover {
+    box-shadow: var(--blog-elevation-2);
+  }
+  .md-btn--elevated:active {
+    box-shadow: var(--blog-elevation-1);
+  }
+
+  /* ── 3. Variant: Tonal ── */
+  .md-btn--tonal {
+    background-color: var(--blog-color-primary-container);
+    color: var(--blog-color-on-primary-container);
+    --md-btn-r: 0;
+    --md-btn-g: 0;
+    --md-btn-b: 0;
+  }
+  [data-theme="dark"] .md-btn--tonal {
+    --md-btn-r: 255;
+    --md-btn-g: 255;
+    --md-btn-b: 255;
+  }
+
+  /* ── 4. Variant: Outlined ── */
+  .md-btn--outlined {
+    background-color: transparent;
+    color: var(--blog-color-primary);
+    border: 1px solid var(--blog-color-outline);
+    --md-btn-r: 59;
+    --md-btn-g: 92;
+    --md-btn-b: 246;
+  }
+  .md-btn--outlined:hover {
+    border-color: var(--blog-color-primary);
+  }
+
+  /* ── 5. Variant: Text ── */
+  .md-btn--text {
+    background-color: transparent;
+    color: var(--blog-color-primary);
+    padding: 0 12px;
+    --md-btn-r: 59;
+    --md-btn-g: 92;
+    --md-btn-b: 246;
+  }
+  .md-btn--text:has([slot="icon"]) {
+    padding-left: 12px;
+    padding-right: 16px;
+  }
+  .md-btn--text:has([slot="icon-trailing"]) {
+    padding-left: 16px;
+    padding-right: 12px;
+  }
+
+  /* ── 6. Variant: FAB (Floating Action Button) ── */
+  .md-btn--fab {
+    height: 56px;
+    min-width: 56px;
+    padding: 0;
+    border-radius: var(--blog-radius-xl, 16px);
+    background-color: var(--blog-color-primary-container);
+    color: var(--blog-color-on-primary-container);
+    box-shadow: var(--blog-elevation-3);
+    --md-btn-r: 0;
+    --md-btn-g: 0;
+    --md-btn-b: 0;
+  }
+  [data-theme="dark"] .md-btn--fab {
+    --md-btn-r: 255;
+    --md-btn-g: 255;
+    --md-btn-b: 255;
+  }
+  .md-btn--fab:hover {
+    box-shadow: var(--blog-elevation-4);
+  }
+  .md-btn--fab:active {
+    box-shadow: var(--blog-elevation-3);
+  }
+  .md-btn--fab .md-btn-label {
+    display: none;
+  }
+  /* Extended FAB support */
+  .md-btn--fab:has(.md-btn-label:not(:empty)) {
+    padding: 0 20px;
+    gap: 8px;
+  }
+  .md-btn--fab:has(.md-btn-label:not(:empty)) .md-btn-label {
+    display: inline;
+  }
+
+  /* ── Disabled State ── */
+  .md-btn--disabled {
+    pointer-events: none;
+    opacity: 0.38;
+    background-color: var(--blog-color-surface-container-highest);
+    color: var(--blog-color-on-surface);
+    box-shadow: none !important;
+    border: none !important;
+  }
+</style>

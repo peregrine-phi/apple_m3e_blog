@@ -1,0 +1,145 @@
+---
+// MDSnackbar.astro — Material Design 3 Snackbar Component
+---
+
+<md-snackbar class="md-snackbar" hidden aria-live="polite">
+  <span class="md-snackbar-message"></span>
+  <button class="md-snackbar-action" type="button">Dismiss</button>
+</md-snackbar>
+
+<style>
+  .md-snackbar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-width: 344px;
+    max-width: 568px;
+    padding: 14px 16px;
+    border-radius: var(--blog-radius-md, 8px);
+    background-color: var(--blog-color-inverse-surface);
+    color: var(--blog-color-inverse-on-surface);
+    border: 1px solid var(--blog-color-outline-variant);
+    box-shadow: var(--blog-elevation-3);
+    font-family: var(--blog-font-sans);
+    font-size: var(--blog-typescale-body-medium-size, 14px);
+    letter-spacing: var(--blog-typescale-body-medium-tracking, 0.25px);
+    opacity: 0;
+    transition: 
+      transform var(--blog-motion-duration-slow, 350ms) var(--blog-motion-easing-emphasized),
+      opacity var(--blog-motion-duration-slow, 350ms) var(--blog-motion-easing-emphasized);
+    pointer-events: auto;
+    box-sizing: border-box;
+  }
+
+  .md-snackbar:not([hidden]) {
+    display: flex;
+  }
+
+  .md-snackbar.md-snackbar--visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+
+  .md-snackbar-message {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--blog-font-weight-medium);
+  }
+
+  .md-snackbar-action {
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0;
+    color: var(--blog-color-primary);
+    font-family: inherit;
+    font-size: var(--blog-typescale-label-large-size, 14px);
+    font-weight: var(--blog-font-weight-semibold, 600);
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: color 150ms;
+    flex-shrink: 0;
+  }
+
+  .md-snackbar-action:hover {
+    color: var(--blog-color-primary-hover);
+  }
+
+  @media (max-width: 480px) {
+    .md-snackbar {
+      min-width: calc(100vw - 32px);
+      bottom: 16px;
+    }
+  }
+</style>
+
+<script>
+  class MDSnackbar extends HTMLElement {
+    private messageEl!: HTMLElement;
+    private actionEl!: HTMLButtonElement;
+    private timeoutId: number | null = null;
+
+    connectedCallback() {
+      this.messageEl = this.querySelector(".md-snackbar-message")!;
+      this.actionEl = this.querySelector(".md-snackbar-action") as HTMLButtonElement;
+
+      // Listen for dismissal click
+      this.actionEl.addEventListener("click", () => this.hide());
+
+      // Global window event listener
+      window.addEventListener("md-snackbar-show", this.handleShowEvent.bind(this) as EventListener);
+    }
+
+    disconnectedCallback() {
+      window.removeEventListener("md-snackbar-show", this.handleShowEvent.bind(this) as EventListener);
+    }
+
+    private handleShowEvent(e: CustomEvent<{ message: string; duration?: number }>) {
+      const { message, duration = 4000 } = e.detail;
+      this.show(message, duration);
+    }
+
+    show(message: string, duration: number) {
+      if (this.timeoutId) {
+        clearTimeout(this.timeoutId);
+      }
+
+      this.messageEl.textContent = message;
+      this.removeAttribute("hidden");
+
+      // Double-rAF to guarantee class transition is picked up
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          this.classList.add("md-snackbar--visible");
+        });
+      });
+
+      this.timeoutId = window.setTimeout(() => {
+        this.hide();
+      }, duration);
+    }
+
+    hide() {
+      this.classList.remove("md-snackbar--visible");
+      
+      // Wait for animation, then set hidden
+      window.setTimeout(() => {
+        if (!this.classList.contains("md-snackbar--visible")) {
+          this.setAttribute("hidden", "");
+        }
+      }, 350); // Matches the slow duration
+    }
+  }
+
+  if (!customElements.get("md-snackbar")) {
+    customElements.define("md-snackbar", MDSnackbar);
+  }
+</script>

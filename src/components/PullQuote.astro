@@ -1,0 +1,100 @@
+---
+// PullQuote.astro — Apple News-style pull quote component
+// Variants: "classic" (left border) | "brutal" (bold block with color)
+
+interface Props {
+  quote: string;
+  cite?: string;
+  variant?: "classic" | "brutal";
+}
+
+const { quote, cite, variant = "classic" } = Astro.props;
+---
+
+<blockquote class:list={["pull-quote", `pull-quote--${variant}`]}>
+  <p>&ldquo;{quote}&rdquo;</p>
+  {cite && (
+    <footer>
+      <cite>{cite}</cite>
+    </footer>
+  )}
+</blockquote>
+
+<style>
+  .pull-quote {
+    margin: var(--blog-space-12) 0;
+    padding: 0;
+    border: none;
+    quotes: none;
+  }
+
+  .pull-quote p {
+    font-family: "SF Pro Display", var(--blog-font-sans);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: var(--blog-font-weight-semibold);
+    line-height: 1.2;
+    letter-spacing: -0.012em;
+    color: var(--blog-color-text-primary);
+    margin: 0;
+  }
+
+  /* ── Classic variant: Apple News editorial ── */
+  .pull-quote--classic {
+    max-width: 540px;
+    padding-left: var(--blog-space-5);
+    border-left: 3px solid var(--blog-color-primary);
+  }
+
+  .pull-quote--classic p {
+    color: var(--blog-color-primary);
+  }
+
+  /* ── Brutalist variant: bold color block ── */
+  .pull-quote--brutal {
+    max-width: 640px;
+    padding: var(--blog-space-6) var(--blog-space-8);
+    background: var(--blog-brutal-accent);
+    border: var(--blog-brutal-border-width, 3px) solid var(--blog-brutal-border-color);
+  }
+
+  .pull-quote--brutal p {
+    color: var(--blog-brutal-on-accent);
+    font-weight: var(--blog-font-weight-heavy);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+  }
+
+  /* Citation */
+  .pull-quote footer {
+    margin-top: var(--blog-space-5);
+  }
+
+  .pull-quote cite {
+    display: block;
+    font-family: "SF Pro Text", var(--blog-font-sans);
+    font-size: var(--blog-typescale-label-large-size);
+    font-weight: var(--blog-font-weight-regular);
+    letter-spacing: 0.02em;
+    color: var(--blog-color-text-secondary);
+    font-style: normal;
+  }
+
+  .pull-quote--brutal cite {
+    color: var(--blog-brutal-on-accent-secondary);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .pull-quote {
+      margin: var(--blog-space-8) 0;
+    }
+
+    .pull-quote p {
+      font-size: 1.375rem;
+    }
+
+    .pull-quote--brutal {
+      padding: var(--blog-space-4);
+    }
+  }
+</style>

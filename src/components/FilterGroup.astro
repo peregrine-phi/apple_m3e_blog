@@ -1,0 +1,82 @@
+---
+// src/components/FilterGroup.astro
+// Separation of Concerns: Reusable, High-Fidelity Filter Layout Component
+
+import MDBadge from "./MDBadge.astro";
+import I18n from "./I18n.astro";
+import type { ChipConfig } from "../content/filter-config";
+
+interface Props {
+  titleKey: string;
+  badgeVariant: "primary" | "secondary";
+  filterType: "tag" | "stage";
+  items: string[];
+  config: Record<string, ChipConfig>;
+  allLabelKey: string;
+}
+
+const { titleKey, badgeVariant, filterType, items, config, allLabelKey } = Astro.props;
+---
+
+<div class={`${filterType}s-container`} style={filterType === "stage" ? "margin-top: 12px; display: flex; flex-direction: column; gap: 8px;" : ""}>
+  <span class="tags-label text-label-large text-secondary" style="display: flex; align-items: center; gap: 8px;">
+    <MDBadge variant={badgeVariant} type="dot" />
+    <I18n tKey={titleKey} />
+  </span>
+  <div class={`${filterType}s-chips`} style={filterType === "stage" ? "display: flex; flex-wrap: wrap; gap: 8px;" : ""}>
+    <!-- The fallback "All" reset chip -->
+    <button class="filter-chip active" data-tag={filterType === "tag" ? "all" : undefined} data-stage={filterType === "stage" ? "all" : undefined} type="button">
+      <span class="chip-label"><I18n tKey={allLabelKey} /></span>
+    </button>
+
+    <!-- Custom dynamic localized chips -->
+    {items.map((itemId) => {
+      const itemConfig = config[itemId.toLowerCase()] || {};
+      const emoji = itemConfig.emoji || "";
+      const customIcon = itemConfig.iconSvg || "";
+      
+      // Personalized inline variables
+      const inlineStyle = [
+        itemConfig.color ? `--chip-color: ${itemConfig.color}` : null,
+        itemConfig.color ? `--chip-on-color: var(--blog-color-on-primary-container)` : null,
+        itemConfig.borderColor ? `--chip-border-color: ${itemConfig.borderColor}` : null,
+        itemConfig.hoverColor ? `--chip-hover-color: ${itemConfig.hoverColor}` : null,
+      ].filter(Boolean).join("; ");
+
+      // Personalized layout variants
+      const variantClass = itemConfig.variant ? `filter-chip--${itemConfig.variant}` : "";
+
+      // Label localization check
+      const displayLabel = 
+        itemId.toLowerCase() === "zh" ? "中文" : 
+        itemId.toLowerCase() === "en" ? "EN" : 
+        itemId.toLowerCase() === "seedling" ? "幼苗期" : 
+        itemId.toLowerCase() === "budding" ? "成长中" : 
+        itemId.toLowerCase() === "evergreen" ? "常青树" : 
+        itemId;
+
+      return (
+        <button 
+          class:list={["filter-chip", variantClass]} 
+          data-tag={filterType === "tag" ? itemId.toLowerCase() : undefined} 
+          data-stage={filterType === "stage" ? itemId.toLowerCase() : undefined} 
+          style={inlineStyle || undefined}
+          type="button"
+        >
+          {emoji && <span class="chip-emoji" style="margin-right: 4px;">{emoji}</span>}
+          {customIcon && <span class="chip-icon-custom" style="margin-right: 6px; display: inline-flex; align-items: center;" set:html={customIcon} />}
+          <span class="chip-label">{displayLabel}</span>
+          <span class="chip-icon-state">
+            <svg class="chip-icon-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <svg class="chip-icon-close" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </span>
+        </button>
+      );
+    })}
+  </div>
+</div>

@@ -1,0 +1,65 @@
+/* ============================================
+   Motion Design Tokens
+   Material 3 Expressive: smooth, spring-like easing
+   Namespace: --blog-motion-*
+   ============================================ */
+
+:root {
+  /* ── Duration Tokens ── */
+  --blog-motion-duration-instant: 0ms;
+  --blog-motion-duration-fast: 150ms;
+  --blog-motion-duration-normal: 250ms;
+  --blog-motion-duration-slow: 350ms;
+  --blog-motion-duration-expressive: 500ms;
+  --blog-motion-duration-entrance: 600ms;
+
+  /* ── Easing Curves ── */
+  /* Standard: everyday transitions */
+  --blog-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  /* Emphasized: expressive, bouncy entries */
+  --blog-motion-easing-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  /* Decelerate: entering the screen */
+  --blog-motion-easing-decelerate: cubic-bezier(0, 0, 0, 1);
+  /* Accelerate: leaving the screen */
+  --blog-motion-easing-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+  /* Apple-style spring (default — responsive, subtle bounce) */
+  --blog-motion-spring-default: linear(
+    0, 0.002, 0.01 0.6%, 0.034 1.5%, 0.114 3.2%, 0.282 5.6%,
+    0.429 7.7%, 0.559 10%, 0.671 12.5%, 0.764 15.3%, 0.862 19.7%,
+    0.924 24%, 0.958 28.7%, 0.978 34%, 0.99 40%, 0.996 47%,
+    0.999 55.3%, 1 65.2%, 1 100%
+  );
+
+  /* Apple-style spring (bouncy — expressive, noticeable rebound) */
+  --blog-motion-spring-bouncy: linear(
+    0, 0.003 1.2%, 0.016 2.8%, 0.048 4.8%, 0.107 7%,
+    0.193 9.5%, 0.286 12%, 0.385 14.5%, 0.488 17%,
+    0.595 19.8%, 0.679 22.3%, 0.749 25%, 0.806 28%,
+    0.868 32.5%, 0.909 37%, 0.937 42%, 0.956 47.5%,
+    0.969 53.5%, 0.978 60%, 0.984 67%, 0.988 74.5%,
+    0.991 82%, 0.993 90%, 0.993 100%
+  );
+
+  /* Keep legacy alias for backward compatibility */
+  --blog-motion-spring: var(--blog-motion-spring-bouncy);
+
+  /* ── Semantic Transitions ── */
+  --blog-transition-fade: opacity var(--blog-motion-duration-normal)
+    var(--blog-motion-easing-standard);
+  --blog-transition-scale: transform var(--blog-motion-duration-normal)
+    var(--blog-motion-easing-emphasized);
+  --blog-transition-color: background-color var(--blog-motion-duration-normal)
+      var(--blog-motion-easing-standard),
+    color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+    border-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+
+  /* ── Reduced Motion ── */
+  @media (prefers-reduced-motion: reduce) {
+    --blog-motion-duration-fast: 0ms;
+    --blog-motion-duration-normal: 0ms;
+    --blog-motion-duration-slow: 0ms;
+    --blog-motion-duration-expressive: 0ms;
+    --blog-motion-duration-entrance: 0ms;
+  }
+}

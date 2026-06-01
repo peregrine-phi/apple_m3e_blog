@@ -1,0 +1,26 @@
+/* ============================================
+   Shape (Border Radius) Design Tokens
+   Fusion: Apple rounded rectangles + M3 corner scale
+   Namespace: --blog-radius-*
+   ============================================ */
+
+:root {
+  /* ── Corner Radius Scale ── */
+  --blog-radius-none: 0;
+  --blog-radius-xs: 4px;
+  --blog-radius-sm: 8px;
+  --blog-radius-md: 12px;
+  --blog-radius-lg: 16px;
+  --blog-radius-xl: 20px;
+  --blog-radius-2xl: 24px;
+  --blog-radius-3xl: 32px;
+  --blog-radius-full: 9999px;
+
+  /* ── Semantic Radius ── */
+  --blog-radius-button: var(--blog-radius-full);
+  --blog-radius-card: var(--blog-radius-lg);
+  --blog-radius-input: var(--blog-radius-sm);
+  --blog-radius-badge: var(--blog-radius-full);
+  --blog-radius-image: var(--blog-radius-md);
+  --blog-radius-container: var(--blog-radius-2xl);
+}

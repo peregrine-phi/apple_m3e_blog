@@ -1,0 +1,30 @@
+---
+// MonetCSS.astro — Pre-generated Monet dynamic color CSS
+// Separated from the UI component so ALL pages get the CSS.
+// This runs at build time (SSG) — no runtime cost.
+import { generateSchemeCSS, MONET_PRESETS, MONET_VARIANTS } from "../utils/monet";
+
+const allBlocks: string[] = [];
+for (const preset of MONET_PRESETS) {
+  for (const v of MONET_VARIANTS) {
+    const key = `${preset.name.replace(/\s+/g, "-").toLowerCase()}--${v.value}`;
+    const { light, dark } = generateSchemeCSS(preset.seed, v.value);
+    // Replace the custom hex-based selector with a clean named selector
+    allBlocks.push(
+      light.replace(
+        `data-monet="custom-${preset.seed.replace("#", "")}-${v.value}"`,
+        `data-monet="${key}"`
+      )
+    );
+    allBlocks.push(
+      dark.replace(
+        `data-monet="custom-${preset.seed.replace("#", "")}-${v.value}"`,
+        `data-monet="${key}"`
+      )
+    );
+  }
+}
+const allCSS = allBlocks.join("\n");
+---
+
+<style is:inline id="monet-all-styles" set:html={allCSS}></style>

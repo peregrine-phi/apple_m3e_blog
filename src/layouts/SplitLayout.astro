@@ -1,0 +1,80 @@
+---
+// SplitLayout.astro (Layer 2)
+// Extends BaseLayout with sidebar + main content grid.
+// Sidebar occupies a left/top column; main content fills the rest.
+// Use for: blog posts with TOC, docs, any side-navigation page.
+
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Sidebar width in px or CSS value (default: 220px) */
+  sidebarWidth?: string;
+  /** Swap sidebar to right side */
+  sidebarRight?: boolean;
+  /** Collapse to single column below this breakpoint (default: 1024px) */
+  collapseAt?: string;
+}
+
+const {
+  title,
+  description,
+  sidebarWidth = "220px",
+  sidebarRight = false,
+  collapseAt = "1024px",
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <div class:list={["split-layout", { "split-layout--right": sidebarRight }]}>
+    <aside class="split-sidebar" style={`--split-sidebar-width: ${sidebarWidth}`}>
+      <slot name="sidebar" />
+    </aside>
+    <main class="split-main">
+      <slot />
+    </main>
+  </div>
+</BaseLayout>
+
+<style>
+  .split-layout {
+    display: grid;
+    grid-template-columns: var(--split-sidebar-width, 220px) 1fr;
+    gap: var(--blog-space-8);
+    max-width: calc(800px + var(--split-sidebar-width, 220px) + var(--blog-space-8) + var(--blog-space-page-inline) * 2);
+    margin-inline: auto;
+    padding-inline: var(--blog-space-page-inline);
+    padding-block: var(--blog-space-12) var(--blog-space-16);
+    align-items: start;
+  }
+
+  .split-layout--right {
+    grid-template-columns: 1fr var(--split-sidebar-width, 220px);
+  }
+
+  .split-sidebar {
+    position: sticky;
+    top: 5.5rem;
+    max-height: calc(100vh - 5.5rem - var(--blog-space-16));
+    overflow-y: auto;
+  }
+
+  .split-main {
+    min-width: 0;
+  }
+
+  @media (max-width: 1024px) {
+    .split-layout {
+      grid-template-columns: 1fr;
+      padding-block: var(--blog-space-8) var(--blog-space-12);
+    }
+
+    .split-sidebar {
+      position: static;
+      max-height: none;
+      overflow: visible;
+      order: -1;
+    }
+  }
+</style>

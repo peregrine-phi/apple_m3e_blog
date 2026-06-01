@@ -1,0 +1,127 @@
+/* ============================================
+   Typography Design Tokens
+   Apple San Francisco + Material 3 Expressive Scale
+   Namespace: --blog-font-* / --blog-typescale-*
+   ============================================ */
+
+:root {
+  /* ── Font Families ── */
+  --blog-font-sans: "SF Pro Display", "SF Pro Text", "Inter",
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+  --blog-font-serif: "New York", "Iowan Old Style", "Apple Garamond",
+    "Noto Serif SC", Georgia, "Times New Roman", serif;
+  --blog-font-mono: "SF Mono", "JetBrains Mono", "Fira Code",
+    "Cascadia Code", Menlo, Consolas, monospace;
+
+  /* ── Font Weights ── */
+  --blog-font-weight-thin: 100;
+  --blog-font-weight-light: 300;
+  --blog-font-weight-regular: 400;
+  --blog-font-weight-medium: 500;
+  --blog-font-weight-semibold: 600;
+  --blog-font-weight-bold: 700;
+  --blog-font-weight-heavy: 800;
+
+  /* ── Typescale: Display (Hero / Featured) ── */
+  --blog-typescale-display-large-size: clamp(3rem, 6vw, 5rem);
+  --blog-typescale-display-large-leading: 1.05;
+  --blog-typescale-display-large-weight: var(--blog-font-weight-bold);
+  --blog-typescale-display-large-tracking: -0.022em;
+
+  --blog-typescale-display-medium-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  --blog-typescale-display-medium-leading: 1.1;
+  --blog-typescale-display-medium-weight: var(--blog-font-weight-bold);
+  --blog-typescale-display-medium-tracking: -0.018em;
+
+  --blog-typescale-display-small-size: clamp(1.75rem, 3vw, 2.5rem);
+  --blog-typescale-display-small-leading: 1.15;
+  --blog-typescale-display-small-weight: var(--blog-font-weight-semibold);
+  --blog-typescale-display-small-tracking: -0.014em;
+
+  /* ── Typescale: Headline ── */
+  --blog-typescale-headline-large-size: clamp(1.5rem, 2.5vw, 2rem);
+  --blog-typescale-headline-large-leading: 1.2;
+  --blog-typescale-headline-large-weight: var(--blog-font-weight-semibold);
+  --blog-typescale-headline-large-tracking: -0.010em;
+
+  --blog-typescale-headline-medium-size: clamp(1.25rem, 2vw, 1.5rem);
+  --blog-typescale-headline-medium-leading: 1.25;
+  --blog-typescale-headline-medium-weight: var(--blog-font-weight-semibold);
+  --blog-typescale-headline-medium-tracking: -0.006em;
+
+  --blog-typescale-headline-small-size: clamp(1.1rem, 1.5vw, 1.25rem);
+  --blog-typescale-headline-small-leading: 1.3;
+  --blog-typescale-headline-small-weight: var(--blog-font-weight-semibold);
+  --blog-typescale-headline-small-tracking: 0;
+
+  /* ── Typescale: Title ── */
+  --blog-typescale-title-large-size: 1.125rem;
+  --blog-typescale-title-large-leading: 1.4;
+  --blog-typescale-title-large-weight: var(--blog-font-weight-medium);
+  --blog-typescale-title-large-tracking: 0;
+
+  --blog-typescale-title-medium-size: 1rem;
+  --blog-typescale-title-medium-leading: 1.5;
+  --blog-typescale-title-medium-weight: var(--blog-font-weight-medium);
+  --blog-typescale-title-medium-tracking: 0.006em;
+
+  --blog-typescale-title-small-size: 0.875rem;
+  --blog-typescale-title-small-leading: 1.4;
+  --blog-typescale-title-small-weight: var(--blog-font-weight-medium);
+  --blog-typescale-title-small-tracking: 0.008em;
+
+  /* ── Typescale: Body ── */
+  --blog-typescale-body-large-size: 1.125rem;
+  --blog-typescale-body-large-leading: 1.7;
+  --blog-typescale-body-large-weight: var(--blog-font-weight-regular);
+  --blog-typescale-body-large-tracking: 0;
+
+  --blog-typescale-body-medium-size: 1rem;
+  --blog-typescale-body-medium-leading: 1.65;
+  --blog-typescale-body-medium-weight: var(--blog-font-weight-regular);
+  --blog-typescale-body-medium-tracking: 0.004em;
+
+  --blog-typescale-body-small-size: 0.8125rem;
+  --blog-typescale-body-small-leading: 1.5;
+  --blog-typescale-body-small-weight: var(--blog-font-weight-regular);
+  --blog-typescale-body-small-tracking: 0.008em;
+
+  /* ── Typescale: Label (Apple News refined tracking) ── */
+  --blog-typescale-label-large-size: 0.875rem;
+  --blog-typescale-label-large-leading: 1.4;
+  --blog-typescale-label-large-weight: var(--blog-font-weight-medium);
+  --blog-typescale-label-large-tracking: 0.02em;
+
+  --blog-typescale-label-medium-size: 0.75rem;
+  --blog-typescale-label-medium-leading: 1.4;
+  --blog-typescale-label-medium-weight: var(--blog-font-weight-medium);
+  --blog-typescale-label-medium-tracking: 0.03em;
+
+  --blog-typescale-label-small-size: 0.6875rem;
+  --blog-typescale-label-small-leading: 1.3;
+  --blog-typescale-label-small-weight: var(--blog-font-weight-medium);
+  --blog-typescale-label-small-tracking: 0.03em;
+
+  /* ── Typescale: Kicker (Apple News editorial) ── */
+  --blog-typescale-kicker-size: 0.8125rem;
+  --blog-typescale-kicker-leading: 1.3;
+  --blog-typescale-kicker-weight: var(--blog-font-weight-semibold);
+  --blog-typescale-kicker-tracking: 0.08em;
+
+  /* ── Typescale: Deck (Apple News standfirst) ── */
+  --blog-typescale-deck-size: 1.25rem;
+  --blog-typescale-deck-leading: 1.45;
+  --blog-typescale-deck-weight: var(--blog-font-weight-regular);
+  --blog-typescale-deck-tracking: 0;
+
+  /* ── Typescale: Code ── */
+  --blog-typescale-code-size: 0.875em;
+  --blog-typescale-code-leading: 1.6;
+  --blog-typescale-code-weight: var(--blog-font-weight-regular);
+
+  /* ── Readable measure ── */
+  --blog-measure-narrow: 45ch;
+  --blog-measure-normal: 65ch;
+  --blog-measure-wide: 80ch;
+}

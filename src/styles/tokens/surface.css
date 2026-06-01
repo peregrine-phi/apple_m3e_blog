@@ -1,0 +1,28 @@
+/* ============================================
+   Surface Container Tokens
+   Material Design 3: tonal elevation hierarchy
+   Namespace: --blog-color-surface-container-*
+
+   M3 replaces shadow-based elevation with
+   tonal elevation — surface containers get
+   progressively lighter (light theme) or
+   darker (dark theme) to indicate elevation.
+   ============================================ */
+
+:root {
+  /* Dark → Light gradient as elevation increases */
+  --blog-color-surface-container-lowest: #f5f5fa;
+  --blog-color-surface-container-low: #f0f0f5;
+  --blog-color-surface-container: #ececf1;
+  --blog-color-surface-container-high: #e6e6ec;
+  --blog-color-surface-container-highest: #e0e0e6;
+}
+
+[data-theme="dark"] {
+  /* Light → Dark gradient as elevation increases */
+  --blog-color-surface-container-lowest: #0e0e10;
+  --blog-color-surface-container-low: #141418;
+  --blog-color-surface-container: #1a1a1e;
+  --blog-color-surface-container-high: #202024;
+  --blog-color-surface-container-highest: #26262a;
+}

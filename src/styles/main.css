@@ -1,0 +1,28 @@
+/* ============================================
+   Main Stylesheet — Entry Point
+   Layers: Tokens → Theme → Tailwind/daisyUI → Base
+   ============================================ */
+
+/* Layer 1: Design Tokens (CSS Custom Properties) */
+@import "./tokens/index.css";
+
+/* Layer 2: Theme Variants */
+@import "./themes/light.css";
+@import "./themes/dark.css";
+
+/* Layer 3: Tailwind CSS v4 + daisyUI v5 */
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* Layer 4: CSS Reset */
+@import "./base/reset.css";
+
+/* Layer 5: Global Semantic Styles */
+@import "./base/global.css";
+@import "./base/buttons.css";
+@import "./base/cards.css";
+@import "./base/garden.css";
+@import "./base/filters.css";
+@import "./base/layouts.css";
+@import "./base/editorial.css";
+

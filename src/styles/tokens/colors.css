@@ -1,0 +1,191 @@
+/* ============================================
+   Color Design Tokens
+   Fusion: Apple HIG + Material 3 Expressive
+   Namespace: --blog-color-*
+   ============================================ */
+
+:root {
+  /* ── Source / Reference Colors ── */
+  --blog-ref-primary-h: 230;
+  --blog-ref-primary-s: 82%;
+  --blog-ref-primary-l: 58%;
+
+  --blog-ref-secondary-h: 260;
+  --blog-ref-secondary-s: 60%;
+  --blog-ref-secondary-l: 55%;
+
+  --blog-ref-tertiary-h: 340;
+  --blog-ref-tertiary-s: 80%;
+  --blog-ref-tertiary-l: 52%;
+
+  --blog-ref-success-h: 150;
+  --blog-ref-success-s: 70%;
+  --blog-ref-success-l: 40%;
+
+  --blog-ref-warning-h: 36;
+  --blog-ref-warning-s: 100%;
+  --blog-ref-warning-l: 50%;
+
+  --blog-ref-error-h: 0;
+  --blog-ref-error-s: 75%;
+  --blog-ref-error-l: 48%;
+
+  /* ── System / Semantic Colors ── */
+  --blog-color-primary: hsl(
+    var(--blog-ref-primary-h),
+    var(--blog-ref-primary-s),
+    var(--blog-ref-primary-l)
+  );
+  --blog-color-primary-hover: hsl(
+    var(--blog-ref-primary-h),
+    var(--blog-ref-primary-s),
+    calc(var(--blog-ref-primary-l) - 10%)
+  );
+  --blog-color-primary-active: hsl(
+    var(--blog-ref-primary-h),
+    var(--blog-ref-primary-s),
+    calc(var(--blog-ref-primary-l) - 16%)
+  );
+  --blog-color-on-primary: #ffffff;
+  --blog-color-primary-container: hsl(
+    var(--blog-ref-primary-h),
+    100%,
+    93%
+  );
+  --blog-color-on-primary-container: hsl(
+    var(--blog-ref-primary-h),
+    60%,
+    20%
+  );
+
+  --blog-color-secondary: hsl(
+    var(--blog-ref-secondary-h),
+    var(--blog-ref-secondary-s),
+    var(--blog-ref-secondary-l)
+  );
+  --blog-color-on-secondary: #ffffff;
+  --blog-color-secondary-container: hsl(
+    var(--blog-ref-secondary-h),
+    80%,
+    92%
+  );
+  --blog-color-on-secondary-container: hsl(
+    var(--blog-ref-secondary-h),
+    50%,
+    20%
+  );
+
+  --blog-color-tertiary: hsl(
+    var(--blog-ref-tertiary-h),
+    var(--blog-ref-tertiary-s),
+    var(--blog-ref-tertiary-l)
+  );
+  --blog-color-on-tertiary: #ffffff;
+  --blog-color-tertiary-container: hsl(
+    var(--blog-ref-tertiary-h),
+    60%,
+    92%
+  );
+  --blog-color-on-tertiary-container: hsl(
+    var(--blog-ref-tertiary-h),
+    60%,
+    20%
+  );
+
+  --blog-color-success: hsl(
+    var(--blog-ref-success-h),
+    var(--blog-ref-success-s),
+    var(--blog-ref-success-l)
+  );
+  --blog-color-warning: hsl(
+    var(--blog-ref-warning-h),
+    var(--blog-ref-warning-s),
+    var(--blog-ref-warning-l)
+  );
+  --blog-color-error: hsl(
+    var(--blog-ref-error-h),
+    var(--blog-ref-error-s),
+    var(--blog-ref-error-l)
+  );
+  --blog-color-on-error: #ffffff;
+  --blog-color-error-container: hsl(
+    var(--blog-ref-error-h),
+    60%,
+    93%
+  );
+  --blog-color-on-error-container: hsl(
+    var(--blog-ref-error-h),
+    70%,
+    20%
+  );
+
+  /* ── Surface & Background ── */
+  --blog-color-background: #fbfbfd;
+  --blog-color-on-background: rgba(0, 0, 0, 0.88);
+
+  --blog-color-surface: #ffffff;
+  --blog-color-on-surface: rgba(0, 0, 0, 0.88);
+  --blog-color-surface-variant: #f2f2f7;
+  --blog-color-on-surface-variant: rgba(0, 0, 0, 0.55);
+
+  --blog-color-surface-raised: #ffffff;
+  --blog-color-surface-dim: #f5f5fa;
+
+  --blog-color-inverse-surface: #303030;
+  --blog-color-inverse-on-surface: #f5f5f5;
+
+  /* ── Glassmorphism (Apple-style frosted glass) ── */
+  --blog-glass-bg: rgba(255, 255, 255, 0.42);
+  --blog-glass-bg-hover: rgba(255, 255, 255, 0.48);
+  --blog-glass-border: rgba(255, 255, 255, 0.58);
+  --blog-glass-border-hover: rgba(255, 255, 255, 0.7);
+  --blog-glass-shadow:
+    0 10px 30px -10px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.02),
+    inset 0 1.5px 0px rgba(255, 255, 255, 0.7),
+    inset 0 -1.5px 0px rgba(0, 0, 0, 0.04);
+  --blog-glass-shadow-hover:
+    0 12px 36px -8px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.04),
+    inset 0 1.5px 0px rgba(255, 255, 255, 0.8),
+    inset 0 -1.5px 0px rgba(0, 0, 0, 0.04);
+  --blog-glass-sweep-gradient: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.18) 30%,
+    rgba(255, 255, 255, 0.38) 50%,
+    rgba(255, 255, 255, 0.18) 70%,
+    transparent
+  );
+
+  /* ── Text (Apple-inspired opacity hierarchy) ── */
+  --blog-color-text-primary: rgba(0, 0, 0, 0.88);
+  --blog-color-text-secondary: rgba(0, 0, 0, 0.55);
+  --blog-color-text-tertiary: rgba(0, 0, 0, 0.28);
+  --blog-color-text-quaternary: rgba(0, 0, 0, 0.12);
+
+  --blog-color-text-link: var(--blog-color-primary);
+  --blog-color-text-link-hover: hsl(
+    var(--blog-ref-primary-h),
+    var(--blog-ref-primary-s),
+    calc(var(--blog-ref-primary-l) - 10%)
+  );
+
+  /* ── Borders & Dividers ── */
+  --blog-color-border: rgba(0, 0, 0, 0.08);
+  --blog-color-border-strong: rgba(0, 0, 0, 0.15);
+  --blog-color-divider: rgba(0, 0, 0, 0.06);
+
+  /* ── M3 Outline tokens (map to border hierarchy) ── */
+  --blog-color-outline: rgba(0, 0, 0, 0.20);
+  --blog-color-outline-variant: rgba(0, 0, 0, 0.10);
+
+  /* ── Selection ── */
+  --blog-color-selection-bg: hsl(
+    var(--blog-ref-primary-h),
+    var(--blog-ref-primary-s),
+    var(--blog-ref-primary-l),
+    0.2
+  );
+  --blog-color-selection-text: var(--blog-color-text-primary);
+}

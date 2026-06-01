@@ -1,0 +1,360 @@
+---
+// MonetSwitcher.astro — Compact header Monet dynamic color switcher
+// CSS is pre-generated in MonetCSS.astro; this is the interactive UI only.
+import { generateSchemeCSS, MONET_PRESETS } from "../utils/monet";
+---
+
+<monet-switcher>
+  <button class="monet-toggle btn btn-ghost" type="button" aria-label="Change color scheme" aria-expanded="false">
+    <span class="monet-toggle-dot"></span>
+  </button>
+
+  <div class="monet-dropdown" hidden>
+    <div class="monet-presets-grid">
+      {MONET_PRESETS.map((preset) => (
+        <button
+          class="monet-preset-dot" 
+          type="button"
+          data-name={preset.name.replace(/\s+/g, "-").toLowerCase()}
+          data-label={preset.name}
+          style={`--preset-color: ${preset.seed}`}
+          aria-label={`Select ${preset.name} theme`}
+        >
+        </button>
+      ))}
+      <button 
+        class="monet-preset-dot monet-custom-dot" 
+        type="button"
+        data-name="custom"
+        data-label="Custom Color"
+        aria-label="Select custom color"
+      >
+        <span class="monet-plus-icon">+</span>
+        <input type="color" class="monet-custom-picker" value="#3B5CF6" aria-label="Choose custom color" />
+      </button>
+    </div>
+    <div class="monet-theme-info">
+      <span class="monet-theme-label">Theme</span>
+      <span class="monet-theme-name">M3 Default</span>
+    </div>
+  </div>
+</monet-switcher>
+
+<style>
+  monet-switcher {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .monet-toggle {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: var(--blog-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blog-color-text-secondary);
+    transition: background-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+  }
+
+  .monet-toggle:hover {
+    background-color: var(--blog-color-surface-variant);
+  }
+
+  .monet-toggle-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--blog-radius-full);
+    background-color: var(--blog-color-primary);
+    box-shadow: 0 0 0 2px var(--blog-color-background), 0 0 0 3.5px var(--blog-color-primary);
+    transition: transform var(--blog-motion-duration-fast) var(--blog-motion-easing-standard), 
+                background-color var(--blog-motion-duration-normal) var(--blog-motion-easing-standard),
+                box-shadow var(--blog-motion-duration-normal) var(--blog-motion-easing-standard);
+  }
+
+  .monet-toggle:hover .monet-toggle-dot {
+    transform: scale(1.15);
+  }
+
+  .monet-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 200;
+    width: 256px;
+    padding: var(--blog-space-4);
+    background: var(--blog-color-surface-container-high);
+    border: 1px solid var(--blog-color-outline-variant);
+    border-radius: var(--blog-radius-card);
+    box-shadow: var(--blog-shadow-dropdown);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-3);
+    animation: slideIn 200ms var(--blog-motion-easing-decelerate);
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .monet-dropdown[hidden] {
+    display: none;
+  }
+
+  .monet-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--blog-space-2);
+  }
+
+  .monet-preset-dot {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--blog-radius-full);
+    background-color: var(--preset-color);
+    border: 2px solid var(--blog-color-surface-container-high);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 150ms var(--blog-motion-easing-standard),
+                border-color 150ms var(--blog-motion-easing-standard),
+                box-shadow 150ms var(--blog-motion-easing-standard);
+  }
+
+  .monet-preset-dot:hover {
+    transform: scale(1.15);
+    z-index: 10;
+  }
+
+  .monet-preset-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 2px solid transparent;
+    border-radius: var(--blog-radius-full);
+    transition: border-color 150ms var(--blog-motion-easing-standard);
+    pointer-events: none;
+  }
+
+  .monet-preset-dot[data-active]::after {
+    border-color: var(--blog-color-primary);
+  }
+
+  /* Custom Color picker dot */
+  .monet-custom-dot {
+    background: var(--custom-color, linear-gradient(135deg, #ff0055, #00ffaa, #0055ff));
+    border: 2px solid var(--blog-color-surface-container-high);
+    color: var(--blog-color-on-primary);
+    font-size: 20px;
+    font-weight: 300;
+  }
+
+  .monet-plus-icon {
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    font-weight: 500;
+    font-size: 16px;
+  }
+
+  .monet-custom-picker {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+
+  /* Bottom Theme Information */
+  .monet-theme-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--blog-color-outline-variant);
+    padding-top: var(--blog-space-3);
+    margin-top: var(--blog-space-1);
+  }
+
+  .monet-theme-label {
+    font-size: var(--blog-typescale-label-small-size);
+    font-weight: var(--blog-font-weight-medium);
+    color: var(--blog-color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .monet-theme-name {
+    font-size: var(--blog-typescale-body-small-size);
+    font-weight: var(--blog-font-weight-semibold);
+    color: var(--blog-color-text-primary);
+    transition: color 150ms var(--blog-motion-easing-standard);
+  }
+</style>
+
+<script>
+  import { generateSchemeCSS, MONET_PRESETS } from "../utils/monet";
+
+  class MonetSwitcher extends HTMLElement {
+    private preset = "m3-default";
+    private variant = "tonalSpot";
+    private dropdown!: HTMLElement;
+    private toggleBtn!: HTMLElement;
+    private themeNameEl!: HTMLElement;
+
+    connectedCallback() {
+      this.dropdown = this.querySelector(".monet-dropdown")!;
+      this.toggleBtn = this.querySelector(".monet-toggle")!;
+      this.themeNameEl = this.querySelector(".monet-theme-name")!;
+
+      this.preset = localStorage.getItem("monet-preset") || "m3-default";
+      this.variant = localStorage.getItem("monet-variant") || "tonalSpot";
+
+      // Restore saved scheme
+      if (this.preset) {
+        if (this.preset.startsWith("custom-")) {
+          const hex = localStorage.getItem("monet-custom-hex");
+          if (hex) {
+            const key = `custom-${hex.replace("#", "")}-${this.variant}`;
+            const { light, dark } = generateSchemeCSS(hex, this.variant);
+            const cssStr = light.replace(
+              /\[data-monet="[^"]*"\]/,
+              `[data-monet="${key}"]`
+            ) +
+              "\n" +
+              dark.replace(
+                /\[data-theme="dark"\]\[data-monet="[^"]*"\]/,
+                `[data-theme="dark"][data-monet="${key}"]`
+              );
+            this.inject(cssStr);
+            document.documentElement.setAttribute("data-monet", key);
+            this.preset = key;
+            localStorage.setItem("monet-preset", key);
+            localStorage.setItem("monet-custom-css", cssStr);
+            this.updateActiveUI("custom", "Custom Color", hex);
+          }
+        } else {
+          const name = this.preset.split("--")[0];
+          this.preset = name;
+          this.apply(name, this.variant);
+          const presetObj = MONET_PRESETS.find(p => p.name.replace(/\s+/g, "-").toLowerCase() === name);
+          this.updateActiveUI(name, presetObj ? presetObj.name : "Theme");
+        }
+      }
+
+      // Toggle dropdown
+      this.toggleBtn.addEventListener("click", () => {
+        const isOpen = !this.dropdown.hasAttribute("hidden");
+        this.dropdown.toggleAttribute("hidden", isOpen);
+        this.toggleBtn.setAttribute("aria-expanded", String(!isOpen));
+      });
+
+      // Close on outside click
+      document.addEventListener("click", (e) => {
+        if (!this.contains(e.target as Node)) {
+          this.dropdown.setAttribute("hidden", "");
+          this.toggleBtn.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      // Preset buttons
+      this.querySelectorAll(".monet-preset-dot:not(.monet-custom-dot)").forEach((b) => {
+        b.addEventListener("click", () => {
+          const name = (b as HTMLElement).dataset.name!;
+          const label = (b as HTMLElement).dataset.label!;
+          this.preset = name;
+          this.apply(name, this.variant);
+          this.updateActiveUI(name, label);
+          localStorage.setItem("monet-preset", name);
+        });
+      });
+
+      // Custom color picker
+      const picker = this.querySelector(".monet-custom-picker") as HTMLInputElement;
+      const customDot = this.querySelector(".monet-custom-dot") as HTMLElement;
+      const customHex = localStorage.getItem("monet-custom-hex");
+      if (customHex && picker) {
+        picker.value = customHex;
+        customDot.style.setProperty("--custom-color", customHex);
+      }
+      
+      picker?.addEventListener("input", () => {
+        const hex = picker.value;
+        customDot.style.setProperty("--custom-color", hex);
+        const key = `custom-${hex.replace("#", "")}-${this.variant}`;
+        const { light, dark } = generateSchemeCSS(hex, this.variant);
+        const cssStr = light.replace(
+          /\[data-monet="[^"]*"\]/,
+          `[data-monet="${key}"]`
+        ) +
+          "\n" +
+          dark.replace(
+            /\[data-theme="dark"\]\[data-monet="[^"]*"\]/,
+            `[data-theme="dark"][data-monet="${key}"]`
+          );
+        this.inject(cssStr);
+        document.documentElement.setAttribute("data-monet", key);
+        this.preset = key;
+        this.updateActiveUI("custom", "Custom Color", hex);
+        localStorage.setItem("monet-preset", key);
+        localStorage.setItem("monet-custom-hex", hex);
+        localStorage.setItem("monet-custom-css", cssStr);
+      });
+
+      // Let clicking the custom dot container open the color picker
+      customDot?.addEventListener("click", (e) => {
+        if (e.target !== picker) {
+          picker.click();
+        }
+      });
+    }
+
+    private apply(name: string, variant: string) {
+      document.documentElement.setAttribute("data-monet", `${name}--${variant}`);
+      document.getElementById("monet-custom-inline")?.remove();
+    }
+
+    private inject(css: string) {
+      let s = document.getElementById("monet-custom-inline") as HTMLStyleElement;
+      if (!s) {
+        s = document.createElement("style");
+        s.id = "monet-custom-inline";
+        document.head.appendChild(s);
+      }
+      s.textContent = css;
+    }
+
+    private updateActiveUI(name: string, label: string, customHex?: string) {
+      // Update active attributes on dots
+      const baseName = name.startsWith("custom-") ? "custom" : name.split("--")[0];
+      this.querySelectorAll(".monet-preset-dot").forEach((b) => {
+        const btn = b as HTMLElement;
+        btn.toggleAttribute("data-active", btn.dataset.name === baseName);
+      });
+
+      // Update label text
+      if (this.themeNameEl) {
+        this.themeNameEl.textContent = label;
+      }
+    }
+  }
+
+  if (!customElements.get("monet-switcher")) {
+    customElements.define("monet-switcher", MonetSwitcher);
+  }
+</script>

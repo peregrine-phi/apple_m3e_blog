@@ -1,0 +1,149 @@
+/* ==========================================================================
+   Button Components (Material 3 State Layer System)
+   ========================================================================== */
+
+.btn {
+  /* State layer content color (on-color) — override per variant */
+  --btn-content-r: 0;
+  --btn-content-g: 0;
+  --btn-content-b: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--blog-space-2);
+  padding: var(--blog-space-2) var(--blog-space-5);
+  border-radius: var(--blog-radius-button);
+  font-family: var(--blog-font-sans);
+  font-size: var(--blog-typescale-label-large-size);
+  font-weight: var(--blog-font-weight-medium);
+  letter-spacing: var(--blog-typescale-label-large-tracking);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    box-shadow var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+    transform var(--blog-motion-duration-normal) var(--blog-motion-easing-emphasized);
+  user-select: none;
+  position: relative;
+}
+
+/* The background-image state layer overlay (M3 compositing) */
+.btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: background-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+  background-color: transparent;
+}
+
+.btn:hover::after {
+  background-color: rgba(
+    var(--btn-content-r),
+    var(--btn-content-g),
+    var(--btn-content-b),
+    var(--blog-state-hover-opacity)
+  );
+}
+
+.btn:active::after {
+  background-color: rgba(
+    var(--btn-content-r),
+    var(--btn-content-g),
+    var(--btn-content-b),
+    var(--blog-state-press-opacity)
+  );
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--blog-color-primary);
+  outline-offset: 2px;
+  border-radius: var(--blog-radius-xs);
+}
+
+.btn:focus-visible::after {
+  background-color: rgba(
+    var(--btn-content-r),
+    var(--btn-content-g),
+    var(--btn-content-b),
+    var(--blog-state-focus-opacity)
+  );
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* ── Primary (filled) ── */
+.btn-primary {
+  --btn-content-r: 255;
+  --btn-content-g: 255;
+  --btn-content-b: 255;
+  background-color: var(--blog-color-primary);
+  color: var(--blog-color-on-primary);
+}
+
+/* ── Secondary / Tonal ── */
+.btn-secondary {
+  --btn-content-r: 0;
+  --btn-content-g: 0;
+  --btn-content-b: 0;
+  background-color: var(--blog-color-surface-container-highest, var(--blog-color-surface-variant));
+  color: var(--blog-color-on-surface-variant, var(--blog-color-text-secondary));
+}
+
+[data-theme="dark"] .btn-secondary {
+  --btn-content-r: 255;
+  --btn-content-g: 255;
+  --btn-content-b: 255;
+}
+
+/* ── Ghost / Text ── */
+.btn-ghost {
+  --btn-content-r: 0;
+  --btn-content-g: 0;
+  --btn-content-b: 0;
+  background-color: transparent;
+  color: var(--blog-color-on-surface-variant, var(--blog-color-text-secondary));
+}
+
+.btn-ghost:hover {
+  color: var(--blog-color-on-surface);
+}
+
+[data-theme="dark"] .btn-ghost {
+  --btn-content-r: 255;
+  --btn-content-g: 255;
+  --btn-content-b: 255;
+}
+
+/* ── Outline ── */
+.btn-outline {
+  --btn-content-r: 0;
+  --btn-content-g: 0;
+  --btn-content-b: 0;
+  background-color: var(--blog-color-surface);
+  color: var(--blog-color-on-surface);
+  border: 2px solid var(--blog-color-outline, var(--blog-color-border-strong));
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background-color: var(--blog-color-on-surface);
+  color: var(--blog-color-surface);
+  box-shadow: 4px 4px 0 var(--blog-color-on-surface);
+}
+
+.btn-outline:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--blog-color-on-surface);
+}
+
+[data-theme="dark"] .btn-outline {
+  --btn-content-r: 255;
+  --btn-content-g: 255;
+  --btn-content-b: 255;
+  border-color: var(--blog-color-outline, var(--blog-color-border));
+}

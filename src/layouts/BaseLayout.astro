@@ -1,0 +1,159 @@
+---
+// BaseLayout.astro — Root layout for all pages
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import MonetCSS from "../components/MonetCSS.astro";
+import MDButton from "../components/MDButton.astro";
+import MDSnackbar from "../components/MDSnackbar.astro";
+import "../styles/main.css";
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  transparentHeader?: boolean;
+}
+
+const {
+  title,
+  description = "A personal blog about design, technology, and thoughtful living.",
+  image,
+  transparentHeader = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme>
+  <head>
+    <!-- Restore saved Lang before first paint to prevent FOUC -->
+    <script is:inline>
+      (function(){
+        var l = localStorage.getItem("lang") || (navigator.language && navigator.language.indexOf("zh") === 0 ? "zh" : "en");
+        document.documentElement.setAttribute("lang", l);
+      })();
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    {image && <meta property="og:image" content={image} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {image && <meta name="twitter:image" content={image} />}
+
+    <!-- Theme color -->
+    <meta name="theme-color" content="#3B5CF6" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Monet Dynamic Color CSS (pre-generated at build time) -->
+    <MonetCSS />
+
+    <!-- Restore saved Monet scheme before first paint to prevent FOUC -->
+    <script is:inline>
+      (function(){
+        var s = localStorage.getItem("monet-preset");
+        if (s) {
+          if (s.indexOf("custom-") === 0) {
+            document.documentElement.setAttribute("data-monet", s);
+            var css = localStorage.getItem("monet-custom-css");
+            if (css) {
+              var style = document.createElement("style");
+              style.id = "monet-custom-inline";
+              style.textContent = css;
+              document.head.appendChild(style);
+            }
+          } else {
+            var v = localStorage.getItem("monet-variant") || "tonalSpot";
+            document.documentElement.setAttribute("data-monet", s + "--" + v);
+          }
+        }
+      })();
+    </script>
+
+    <title>{title}</title>
+
+    <!-- Prevent FOUC (Flash of Unstyled Content) with theme -->
+    <script is:inline>
+      (function () {
+        const theme =
+          localStorage.getItem("theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <Header transparent={transparentHeader} />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+
+    <!-- "Scroll to Top" FAB component -->
+    <div class="scroll-to-top-container">
+      <MDButton id="scroll-to-top-btn" variant="fab" aria-label="Scroll to top">
+        <svg slot="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="18 15 12 9 6 15" />
+        </svg>
+      </MDButton>
+    </div>
+
+    <!-- Global MDSnackbar notification container -->
+    <MDSnackbar />
+
+    <style is:global>
+      /* Scroll to Top container styling */
+      .scroll-to-top-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 90;
+        opacity: 0;
+        transform: scale(0) translateY(12px);
+        transition: 
+          opacity var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-emphasized),
+          transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-emphasized);
+        pointer-events: none;
+      }
+
+      .scroll-to-top-container.visible {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        pointer-events: auto;
+      }
+    </style>
+
+    <script>
+      const scrollContainer = document.querySelector(".scroll-to-top-container") as HTMLElement;
+      const scrollBtn = document.getElementById("scroll-to-top-btn");
+
+      if (scrollContainer && scrollBtn) {
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 300) {
+            scrollContainer.classList.add("visible");
+          } else {
+            scrollContainer.classList.remove("visible");
+          }
+        });
+
+        scrollBtn.addEventListener("click", () => {
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

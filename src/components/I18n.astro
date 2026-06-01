@@ -1,0 +1,11 @@
+---
+// src/components/I18n.astro
+import { translations } from "../i18n/translations";
+
+interface Props {
+  tKey: keyof typeof translations.en;
+}
+
+const { tKey } = Astro.props;
+---
+<span class="i18n-en">{translations.en[tKey]}</span><span class="i18n-zh">{translations.zh[tKey]}</span>

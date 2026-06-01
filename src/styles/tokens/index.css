@@ -1,0 +1,13 @@
+/* ============================================
+   Design Tokens — Aggregated Entry Point
+   ============================================ */
+
+@import "./colors.css";
+@import "./typography.css";
+@import "./spacing.css";
+@import "./elevation.css";
+@import "./shape.css";
+@import "./motion.css";
+@import "./brutalist.css";
+@import "./state-layer.css";
+@import "./surface.css";

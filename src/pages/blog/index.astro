@@ -1,0 +1,217 @@
+---
+// blog/index.astro — Blog post listing with dynamic tag & search filtering
+import BlogListLayout from "../../layouts/BlogListLayout.astro";
+import BlogCard from "../../components/BlogCard.astro";
+import SearchBar from "../../components/SearchBar.astro";
+import MDBadge from "../../components/MDBadge.astro";
+import I18n from "../../components/I18n.astro";
+import FilterGroup from "../../components/FilterGroup.astro";
+import { tagConfig, stageConfig } from "../../content/filter-config";
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection("blog", ({ data }) => !data.draft);
+const posts = allPosts.sort(
+  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+
+// Get unique tags from all posts
+const allTags = Array.from(new Set(posts.flatMap(p => p.data.tags || []))).sort();
+---
+
+<BlogListLayout
+  title="Blog — M3E"
+  description="All articles on design, technology, and thoughtful living."
+>
+  {
+    posts.length === 0 ? (
+      <div class="empty-state">
+        <p class="text-body-large text-secondary"><I18n tKey="blog.empty" /></p>
+      </div>
+    ) : (
+      <div class="blog-filter-section">
+        <div class="search-container">
+          <SearchBar id="blog-search" placeholder="Search articles, tags or descriptions..." />
+        </div>
+
+        <!-- Reusable Filter Layout Group: Tags -->
+        <FilterGroup
+          titleKey="blog.filterTag"
+          badgeVariant="primary"
+          filterType="tag"
+          items={allTags}
+          config={tagConfig}
+          allLabelKey="blog.allTags"
+        />
+
+        <!-- Reusable Filter Layout Group: Stages -->
+        <FilterGroup
+          titleKey="blog.filterStage"
+          badgeVariant="secondary"
+          filterType="stage"
+          items={["seedling", "budding", "evergreen"]}
+          config={stageConfig}
+          allLabelKey="blog.allStages"
+        />
+      </div>
+
+      <div class="blog-grid">
+        {posts.map((post) => (
+          <div 
+            class="blog-card-wrapper" 
+            data-tags={post.data.tags?.map(t => t.toLowerCase()).join(",") || ""}
+            data-title={post.data.title.toLowerCase()}
+            data-desc={post.data.description.toLowerCase()}
+            data-stage={post.data.growthStage}
+          >
+            <BlogCard post={post} />
+          </div>
+        ))}
+      </div>
+    )
+  }
+</BlogListLayout>
+
+
+<script>
+  function initFilters() {
+    const searchInput = document.getElementById("blog-search") as HTMLInputElement;
+    const tagChips = document.querySelectorAll(".tags-chips .filter-chip");
+    const allTagChip = document.querySelector('.tags-chips .filter-chip[data-tag="all"]');
+    const stageChips = document.querySelectorAll(".stages-chips .filter-chip");
+    const allStageChip = document.querySelector('.stages-chips .filter-chip[data-stage="all"]');
+    const cards = document.querySelectorAll(".blog-card-wrapper") as NodeListOf<HTMLElement>;
+
+    let activeTags = new Set<string>();
+    let activeStages = new Set<string>();
+    let searchQuery = "";
+
+    function updatePlaceholder(lang: string) {
+      if (searchInput) {
+        searchInput.placeholder = lang === "zh" ? "搜索文章、标签或描述..." : "Search articles, tags or descriptions...";
+      }
+    }
+
+    // Set initial placeholder based on current lang
+    const initialLang = document.documentElement.getAttribute("lang") || "en";
+    updatePlaceholder(initialLang);
+
+    // Listen to client-side language changes
+    window.addEventListener("lang-change", (e: any) => {
+      updatePlaceholder(e.detail.lang);
+      // Re-trigger filter in case empty state text needs localization change
+      filterPosts();
+    });
+
+    function filterPosts() {
+      let visibleCount = 0;
+
+      cards.forEach((card) => {
+        const tagsStr = card.dataset.tags || "";
+        const title = card.dataset.title || "";
+        const desc = card.dataset.desc || "";
+        const stage = card.dataset.stage || "seedling";
+
+        const cardTags = tagsStr.split(",").filter(Boolean);
+        const matchesTag = activeTags.size === 0 || cardTags.some(t => activeTags.has(t));
+        const matchesStage = activeStages.size === 0 || activeStages.has(stage);
+        const matchesSearch = title.includes(searchQuery) || desc.includes(searchQuery) || tagsStr.includes(searchQuery);
+
+        if (matchesTag && matchesStage && matchesSearch) {
+          card.style.display = "";
+          card.style.opacity = "0";
+          card.style.transform = "translateY(8px)";
+          requestAnimationFrame(() => {
+            card.style.transition = "opacity 200ms cubic-bezier(0.2, 0, 0, 1), transform 200ms cubic-bezier(0.2, 0, 0, 1)";
+            card.style.opacity = "1";
+            card.style.transform = "translateY(0)";
+          });
+          visibleCount++;
+        } else {
+          card.style.display = "none";
+        }
+      });
+
+      // Handle empty state
+      let emptyEl = document.getElementById("blog-empty-state");
+      if (visibleCount === 0) {
+        if (!emptyEl) {
+          emptyEl = document.createElement("div");
+          emptyEl.id = "blog-empty-state";
+          emptyEl.className = "empty-state";
+          const grid = document.querySelector(".blog-grid");
+          grid?.parentNode?.appendChild(emptyEl);
+        }
+        const isZh = document.documentElement.getAttribute("lang") === "zh";
+        emptyEl.innerHTML = `<p class="text-body-large text-secondary">${
+          isZh ? "没有找到匹配您搜索的文章。" : "No articles found matching your search."
+        }</p>`;
+      } else {
+        emptyEl?.remove();
+      }
+    }
+
+    tagChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const tag = (chip as HTMLElement).dataset.tag || "all";
+        
+        if (tag === "all") {
+          activeTags.clear();
+          tagChips.forEach((c) => c.classList.remove("active"));
+          allTagChip?.classList.add("active");
+        } else {
+          allTagChip?.classList.remove("active");
+          
+          if (activeTags.has(tag)) {
+            activeTags.delete(tag);
+            chip.classList.remove("active");
+          } else {
+            activeTags.add(tag);
+            chip.classList.add("active");
+          }
+          
+          if (activeTags.size === 0) {
+            allTagChip?.classList.add("active");
+          }
+        }
+        
+        filterPosts();
+      });
+    });
+
+    stageChips.forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const stage = (chip as HTMLElement).dataset.stage || "all";
+        
+        if (stage === "all") {
+          activeStages.clear();
+          stageChips.forEach((c) => c.classList.remove("active"));
+          allStageChip?.classList.add("active");
+        } else {
+          allStageChip?.classList.remove("active");
+          
+          if (activeStages.has(stage)) {
+            activeStages.delete(stage);
+            chip.classList.remove("active");
+          } else {
+            activeStages.add(stage);
+            chip.classList.add("active");
+          }
+          
+          if (activeStages.size === 0) {
+            allStageChip?.classList.add("active");
+          }
+        }
+        
+        filterPosts();
+      });
+    });
+
+    searchInput?.addEventListener("input", () => {
+      searchQuery = searchInput.value.toLowerCase().trim();
+      filterPosts();
+    });
+  }
+
+  initFilters();
+  document.addEventListener("astro:after-swap", initFilters);
+</script>

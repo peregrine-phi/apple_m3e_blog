@@ -1,0 +1,236 @@
+/* ============================================
+   Global Styles
+   Semantic utility classes using design tokens
+   ============================================ */
+
+/* ── Typography Utility Classes ── */
+
+.text-display-large {
+  font-size: var(--blog-typescale-display-large-size);
+  line-height: var(--blog-typescale-display-large-leading);
+  font-weight: var(--blog-typescale-display-large-weight);
+  letter-spacing: var(--blog-typescale-display-large-tracking);
+}
+
+.text-display-medium {
+  font-size: var(--blog-typescale-display-medium-size);
+  line-height: var(--blog-typescale-display-medium-leading);
+  font-weight: var(--blog-typescale-display-medium-weight);
+  letter-spacing: var(--blog-typescale-display-medium-tracking);
+}
+
+.text-display-small {
+  font-size: var(--blog-typescale-display-small-size);
+  line-height: var(--blog-typescale-display-small-leading);
+  font-weight: var(--blog-typescale-display-small-weight);
+  letter-spacing: var(--blog-typescale-display-small-tracking);
+}
+
+.text-headline-large {
+  font-size: var(--blog-typescale-headline-large-size);
+  line-height: var(--blog-typescale-headline-large-leading);
+  font-weight: var(--blog-typescale-headline-large-weight);
+  letter-spacing: var(--blog-typescale-headline-large-tracking);
+}
+
+.text-headline-medium {
+  font-size: var(--blog-typescale-headline-medium-size);
+  line-height: var(--blog-typescale-headline-medium-leading);
+  font-weight: var(--blog-typescale-headline-medium-weight);
+  letter-spacing: var(--blog-typescale-headline-medium-tracking);
+}
+
+.text-headline-small {
+  font-size: var(--blog-typescale-headline-small-size);
+  line-height: var(--blog-typescale-headline-small-leading);
+  font-weight: var(--blog-typescale-headline-small-weight);
+  letter-spacing: var(--blog-typescale-headline-small-tracking);
+}
+
+.text-body-large {
+  font-size: var(--blog-typescale-body-large-size);
+  line-height: var(--blog-typescale-body-large-leading);
+  font-weight: var(--blog-typescale-body-large-weight);
+  letter-spacing: var(--blog-typescale-body-large-tracking);
+}
+
+.text-body-medium {
+  font-size: var(--blog-typescale-body-medium-size);
+  line-height: var(--blog-typescale-body-medium-leading);
+  font-weight: var(--blog-typescale-body-medium-weight);
+  letter-spacing: var(--blog-typescale-body-medium-tracking);
+}
+
+.text-body-small {
+  font-size: var(--blog-typescale-body-small-size);
+  line-height: var(--blog-typescale-body-small-leading);
+  font-weight: var(--blog-typescale-body-small-weight);
+  letter-spacing: var(--blog-typescale-body-small-tracking);
+}
+
+.text-label-large {
+  font-size: var(--blog-typescale-label-large-size);
+  line-height: var(--blog-typescale-label-large-leading);
+  font-weight: var(--blog-typescale-label-large-weight);
+  letter-spacing: var(--blog-typescale-label-large-tracking);
+}
+
+.text-label-medium {
+  font-size: var(--blog-typescale-label-medium-size);
+  line-height: var(--blog-typescale-label-medium-leading);
+  font-weight: var(--blog-typescale-label-medium-weight);
+  letter-spacing: var(--blog-typescale-label-medium-tracking);
+}
+
+.text-label-small {
+  font-size: var(--blog-typescale-label-small-size);
+  line-height: var(--blog-typescale-label-small-leading);
+  font-weight: var(--blog-typescale-label-small-weight);
+  letter-spacing: var(--blog-typescale-label-small-tracking);
+}
+
+/* ── Apple News editorial: Kicker & Deck ── */
+.text-kicker {
+  font-size: var(--blog-typescale-kicker-size);
+  line-height: var(--blog-typescale-kicker-leading);
+  font-weight: var(--blog-typescale-kicker-weight);
+  letter-spacing: var(--blog-typescale-kicker-tracking);
+  text-transform: uppercase;
+  color: var(--blog-color-primary);
+}
+
+.text-deck {
+  font-size: var(--blog-typescale-deck-size);
+  line-height: var(--blog-typescale-deck-leading);
+  font-weight: var(--blog-typescale-deck-weight);
+  letter-spacing: var(--blog-typescale-deck-tracking);
+  color: var(--blog-color-text-secondary);
+}
+
+.text-serif {
+  font-family: var(--blog-font-serif);
+}
+
+.text-mono {
+  font-family: var(--blog-font-mono);
+}
+
+/* ── Text Color Utilities ── */
+.text-primary {
+  color: var(--blog-color-text-primary);
+}
+
+.text-secondary {
+  color: var(--blog-color-text-secondary);
+}
+
+.text-tertiary {
+  color: var(--blog-color-text-tertiary);
+}
+
+/* ── Measure (readable width) ── */
+.measure-narrow {
+  max-width: var(--blog-measure-narrow);
+}
+
+.measure-normal {
+  max-width: var(--blog-measure-normal);
+}
+
+.measure-wide {
+  max-width: var(--blog-measure-wide);
+}
+
+/* ── Surface Utilities ── */
+.surface {
+  background-color: var(--blog-color-surface);
+  color: var(--blog-color-on-surface);
+}
+
+.surface-variant {
+  background-color: var(--blog-color-surface-variant);
+  color: var(--blog-color-on-surface-variant);
+}
+
+.surface-raised {
+  background-color: var(--blog-color-surface-raised);
+  color: var(--blog-color-on-surface);
+}
+
+
+
+/* ── Container ── */
+.container-narrow {
+  width: 100%;
+  max-width: 800px;
+  margin-inline: auto;
+  padding-inline: var(--blog-space-page-inline);
+}
+
+.container-wide {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--blog-space-page-inline);
+}
+
+/* ── Divider ── */
+.divider {
+  border: none;
+  border-top: 1px solid var(--blog-color-divider);
+}
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--blog-space-0-5) var(--blog-space-2-5);
+  border-radius: var(--blog-radius-badge);
+  font-size: var(--blog-typescale-label-small-size);
+  font-weight: var(--blog-font-weight-medium);
+  letter-spacing: var(--blog-typescale-label-small-tracking);
+  background-color: var(--blog-color-primary-container);
+  color: var(--blog-color-on-primary-container);
+}
+
+/* ── Visually Hidden ── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Responsive utilities ── */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* ── Global focus-visible (all inline links) ── */
+a:focus-visible {
+  outline: 2px solid var(--blog-color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── i18n Visibility Controls ── */
+html[lang="en"] .i18n-zh {
+  display: none !important;
+}
+html[lang="zh"] .i18n-en {
+  display: none !important;
+}
+

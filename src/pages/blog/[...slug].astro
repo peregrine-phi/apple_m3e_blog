@@ -1,0 +1,24 @@
+---
+// blog/[...slug].astro — Individual blog post page
+import { getCollection, type CollectionEntry } from "astro:content";
+import BlogPostLayout from "../../layouts/BlogPostLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/\.mdx?$/, "") },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await post.render();
+---
+
+<BlogPostLayout post={post} headings={headings}>
+  <Content />
+</BlogPostLayout>

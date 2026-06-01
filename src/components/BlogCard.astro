@@ -1,0 +1,227 @@
+---
+// BlogCard.astro — Blog post card component
+// Variants: "default" (clean Apple card) | "brutal" (thick border + offset shadow)
+import type { CollectionEntry } from "astro:content";
+import Chip from "./Chip.astro";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+  variant?: "default" | "brutal";
+  showImage?: boolean;
+}
+
+const { post, variant = "default", showImage = false } = Astro.props;
+const { title, description, publishedAt, tags, image, growthStage } = post.data;
+const formattedDate = publishedAt.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+const hasImage = showImage && image != null;
+
+// i18n tag classification
+const langTag = tags.find(t => t.toLowerCase() === "en" || t.toLowerCase() === "zh");
+const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase() !== "zh");
+---
+
+<article class:list={["blog-card", `blog-card--${variant}`]}>
+  <a href={`/blog/${post.id.replace(/\.mdx?$/, "")}`} class="blog-card-link">
+    {
+      hasImage && (
+        <div class="blog-card-image">
+          <img src={image} alt="" loading="lazy" decoding="async" />
+        </div>
+      )
+    }
+    <div class="blog-card-content">
+      <!-- Kicker & Growth Stage Header -->
+      <div class="blog-card-header">
+        {
+          displayTags.length > 0 && (
+            <p class="blog-card-kicker text-kicker">{displayTags[0]}</p>
+          )
+        }
+        <div class="blog-card-meta-chips" style="display: flex; align-items: center; gap: 6px;">
+          {
+            langTag && (
+              <span class={`blog-card-lang blog-card-lang--${langTag.toLowerCase()}`} title={`Language: ${langTag.toUpperCase()}`}>
+                <span class="lang-label">{langTag.toUpperCase() === "ZH" ? "中文" : "EN"}</span>
+              </span>
+            )
+          }
+          <span class={`blog-card-stage blog-card-stage--${growthStage}`} title={`Growth stage: ${growthStage}`}>
+            <span class="stage-emoji">{growthStage === "evergreen" ? "🌳" : growthStage === "budding" ? "🌿" : "🌱"}</span>
+            <span class="stage-label">{growthStage}</span>
+          </span>
+        </div>
+      </div>
+
+      <h2 class="blog-card-title text-headline-medium">{title}</h2>
+
+      <p class="blog-card-desc text-body-medium text-secondary">{description}</p>
+
+      <div class="blog-card-footer">
+        <time
+          datetime={publishedAt.toISOString()}
+          class="text-label-medium text-tertiary"
+        >
+          {formattedDate}
+        </time>
+
+        {
+          displayTags.length > 1 && (
+            <span class="blog-card-extra-tags">
+              {displayTags.slice(1, 3).map((tag) => (
+                <Chip variant="filter">{tag}</Chip>
+              ))}
+            </span>
+          )
+        }
+      </div>
+    </div>
+  </a>
+</article>
+
+<style>
+  /* ── Default card ── */
+  .blog-card {
+    overflow: hidden;
+    background-color: var(--blog-color-surface);
+    border-radius: var(--blog-radius-card);
+    border: 1px solid var(--blog-color-border);
+    transition:
+      box-shadow var(--blog-motion-duration-normal)
+        var(--blog-motion-easing-standard),
+      transform var(--blog-motion-duration-normal)
+        var(--blog-motion-easing-standard);
+  }
+
+  .blog-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--blog-shadow-card-hover);
+  }
+
+  /* ── Brutalist card ── */
+  .blog-card--brutal {
+    border: var(--blog-brutal-border-width) solid var(--blog-brutal-border-color);
+    border-radius: var(--blog-radius-card);
+    box-shadow: var(--blog-brutal-shadow);
+    background: var(--blog-color-surface);
+  }
+
+  .blog-card--brutal:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--blog-brutal-shadow-hover);
+  }
+
+  .blog-card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  .blog-card-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--blog-color-background),
+      0 0 0 4px var(--blog-color-primary);
+  }
+
+  /* ── Cover image ── */
+  .blog-card-image {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-bottom: 1px solid var(--blog-color-border);
+  }
+
+  .blog-card--brutal .blog-card-image {
+    border-bottom: var(--blog-brutal-border-width) solid var(--blog-brutal-border-color);
+  }
+
+  .blog-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--blog-motion-duration-slow)
+      var(--blog-motion-easing-standard);
+  }
+
+  .blog-card:hover .blog-card-image img {
+    transform: scale(1.03);
+  }
+
+  /* ── Content ── */
+  .blog-card-content {
+    padding: var(--blog-space-card-padding);
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-2);
+    height: 100%;
+  }
+
+  .blog-card-kicker {
+    margin: 0;
+  }
+
+  .blog-card-title {
+    color: var(--blog-color-text-primary);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-card-desc {
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin: 0;
+  }
+
+  /* ── Footer ── */
+  .blog-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--blog-space-2);
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: var(--blog-space-2);
+  }
+
+  .blog-card-extra-tags {
+    display: flex;
+    gap: var(--blog-space-1-5);
+    flex-wrap: wrap;
+  }
+
+  /* ── Language Badge ── */
+  .blog-card-lang {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--blog-radius-badge, 12px);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-sizing: border-box;
+    transition: background-color var(--blog-motion-duration-fast), color var(--blog-motion-duration-fast);
+  }
+
+  .blog-card-lang--en {
+    background-color: var(--blog-color-primary-container);
+    color: var(--blog-color-on-primary-container);
+    border: 1px solid var(--blog-color-outline-variant);
+  }
+
+  .blog-card-lang--zh {
+    background-color: var(--blog-color-tertiary-container);
+    color: var(--blog-color-on-tertiary-container);
+    border: 1px solid var(--blog-color-outline-variant);
+  }
+</style>

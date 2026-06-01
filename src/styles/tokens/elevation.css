@@ -1,0 +1,37 @@
+/* ============================================
+   Elevation (Shadow) Design Tokens
+   M3-inspired elevation hierarchy
+   Namespace: --blog-elevation-*
+   ============================================ */
+
+:root {
+  /* ── Elevation Levels ── */
+  --blog-elevation-0: none;
+
+  --blog-elevation-1:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.06);
+  --blog-elevation-2:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 3px 12px rgba(0, 0, 0, 0.06);
+  --blog-elevation-3:
+    0 2px 6px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.08);
+  --blog-elevation-4:
+    0 4px 12px rgba(0, 0, 0, 0.05),
+    0 16px 40px rgba(0, 0, 0, 0.1);
+  --blog-elevation-5:
+    0 8px 24px rgba(0, 0, 0, 0.06),
+    0 24px 64px rgba(0, 0, 0, 0.14);
+
+  /* ── Semantic Elevation ── */
+  --blog-shadow-card: var(--blog-elevation-1);
+  --blog-shadow-card-hover: var(--blog-elevation-3);
+  --blog-shadow-dropdown: var(--blog-elevation-3);
+  --blog-shadow-modal: var(--blog-elevation-5);
+  --blog-shadow-nav: var(--blog-elevation-2);
+
+  /* ── Subtle inner glow (Apple-style) ── */
+  --blog-shadow-inset-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --blog-shadow-ring: 0 0 0 1px var(--blog-color-border);
+}

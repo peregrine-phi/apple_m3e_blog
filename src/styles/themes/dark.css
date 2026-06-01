@@ -1,0 +1,200 @@
+/* ============================================
+   Dark Theme
+   Apple-inspired true dark with M3 surface nuance
+   ============================================ */
+
+[data-theme="dark"] {
+  /* ── System / Semantic Colors ── */
+
+  --blog-color-primary: hsl(
+    var(--blog-ref-primary-h),
+    100%,
+    78%
+  );
+  --blog-color-primary-hover: hsl(
+    var(--blog-ref-primary-h),
+    100%,
+    68%
+  );
+  --blog-color-primary-active: hsl(
+    var(--blog-ref-primary-h),
+    100%,
+    58%
+  );
+  --blog-color-on-primary: hsl(
+    var(--blog-ref-primary-h),
+    50%,
+    12%
+  );
+  --blog-color-primary-container: hsl(
+    var(--blog-ref-primary-h),
+    40%,
+    22%
+  );
+  --blog-color-on-primary-container: hsl(
+    var(--blog-ref-primary-h),
+    100%,
+    88%
+  );
+
+  --blog-color-secondary: hsl(
+    var(--blog-ref-secondary-h),
+    70%,
+    72%
+  );
+  --blog-color-on-secondary: hsl(
+    var(--blog-ref-secondary-h),
+    50%,
+    12%
+  );
+  --blog-color-secondary-container: hsl(
+    var(--blog-ref-secondary-h),
+    35%,
+    22%
+  );
+  --blog-color-on-secondary-container: hsl(
+    var(--blog-ref-secondary-h),
+    80%,
+    88%
+  );
+
+  --blog-color-tertiary: hsl(
+    var(--blog-ref-tertiary-h),
+    70%,
+    70%
+  );
+  --blog-color-on-tertiary: hsl(
+    var(--blog-ref-tertiary-h),
+    60%,
+    12%
+  );
+  --blog-color-tertiary-container: hsl(
+    var(--blog-ref-tertiary-h),
+    35%,
+    22%
+  );
+  --blog-color-on-tertiary-container: hsl(
+    var(--blog-ref-tertiary-h),
+    60%,
+    88%
+  );
+
+  /* ── Surface & Background ── */
+  --blog-color-background: #0a0a0c;
+  --blog-color-on-background: rgba(255, 255, 255, 0.88);
+
+  --blog-color-surface: #1c1c1e;
+  --blog-color-on-surface: rgba(255, 255, 255, 0.88);
+  --blog-color-surface-variant: #2c2c2e;
+  --blog-color-on-surface-variant: rgba(255, 255, 255, 0.55);
+
+  --blog-color-surface-raised: #28282a;
+  --blog-color-surface-dim: #141416;
+
+  --blog-color-inverse-surface: #f5f5f5;
+  --blog-color-inverse-on-surface: #303030;
+
+  /* ── Glassmorphism ── */
+  --blog-glass-bg: rgba(22, 22, 26, 0.45);
+  --blog-glass-bg-hover: rgba(22, 22, 26, 0.52);
+  --blog-glass-border: rgba(255, 255, 255, 0.15);
+  --blog-glass-border-hover: rgba(255, 255, 255, 0.2);
+  --blog-glass-shadow:
+    0 10px 30px -10px rgba(0, 0, 0, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.15),
+    inset 0 1.5px 0px rgba(255, 255, 255, 0.12),
+    inset 0 -1.5px 0px rgba(0, 0, 0, 0.2);
+  --blog-glass-shadow-hover:
+    0 12px 36px -8px rgba(0, 0, 0, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    inset 0 1.5px 0px rgba(255, 255, 255, 0.15),
+    inset 0 -1.5px 0px rgba(0, 0, 0, 0.2);
+  --blog-glass-sweep-gradient: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05) 30%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 70%,
+    transparent
+  );
+
+  /* ── Text ── */
+  --blog-color-text-primary: rgba(255, 255, 255, 0.92);
+  --blog-color-text-secondary: rgba(255, 255, 255, 0.55);
+  --blog-color-text-tertiary: rgba(255, 255, 255, 0.28);
+  --blog-color-text-quaternary: rgba(255, 255, 255, 0.12);
+
+  --blog-color-text-link: var(--blog-color-primary);
+  --blog-color-text-link-hover: hsl(
+    var(--blog-ref-primary-h),
+    100%,
+    88%
+  );
+
+  /* ── Borders & Dividers ── */
+  --blog-color-border: rgba(255, 255, 255, 0.08);
+  --blog-color-border-strong: rgba(255, 255, 255, 0.15);
+  --blog-color-divider: rgba(255, 255, 255, 0.06);
+
+  /* ── M3 Outline tokens ── */
+  --blog-color-outline: rgba(255, 255, 255, 0.20);
+  --blog-color-outline-variant: rgba(255, 255, 255, 0.10);
+
+  /* ── Selection ── */
+  --blog-color-selection-bg: hsla(
+    var(--blog-ref-primary-h),
+    100%,
+    78%,
+    0.3
+  );
+  --blog-color-selection-text: var(--blog-color-text-primary);
+
+  /* ── Shadows (darker for dark mode) ── */
+  --blog-elevation-1:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 1px 3px rgba(0, 0, 0, 0.3);
+  --blog-elevation-2:
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    0 3px 12px rgba(0, 0, 0, 0.3);
+  --blog-elevation-3:
+    0 2px 6px rgba(0, 0, 0, 0.2),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+  --blog-elevation-4:
+    0 4px 12px rgba(0, 0, 0, 0.25),
+    0 16px 40px rgba(0, 0, 0, 0.4);
+  --blog-elevation-5:
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    0 24px 64px rgba(0, 0, 0, 0.5);
+
+  /* Re-apply semantic shadows */
+  --blog-shadow-card: var(--blog-elevation-1);
+  --blog-shadow-card-hover: var(--blog-elevation-3);
+  --blog-shadow-dropdown: var(--blog-elevation-3);
+  --blog-shadow-modal: var(--blog-elevation-5);
+  --blog-shadow-nav: var(--blog-elevation-2);
+
+  --blog-shadow-inset-subtle: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --blog-shadow-ring: 0 0 0 1px var(--blog-color-border);
+
+  /* ── Dark mode semantic colors (Error / Warning / Success) ── */
+  --blog-color-error: hsl(
+    var(--blog-ref-error-h),
+    70%,
+    66%
+  );
+  --blog-color-on-error: hsl(
+    var(--blog-ref-error-h),
+    80%,
+    8%
+  );
+  --blog-color-error-container: hsl(
+    var(--blog-ref-error-h),
+    40%,
+    22%
+  );
+  --blog-color-on-error-container: hsl(
+    var(--blog-ref-error-h),
+    90%,
+    88%
+  );
+}

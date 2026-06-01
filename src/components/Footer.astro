@@ -1,0 +1,128 @@
+---
+// Footer.astro — Site footer
+import I18n from "./I18n.astro";
+---
+
+<footer class="site-footer">
+  <div class="container-wide footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="site-logo text-headline-small">
+        <span class="logo-dot" aria-hidden="true"></span>
+        M3E
+      </a>
+      <p class="text-body-small text-secondary">
+        <I18n tKey="footer.desc" />
+      </p>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4 class="text-label-large text-secondary"><I18n tKey="footer.nav" /></h4>
+        <a href="/" class="footer-link text-body-small"><I18n tKey="nav.home" /></a>
+        <a href="/blog" class="footer-link text-body-small"><I18n tKey="nav.blog" /></a>
+        <a href="/about" class="footer-link text-body-small"><I18n tKey="nav.about" /></a>
+      </div>
+      <div class="footer-col">
+        <h4 class="text-label-large text-secondary"><I18n tKey="footer.connect" /></h4>
+        <a href="/rss.xml" class="footer-link text-body-small"><I18n tKey="footer.rss" /></a>
+        <a href="https://github.com" class="footer-link text-body-small" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-wide footer-bottom">
+    <hr class="divider" />
+    <p class="text-label-small text-tertiary">
+      &copy; {new Date().getFullYear()} M3E. <I18n tKey="footer.built" />
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--blog-space-section-gap);
+    padding-top: var(--blog-space-16);
+    padding-bottom: var(--blog-space-8);
+    border-top: 1px solid var(--blog-color-divider);
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--blog-space-12);
+    flex-wrap: wrap;
+    margin-bottom: var(--blog-space-8);
+  }
+
+  .footer-brand {
+    max-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-3);
+  }
+
+  .site-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+    color: var(--blog-color-text-primary);
+    font-weight: var(--blog-font-weight-bold);
+    text-decoration: none;
+  }
+
+  .logo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--blog-radius-full);
+    background: linear-gradient(
+      135deg,
+      var(--blog-color-primary),
+      var(--blog-color-tertiary)
+    );
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--blog-space-12);
+  }
+
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-2);
+  }
+
+  .footer-link {
+    color: var(--blog-color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--blog-radius-xs);
+    transition: color var(--blog-motion-duration-fast)
+      var(--blog-motion-easing-standard);
+  }
+
+  .footer-link:hover {
+    color: var(--blog-color-text-primary);
+  }
+
+  .footer-link:focus-visible {
+    outline: 2px solid var(--blog-color-primary);
+    outline-offset: 2px;
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-4);
+  }
+
+  @media (max-width: 600px) {
+    .footer-inner {
+      flex-direction: column;
+      gap: var(--blog-space-8);
+    }
+
+    .footer-links {
+      gap: var(--blog-space-8);
+    }
+  }
+</style>

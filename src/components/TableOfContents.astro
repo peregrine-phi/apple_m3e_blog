@@ -1,0 +1,231 @@
+---
+// TableOfContents.astro — Apple News style article TOC
+// Props: headings[] from Astro's post.render()
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings?: Heading[];
+}
+
+const { headings = [] } = Astro.props;
+
+// Filter to h2 & h3 only; ignore h1 (it's the post title)
+const tocItems = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+const hasToc = tocItems.length > 0;
+---
+
+{hasToc && (
+  <>
+    <!-- Mobile: collapsible toggle -->
+    <details class="toc-mobile">
+      <summary class="toc-toggle">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toc-icon-list"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/></svg>
+        <span>Table of Contents</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toc-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <nav class="toc-nav-mobile" aria-label="Table of Contents">
+        <ol>
+          {tocItems.map((item) => (
+            <li class={`toc-item toc-depth-${item.depth}`}>
+              <a href={`#${item.slug}`} class="toc-link">{item.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </details>
+
+    <!-- Desktop: sticky sidebar -->
+    <aside class="toc-sidebar">
+      <span class="toc-label text-label-small text-tertiary">On this page</span>
+      <nav aria-label="Table of Contents">
+        <ol class="toc-list">
+          {tocItems.map((item) => (
+            <li class={`toc-item toc-depth-${item.depth}`}>
+              <a href={`#${item.slug}`} class="toc-link">{item.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    </aside>
+  </>
+)}
+
+<style>
+  /* ── Mobile TOC ── */
+  .toc-mobile {
+    display: none;
+    margin-bottom: var(--blog-space-6);
+    border: 1px solid var(--blog-color-border);
+    border-radius: var(--blog-radius-md);
+    background: var(--blog-color-surface);
+  }
+
+  .toc-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+    padding: var(--blog-space-4) var(--blog-space-5);
+    font-size: var(--blog-typescale-label-medium-size);
+    font-weight: var(--blog-font-weight-semibold);
+    color: var(--blog-color-text-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .toc-chevron {
+    margin-left: auto;
+    flex-shrink: 0;
+    transition: transform var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+  }
+
+  .toc-mobile[open] .toc-chevron {
+    transform: rotate(180deg);
+  }
+
+  .toc-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc-toggle::marker {
+    display: none;
+    content: "";
+  }
+
+  .toc-mobile[open] .toc-toggle {
+    border-bottom: 1px solid var(--blog-color-divider);
+  }
+
+  .toc-nav-mobile {
+    padding: var(--blog-space-3) var(--blog-space-5) var(--blog-space-4);
+  }
+
+  .toc-nav-mobile ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-1);
+  }
+
+  /* ── Desktop Sidebar TOC ── */
+  .toc-sidebar {
+    position: sticky;
+    top: 5.5rem;
+    width: 220px;
+    flex-shrink: 0;
+    max-height: calc(100vh - 5.5rem - var(--blog-space-16));
+    overflow-y: auto;
+    padding-right: var(--blog-space-4);
+    padding-left: var(--blog-space-2);
+    border-left: 1px solid var(--blog-color-divider);
+  }
+
+  .toc-label {
+    display: block;
+    margin-bottom: var(--blog-space-3);
+    text-transform: uppercase;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  /* ── Shared TOC items ── */
+  .toc-item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-depth-3 {
+    padding-left: var(--blog-space-4);
+  }
+
+  .toc-link {
+    display: block;
+    padding: 4px 0;
+    font-size: var(--blog-typescale-body-small-size);
+    line-height: 1.45;
+    color: var(--blog-color-text-tertiary);
+    text-decoration: none;
+    border-radius: var(--blog-radius-xs);
+    transition: color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+  }
+
+  .toc-link:hover {
+    color: var(--blog-color-text-primary);
+  }
+
+  .toc-link:focus-visible {
+    outline: 2px solid var(--blog-color-primary);
+    outline-offset: 1px;
+    border-radius: var(--blog-radius-xs);
+  }
+
+  /* Active heading — highlighted by JS via data attribute */
+  .toc-link[data-active="true"] {
+    color: var(--blog-color-primary);
+    font-weight: var(--blog-font-weight-medium);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 1024px) {
+    .toc-sidebar {
+      display: none;
+    }
+
+    .toc-mobile {
+      display: block;
+    }
+  }
+</style>
+
+<script>
+  // IntersectionObserver to highlight active heading in desktop TOC
+  function initTocScrollSpy() {
+    const tocLinks = document.querySelectorAll('.toc-sidebar .toc-link');
+    if (tocLinks.length === 0) return;
+
+    const headingIds = Array.from(tocLinks).map((link) =>
+      link.getAttribute('href')?.replace('#', '')
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.id;
+          const link = document.querySelector(`.toc-sidebar .toc-link[href="#${id}"]`);
+          if (!link) return;
+
+          if (entry.isIntersecting) {
+            // Deactivate all links, then activate current
+            tocLinks.forEach((l) => l.removeAttribute('data-active'));
+            link.setAttribute('data-active', 'true');
+          }
+        });
+      },
+      {
+        rootMargin: '-80px 0px -70% 0px',
+        threshold: 0,
+      }
+    );
+
+    headingIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  }
+
+  initTocScrollSpy();
+</script>

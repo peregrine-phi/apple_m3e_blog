@@ -1,0 +1,202 @@
+---
+// Chip.astro — Material Design 3 Chip component
+// Variants: assist | filter | input | suggestion
+
+const {
+  variant = "assist",
+  icon,
+  closable = false,
+  selected = false,
+  href,
+  id,
+} = Astro.props;
+
+const Tag = href ? "a" : "button";
+const buttonType = href ? null : "button";
+---
+
+<Tag
+  class:list={[
+    "chip",
+    `chip--${variant}`,
+    { "chip--selected": selected },
+    { "chip--closable": closable },
+    { "chip--icon": icon != null },
+  ]}
+  href={href}
+  type={buttonType}
+  aria-pressed={variant === "filter" ? String(selected) : null}
+>
+  <!-- Leading icon -->
+  {icon && <span class="chip-icon" aria-hidden="true"><slot name="icon" /></span>}
+
+  <!-- Label -->
+  <span class="chip-label"><slot /></span>
+
+  <!-- Filter checkmark -->
+  {variant === "filter" && selected && (
+    <span class="chip-check" aria-hidden="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </span>
+  )}
+
+  <!-- Close button (input variant) -->
+  {closable && variant === "input" && (
+    <span class="chip-close" role="button" aria-label="Remove" tabindex="0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </span>
+  )}
+</Tag>
+
+<style>
+  /* ── Base Chip ── */
+  .chip {
+    --chip-content-r: 0;
+    --chip-content-g: 0;
+    --chip-content-b: 0;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 8px;
+    border: 1px solid var(--blog-color-outline, var(--blog-color-border));
+    font-family: var(--blog-font-sans);
+    font-size: var(--blog-typescale-label-large-size);
+    font-weight: var(--blog-font-weight-medium);
+    letter-spacing: var(--blog-typescale-label-large-tracking);
+    line-height: 1;
+    color: var(--blog-color-on-surface-variant, var(--blog-color-text-secondary));
+    background-color: transparent;
+    cursor: pointer;
+    user-select: none;
+    text-decoration: none;
+    transition:
+      background-color 150ms var(--blog-motion-easing-standard),
+      box-shadow 150ms var(--blog-motion-easing-standard),
+      border-color 150ms var(--blog-motion-easing-standard);
+  }
+
+  /* State layers — M3 approach using linear-gradient overlay */
+  .chip:hover {
+    background-image: linear-gradient(
+      rgba(var(--chip-content-r), var(--chip-content-g), var(--chip-content-b), var(--blog-state-hover-opacity)),
+      rgba(var(--chip-content-r), var(--chip-content-g), var(--chip-content-b), var(--blog-state-hover-opacity))
+    );
+  }
+
+  .chip:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--blog-color-primary);
+    background-image: linear-gradient(
+      rgba(var(--chip-content-r), var(--chip-content-g), var(--chip-content-b), var(--blog-state-focus-opacity)),
+      rgba(var(--chip-content-r), var(--chip-content-g), var(--chip-content-b), var(--blog-state-focus-opacity))
+    );
+  }
+
+  .chip:active {
+    background-image: linear-gradient(
+      rgba(var(--chip-content-r), var(--chip-content-g), var(--chip-content-b), var(--blog-state-press-opacity)),
+      rgba(var(--chip-content-r), var(--chip-content-g), var(--chip-content-b), var(--blog-state-press-opacity))
+    );
+  }
+
+  /* ── Variant: Assist (elevated) ── */
+  .chip--assist {
+    background-color: var(--blog-color-surface);
+    box-shadow: var(--blog-shadow-card);
+    border-color: var(--blog-color-outline, var(--blog-color-border));
+  }
+
+  .chip--assist:hover {
+    box-shadow: var(--blog-shadow-card-hover);
+  }
+
+  /* ── Variant: Filter (outlined + checkmark) ── */
+  .chip--filter {
+    border-color: var(--blog-color-outline, var(--blog-color-border));
+  }
+
+  .chip--selected {
+    background-color: var(--blog-color-secondary-container);
+    color: var(--blog-color-on-secondary-container);
+    border-color: transparent;
+  }
+
+  .chip--selected:hover {
+    background-color: var(--blog-color-secondary-container);
+    /* state layer still applies via gradient */
+  }
+
+  .chip-check {
+    display: inline-flex;
+    align-items: center;
+    margin-left: -4px;
+  }
+
+  /* ── Variant: Input (contained + close) ── */
+  .chip--input {
+    background-color: var(--blog-color-surface-container-highest, var(--blog-color-surface-variant));
+    border-color: transparent;
+    padding-right: 4px;
+  }
+
+  .chip-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-left: -4px;
+    cursor: pointer;
+    transition: background-color 150ms;
+  }
+
+  .chip-close:hover {
+    background-color: rgba(var(--chip-content-r), var(--chip-content-g), var(--chip-content-b), var(--blog-state-hover-opacity));
+  }
+
+  /* ── Variant: Suggestion (outlined, lighter) ── */
+  .chip--suggestion {
+    border-style: dashed;
+    color: var(--blog-color-on-surface-variant, var(--blog-color-text-tertiary));
+  }
+
+  /* ── With leading icon ── */
+  .chip--icon {
+    padding-left: 8px;
+  }
+
+  .chip-icon {
+    display: inline-flex;
+    align-items: center;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  /* ── Label ── */
+  .chip-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+
+  /* ── Dark theme ── */
+  [data-theme="dark"] .chip {
+    --chip-content-r: 255;
+    --chip-content-g: 255;
+    --chip-content-b: 255;
+  }
+
+  [data-theme="dark"] .chip--assist {
+    background-color: var(--blog-color-surface-container-high);
+  }
+
+  [data-theme="dark"] .chip--input {
+    background-color: var(--blog-color-surface-container-high);
+  }
+</style>

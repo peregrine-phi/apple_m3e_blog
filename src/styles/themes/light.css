@@ -1,0 +1,10 @@
+/* ============================================
+   Light Theme
+   Apple-inspired clean light aesthetic
+   ============================================ */
+
+:root,
+[data-theme="light"] {
+  /* Reference colors already defined in colors.css */
+  /* All system colors are light-mode by default */
+}

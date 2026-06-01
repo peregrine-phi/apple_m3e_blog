@@ -1,0 +1,24 @@
+/* ============================================
+   Grid Listings, Card Wrappers & Placeholders Stylesheet
+   ============================================ */
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--blog-space-6);
+}
+
+.empty-state {
+  padding: var(--blog-space-16) 0;
+  text-align: center;
+}
+
+.blog-card-wrapper {
+  will-change: opacity, transform;
+}
+
+@media (max-width: 600px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+}

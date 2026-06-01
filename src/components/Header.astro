@@ -1,0 +1,286 @@
+---
+// Header.astro — Site header with high-fidelity, pure CSS Liquid Glass navigation bar
+import ThemeToggle from "./ThemeToggle.astro";
+import MonetSwitcher from "./MonetSwitcher.astro";
+import LanguageToggle from "./LanguageToggle.astro";
+import I18n from "./I18n.astro";
+
+interface Props {
+  transparent?: boolean;
+}
+
+const { transparent = false } = Astro.props;
+---
+
+<header class:list={["site-header", { "site-header--transparent": transparent }]}>
+  <div class="liquid-glass-bar">
+    <div class="liquid-glass-bg-layer"></div>
+    <div class="liquid-glass-inner">
+      <a href="/" class="site-logo text-headline-small" aria-label="Home">
+        <span class="logo-dot" aria-hidden="true"></span>
+        M3E
+      </a>
+
+      <nav class="site-nav hide-mobile" aria-label="Main navigation">
+        <a href="/blog" class="nav-link text-label-large"><I18n tKey="nav.blog" /></a>
+        <a href="/about" class="nav-link text-label-large"><I18n tKey="nav.about" /></a>
+      </nav>
+
+      <div class="header-actions">
+        <MonetSwitcher />
+        <LanguageToggle />
+        <ThemeToggle />
+        <!-- Mobile menu button -->
+        <button
+          class="btn btn-ghost hide-desktop"
+          id="mobile-menu-btn"
+          aria-label="Toggle menu"
+          type="button"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <nav class="mobile-nav hide-desktop" id="mobile-nav" aria-label="Mobile navigation">
+      <a href="/blog" class="mobile-nav-link"><I18n tKey="nav.blog" /></a>
+      <a href="/about" class="mobile-nav-link"><I18n tKey="nav.about" /></a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* ── Outer sticky wrapper ── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 12px 16px 0;
+    pointer-events: none; /* clicks pass through the padding area */
+    transition: padding var(--blog-motion-duration-normal, 250ms)
+      var(--blog-motion-easing-standard);
+  }
+
+  /* ── The floating glass bar container ── */
+  .liquid-glass-bar {
+    pointer-events: auto;
+    position: relative;
+    max-width: 980px;
+    margin: 0 auto;
+    border-radius: 18px;
+
+    /* ── High-Fidelity Frosted Liquid Glass ── */
+    background: var(--blog-glass-bg);
+    backdrop-filter: saturate(190%) blur(24px);
+    -webkit-backdrop-filter: saturate(190%) blur(24px);
+
+    /* Liquid glass borders — specular outer rim & bevels */
+    border: 1px solid var(--blog-glass-border);
+    box-shadow: var(--blog-glass-shadow);
+
+    transition:
+      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ── Background clip layer for gloss sweep ── */
+  .liquid-glass-bg-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Liquid Glass Specular Sweep shine effect on hover */
+  .liquid-glass-bg-layer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: var(--blog-glass-sweep-gradient);
+    transform: skewX(-25deg);
+    transition: left 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .liquid-glass-bar:hover {
+    transform: translateY(1px);
+    background: var(--blog-glass-bg-hover);
+    border-color: var(--blog-glass-border-hover);
+    box-shadow: var(--blog-glass-shadow-hover);
+  }
+
+  .liquid-glass-bar:hover .liquid-glass-bg-layer::before {
+    left: 150%;
+  }
+
+  /* ── Transparent state when scrolled to top (home page) ── */
+  .site-header--transparent:not(.scrolled) .liquid-glass-bar {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .site-header--transparent:not(.scrolled) .liquid-glass-bg-layer::before {
+    display: none;
+  }
+
+  /* ── Inner flex container ── */
+  .liquid-glass-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 54px;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1; /* keep contents on top of the sweep */
+  }
+
+  /* ── Logo ── */
+  .site-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+    color: var(--blog-color-text-primary);
+    font-weight: var(--blog-font-weight-bold);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    border-radius: var(--blog-radius-xs);
+  }
+
+  .site-logo:focus-visible {
+    outline: 2px solid var(--blog-color-primary);
+    outline-offset: 2px;
+  }
+
+  .logo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--blog-radius-full);
+    background: linear-gradient(
+      135deg,
+      var(--blog-color-primary),
+      var(--blog-color-tertiary)
+    );
+  }
+
+  /* ── Navigation ── */
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-1);
+  }
+
+  .nav-link {
+    padding: var(--blog-space-2) var(--blog-space-3);
+    color: var(--blog-color-text-secondary);
+    border-radius: 10px;
+    text-decoration: none;
+    transition:
+      color var(--blog-space-2) var(--blog-motion-easing-standard),
+      background-color var(--blog-space-2) var(--blog-motion-easing-standard);
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: var(--blog-color-text-primary);
+    background-color: var(--blog-color-surface-variant);
+  }
+
+  .nav-link:focus-visible {
+    outline: 2px solid var(--blog-color-primary);
+    outline-offset: 2px;
+  }
+
+  /* ── Header actions ── */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+  }
+
+  /* ── Mobile menu ── */
+  .mobile-nav {
+    display: none;
+    flex-direction: column;
+    padding: var(--blog-space-3) var(--blog-space-4);
+    border-top: 1px solid var(--blog-glass-border);
+  }
+
+  .mobile-nav.open {
+    display: flex;
+  }
+
+  .mobile-nav-link {
+    padding: var(--blog-space-3) var(--blog-space-4);
+    color: var(--blog-color-text-primary);
+    font-size: var(--blog-typescale-title-medium-size);
+    font-weight: var(--blog-font-weight-medium);
+    text-decoration: none;
+    border-radius: 10px;
+  }
+
+  .mobile-nav-link:hover {
+    background-color: var(--blog-color-surface-variant);
+  }
+
+  :global([data-theme="dark"]) .mobile-nav {
+    border-top-color: var(--blog-color-border);
+  }
+
+  /* ── Scrolled state: slightly reduce top padding ── */
+  .site-header.scrolled {
+    padding-top: 6px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .site-header {
+      padding: 8px 10px 0;
+    }
+
+    .liquid-glass-bar {
+      border-radius: 14px;
+    }
+
+    .liquid-glass-inner {
+      height: 48px;
+      padding: 0 14px;
+    }
+  }
+</style>
+
+<script>
+  // Mobile menu toggle
+  document.getElementById("mobile-menu-btn")?.addEventListener("click", () => {
+    document.getElementById("mobile-nav")?.classList.toggle("open");
+  });
+
+  // Add scrolled class for subtle padding change on scroll
+  const header = document.querySelector(".site-header") as HTMLElement;
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 20) {
+        header.classList.add("scrolled");
+      } else {
+        header.classList.remove("scrolled");
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // initial state
+  }
+</script>

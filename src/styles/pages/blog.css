@@ -1,0 +1,164 @@
+/* ============================================
+   Blog Index Page Styles
+   ============================================ */
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--blog-space-6);
+}
+
+.empty-state {
+  padding: var(--blog-space-16) 0;
+  text-align: center;
+}
+
+.blog-filter-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--blog-space-6);
+  margin-bottom: var(--blog-space-8);
+  padding-bottom: var(--blog-space-6);
+  border-bottom: 1px solid var(--blog-color-divider);
+}
+
+.search-container {
+  max-width: 480px;
+  width: 100%;
+}
+
+.tags-container {
+  display: flex;
+  align-items: center;
+  gap: var(--blog-space-4);
+  flex-wrap: wrap;
+}
+
+.tags-chips {
+  display: flex;
+  gap: var(--blog-space-2);
+  flex-wrap: wrap;
+}
+
+/* High fidelity M3 Filter Chip */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: var(--blog-radius-sm, 8px);
+  border: 1px solid var(--blog-color-outline);
+  background: transparent;
+  color: var(--blog-color-on-surface-variant);
+  font-family: var(--blog-font-sans);
+  font-size: var(--blog-typescale-label-large-size);
+  font-weight: var(--blog-font-weight-medium);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: 
+    background-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+    border-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+    color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+    transform 100ms;
+  user-select: none;
+}
+
+.filter-chip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-color: var(--blog-color-on-surface);
+  opacity: 0;
+  transition: opacity 150ms;
+}
+
+.filter-chip:hover {
+  background-color: var(--blog-color-surface-variant);
+  border-color: var(--blog-color-on-surface);
+}
+
+.filter-chip:active {
+  transform: scale(0.97);
+}
+
+.filter-chip.active {
+  background-color: var(--blog-color-primary-container);
+  color: var(--blog-color-on-primary-container);
+  border-color: transparent;
+}
+
+.filter-chip.active:hover {
+  background-color: var(--blog-color-surface-variant);
+  color: var(--blog-color-on-surface-variant);
+  border-color: transparent;
+}
+
+/* ── Check & Close State Icon Transitions ── */
+.chip-icon-state {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 6px;
+  overflow: hidden;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s;
+  opacity: 1;
+}
+
+.filter-chip:not(.active) .chip-icon-state {
+  width: 0;
+  margin-left: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip-icon-check,
+.chip-icon-close {
+  position: absolute;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, color 0.2s;
+}
+
+.chip-icon-check {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.chip-icon-close {
+  opacity: 0;
+  transform: scale(0.5) rotate(-90deg);
+}
+
+/* Hover active state: reveal close icon, hide check icon, soft red accent */
+.filter-chip.active:hover .chip-icon-check {
+  opacity: 0;
+  transform: scale(0.5) rotate(90deg);
+}
+
+.filter-chip.active:hover .chip-icon-close {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  color: var(--blog-color-error);
+}
+
+.blog-card-wrapper {
+  will-change: opacity, transform;
+}
+
+@media (max-width: 768px) {
+  .tags-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--blog-space-2);
+  }
+}
+
+@media (max-width: 600px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+}

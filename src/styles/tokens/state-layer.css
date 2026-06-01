@@ -1,0 +1,78 @@
+/* ============================================
+   State Layer Design Tokens
+   Material Design 3: unified state layering
+   Namespace: --blog-state-*
+
+   Core concept: instead of defining separate
+   hover/active colors per component, M3 uses
+   a single content-color overlay at fixed
+   opacities. This works identically in both
+   light and dark themes.
+
+   Formula:
+     final = surface color + (content color × opacity)
+   ============================================ */
+
+:root {
+  /* ── State Layer Opacities (M3 spec) ── */
+  --blog-state-hover-opacity: 0.08;
+  --blog-state-focus-opacity: 0.12;
+  --blog-state-press-opacity: 0.12;
+  --blog-state-drag-opacity: 0.16;
+
+  /* ── Semantic State Tokens ── */
+  /* Apply as: background-image or box-shadow overlay */
+  --blog-state-hover: rgba(
+    var(--blog-state-content-r),
+    var(--blog-state-content-g),
+    var(--blog-state-content-b),
+    var(--blog-state-hover-opacity)
+  );
+
+  --blog-state-focus: rgba(
+    var(--blog-state-content-r),
+    var(--blog-state-content-g),
+    var(--blog-state-content-b),
+    var(--blog-state-focus-opacity)
+  );
+
+  --blog-state-press: rgba(
+    var(--blog-state-content-r),
+    var(--blog-state-content-g),
+    var(--blog-state-content-b),
+    var(--blog-state-press-opacity)
+  );
+
+  --blog-state-drag: rgba(
+    var(--blog-state-content-r),
+    var(--blog-state-content-g),
+    var(--blog-state-content-b),
+    var(--blog-state-drag-opacity)
+  );
+}
+
+/* ── Usage pattern per component (scoped via CSS custom properties) ── */
+/*
+  .my-component {
+    --blog-state-content-r: 255;  // content/on-surface color RGB
+    --blog-state-content-g: 255;
+    --blog-state-content-b: 255;
+
+    background-color: var(--blog-color-primary);
+    color: var(--blog-color-on-primary);
+  }
+
+  .my-component:hover {
+    background-image: linear-gradient(
+      var(--blog-state-hover),
+      var(--blog-state-hover)
+    );
+  }
+
+  .my-component:focus-visible {
+    background-image: linear-gradient(
+      var(--blog-state-focus),
+      var(--blog-state-focus)
+    );
+  }
+*/

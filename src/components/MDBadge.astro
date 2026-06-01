@@ -1,0 +1,81 @@
+---
+// MDBadge.astro — Material Design 3 Badge Component
+// Supports variants: primary | secondary | error
+// Supports types: large (with count/text) | dot (small indicator)
+
+interface Props {
+  variant?: "primary" | "secondary" | "error";
+  type?: "large" | "dot";
+  class?: string;
+}
+
+const {
+  variant = "primary",
+  type = "large",
+  class: className = "",
+  ...attrs
+} = Astro.props;
+---
+
+<span
+  class:list={[
+    "md-badge",
+    `md-badge--${variant}`,
+    `md-badge--${type}`,
+    className
+  ]}
+  {...attrs}
+>
+  {type === "large" && <slot />}
+</span>
+
+<style>
+  .md-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    font-family: var(--blog-font-sans);
+    line-height: 1;
+    user-select: none;
+  }
+
+  /* ── 1. Type: Large (standard badge with text) ── */
+  .md-badge--large {
+    height: 16px;
+    min-width: 16px;
+    padding: 0 4px;
+    border-radius: var(--blog-radius-full, 9999px);
+    font-size: var(--blog-typescale-label-small-size, 11px);
+    font-weight: var(--blog-font-weight-semibold, 600);
+    letter-spacing: var(--blog-typescale-label-small-tracking, 0.5px);
+  }
+
+  /* ── 2. Type: Dot (small visual dot) ── */
+  .md-badge--dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    padding: 0;
+  }
+
+  /* ── Variants (Monet Tonal Mappings) ── */
+  
+  /* Primary Badge */
+  .md-badge--primary {
+    background-color: var(--blog-color-primary);
+    color: var(--blog-color-on-primary);
+  }
+
+  /* Secondary Badge */
+  .md-badge--secondary {
+    background-color: var(--blog-color-secondary-container);
+    color: var(--blog-color-on-secondary-container);
+  }
+
+  /* Error Badge (Notification highlight) */
+  .md-badge--error {
+    background-color: var(--blog-color-error);
+    color: var(--blog-color-on-error);
+  }
+</style>

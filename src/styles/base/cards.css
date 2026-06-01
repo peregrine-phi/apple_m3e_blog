@@ -1,0 +1,42 @@
+/* ==========================================================================
+   Card Components (Apple Fluid-Glass & Brutalist Styles)
+   ========================================================================== */
+
+.card {
+  background-color: var(--blog-color-surface);
+  border-radius: var(--blog-radius-card);
+  border: 1px solid var(--blog-color-border);
+  transition: box-shadow var(--blog-motion-duration-normal)
+    var(--blog-motion-easing-standard);
+}
+
+.card:hover {
+  box-shadow: var(--blog-shadow-card-hover);
+}
+
+/* Brutalist card — Apple curves + thick border + offset shadow */
+.card-brutal {
+  background-color: var(--blog-color-surface);
+  border-radius: var(--blog-radius-card);
+  border: var(--blog-brutal-border-width) solid var(--blog-brutal-border-color);
+  box-shadow: var(--blog-brutal-shadow);
+  transition: var(--blog-brutal-transition);
+}
+
+.card-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--blog-brutal-shadow-hover);
+}
+
+/* Brutalist accent blocks */
+.brutal-block,
+.brutal-block-yellow {
+  padding: var(--blog-space-4) var(--blog-space-6);
+  border: var(--blog-brutal-border-width) solid var(--blog-brutal-border-color);
+  font-weight: var(--blog-font-weight-bold);
+}
+
+.brutal-block-yellow {
+  background: var(--blog-brutal-yellow);
+  color: var(--blog-brutal-on-accent);
+}
