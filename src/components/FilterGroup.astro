@@ -5,14 +5,15 @@
 import MDBadge from "./MDBadge.astro";
 import I18n from "./I18n.astro";
 import type { ChipConfig } from "../content/filter-config";
+import { translations } from "../i18n/translations";
 
 interface Props {
-  titleKey: string;
+  titleKey: keyof typeof translations.en;
   badgeVariant: "primary" | "secondary";
   filterType: "tag" | "stage";
   items: string[];
   config: Record<string, ChipConfig>;
-  allLabelKey: string;
+  allLabelKey: keyof typeof translations.en;
 }
 
 const { titleKey, badgeVariant, filterType, items, config, allLabelKey } = Astro.props;

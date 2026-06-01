@@ -1,7 +1,7 @@
 ---
 // MonetSwitcher.astro — Compact header Monet dynamic color switcher
 // CSS is pre-generated in MonetCSS.astro; this is the interactive UI only.
-import { generateSchemeCSS, MONET_PRESETS } from "../utils/monet";
+import { MONET_PRESETS } from "../utils/monet";
 import { monetConfig } from "../config/monet.config.js";
 const defaultSeed = monetConfig.defaultSeed;
 ---
@@ -211,7 +211,7 @@ const defaultSeed = monetConfig.defaultSeed;
 </style>
 
 <script>
-  import { generateSchemeCSS, MONET_PRESETS } from "../utils/monet";
+  import { generateSchemeCSS } from "../utils/monet";
 
   class MonetSwitcher extends HTMLElement {
     private preset = "monet";
@@ -247,17 +247,13 @@ const defaultSeed = monetConfig.defaultSeed;
             this.preset = key;
             localStorage.setItem("monet-preset", key);
             localStorage.setItem("monet-custom-css", cssStr);
-            this.updateActiveUI("custom", "Custom Color", hex);
+            this.updateActiveUI("custom");
           }
         } else {
           const name = this.preset.split("--")[0];
           this.preset = name;
           this.apply(name, this.variant);
-          const presetObj = MONET_PRESETS.find(p => p.name.replace(/\s+/g, "-").toLowerCase() === name);
-          const displayName = presetObj 
-            ? presetObj.name.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
-            : "Theme";
-          this.updateActiveUI(name, displayName);
+          this.updateActiveUI(name);
         }
       }
 
@@ -280,10 +276,9 @@ const defaultSeed = monetConfig.defaultSeed;
       this.querySelectorAll(".monet-preset-row:not(.monet-custom-row)").forEach((b) => {
         b.addEventListener("click", () => {
           const name = (b as HTMLElement).dataset.name!;
-          const label = (b as HTMLElement).dataset.label!;
           this.preset = name;
           this.apply(name, this.variant);
-          this.updateActiveUI(name, label);
+          this.updateActiveUI(name);
           localStorage.setItem("monet-preset", name);
         });
       });
@@ -316,7 +311,7 @@ const defaultSeed = monetConfig.defaultSeed;
         this.inject(cssStr);
         document.documentElement.setAttribute("data-monet", key);
         this.preset = key;
-        this.updateActiveUI("custom", "Custom Color", hex);
+        this.updateActiveUI("custom");
         localStorage.setItem("monet-preset", key);
         localStorage.setItem("monet-custom-hex", hex);
         localStorage.setItem("monet-custom-css", cssStr);
@@ -338,7 +333,7 @@ const defaultSeed = monetConfig.defaultSeed;
       s.textContent = css;
     }
 
-    private updateActiveUI(name: string, label: string, customHex?: string) {
+    private updateActiveUI(name: string) {
       // Update active attributes on rows
       const baseName = name.startsWith("custom-") ? "custom" : name.split("--")[0];
       this.querySelectorAll(".monet-preset-row").forEach((b) => {

@@ -318,10 +318,6 @@ const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase()
             `;
 
             const linkRect = link.getBoundingClientRect();
-            // Temporarily make popover visible to compute its layout dimensions
-            popover.classList.add("visible");
-            const popoverRect = popover.getBoundingClientRect();
-            popover.classList.remove("visible");
 
             const top = window.scrollY + linkRect.bottom + 8;
             const left = window.scrollX + linkRect.left + (linkRect.width / 2) - (280 / 2);

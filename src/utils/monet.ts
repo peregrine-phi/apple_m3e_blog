@@ -89,7 +89,7 @@ function oklabToRgb(L: number, a: number, b: number): [number, number, number] {
 
 // ── Monet Palette Generator ──
 
-function toneColor(L: number, C: number, H: number, tone: number): string {
+function toneColor(_L: number, C: number, H: number, tone: number): string {
   // tone is 0-100 (OKLCH Lightness)
   const tL = tone / 100;
   // Scale chroma: maintain at low tones, reduce at extremes for perceptual quality

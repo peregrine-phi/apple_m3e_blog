@@ -3,10 +3,11 @@
 // Supports variants: primary | secondary | error
 // Supports types: large (with count/text) | dot (small indicator)
 
-interface Props {
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"span"> {
   variant?: "primary" | "secondary" | "error";
   type?: "large" | "dot";
-  class?: string;
 }
 
 const {

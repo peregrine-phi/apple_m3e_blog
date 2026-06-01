@@ -197,9 +197,9 @@ const hasToc = tocItems.length > 0;
     const tocLinks = document.querySelectorAll('.toc-sidebar .toc-link');
     if (tocLinks.length === 0) return;
 
-    const headingIds = Array.from(tocLinks).map((link) =>
-      link.getAttribute('href')?.replace('#', '')
-    );
+    const headingIds = Array.from(tocLinks)
+      .map((link) => link.getAttribute('href')?.replace('#', ''))
+      .filter((id): id is string => !!id);
 
     const observer = new IntersectionObserver(
       (entries) => {

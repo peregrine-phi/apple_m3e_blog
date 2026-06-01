@@ -1,0 +1,86 @@
+---
+/**
+ * Music.astro - 音乐播放器数据配置层
+ * 
+ * 职责：
+ * 1. 定义曲目数据源（提供 100% 高可用 CORS 支持的测试曲目与 Meting API 混合机制）
+ * 2. 引入 Svelte Island 组件
+ * 3. 传递数据给播放器
+ * 
+ * 使用方式：
+ * <Music client:load />
+ */
+
+import MusicPlayer from './MusicPlayer.svelte';
+
+// ════════════════════════════════════════════
+// 配置区：修改以下参数来定制播放器
+// ════════════════════════════════════════════
+
+// 模式选择：'api' = 尝试 Meting API（失败自动降级到下面兜底），'local' = 直接使用下面的高可用精品歌单
+const MODE = 'api'; 
+
+// ── 100% 稳定的高可用、支持 CORS 精品测试歌单（作为本地模式或在线 API 失败时的完美兜底）
+const stableTracks = [
+  {
+    name: 'Morning Coffee (Lofi Chill)',
+    artist: 'Helix Project',
+    src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&auto=format&fit=crop&q=80',
+  },
+  {
+    name: 'Late Night Drive (Synthwave)',
+    artist: 'Synth Master',
+    src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    cover: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&auto=format&fit=crop&q=80',
+  },
+  {
+    name: 'Deep Focus (Acoustic Guitar)',
+    artist: 'Acoustic String Duo',
+    src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    cover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300&auto=format&fit=crop&q=80',
+  },
+  {
+    name: 'Coding Session (Electronic Beats)',
+    artist: 'Helix Digital Tech',
+    src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+    cover: 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=300&auto=format&fit=crop&q=80',
+  },
+];
+
+// ── Meting API 在线配置 ──
+const METING_API = 'https://api.i-meto.com/meting/api'; // 公用实例
+const PLAYLIST_ID = '60198'; // 网易云歌单 ID
+const SERVER = 'netease';     // 平台代码
+
+// ════════════════════════════════════════════
+// 逻辑区：根据模式选择数据源
+// ════════════════════════════════════════════
+
+let audioList: typeof stableTracks = [];
+let apiEndpoint = '';
+
+if (MODE === 'api') {
+  apiEndpoint = `${METING_API}?server=${SERVER}&type=playlist&id=${PLAYLIST_ID}`;
+  audioList = []; // 优先从 API 加载，API 失败则使用 stableTracks 兜底
+} else {
+  audioList = stableTracks;
+  apiEndpoint = '';
+}
+---
+
+<!-- 
+  播放器组件
+  client:load = 页面加载时立即水合
+-->
+<MusicPlayer
+  client:load
+  transition:persist
+  audioList={audioList}
+  apiEndpoint={apiEndpoint}
+  fallbackTracks={stableTracks}
+/>
+
+<style>
+  /* Base wrapper styles are defined in BaseLayout.astro to position the container */
+</style>

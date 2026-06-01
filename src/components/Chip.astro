@@ -16,6 +16,7 @@ const buttonType = href ? null : "button";
 ---
 
 <Tag
+  id={id}
   class:list={[
     "chip",
     `chip--${variant}`,
@@ -25,7 +26,7 @@ const buttonType = href ? null : "button";
   ]}
   href={href}
   type={buttonType}
-  aria-pressed={variant === "filter" ? String(selected) : null}
+  aria-pressed={variant === "filter" ? (selected ? "true" : "false") : undefined}
 >
   <!-- Leading icon -->
   {icon && <span class="chip-icon" aria-hidden="true"><slot name="icon" /></span>}

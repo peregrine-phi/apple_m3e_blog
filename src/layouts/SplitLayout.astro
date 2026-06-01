@@ -13,8 +13,6 @@ interface Props {
   sidebarWidth?: string;
   /** Swap sidebar to right side */
   sidebarRight?: boolean;
-  /** Collapse to single column below this breakpoint (default: 1024px) */
-  collapseAt?: string;
 }
 
 const {
@@ -22,7 +20,6 @@ const {
   description,
   sidebarWidth = "220px",
   sidebarRight = false,
-  collapseAt = "1024px",
 } = Astro.props;
 ---
 
