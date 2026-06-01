@@ -11,10 +11,11 @@ export const siteConfig = {
     github: "/about",
   },
   music: {
-    mode: "api" as "api" | "local",
-    metingApi: "https://api.i-meto.com/meting/api",
-    playlistId: "60198",
-    server: "netease",
+    mode: (import.meta.env.PUBLIC_MUSIC_MODE || "api") as "api" | "local",
+    metingApi: import.meta.env.PUBLIC_MUSIC_METING_API || "https://api.i-meto.com/meting/api",
+    type: (import.meta.env.PUBLIC_MUSIC_TYPE || "album") as "playlist" | "album" | "song" | "artist",
+    id: import.meta.env.PUBLIC_MUSIC_ID || "398973",
+    server: import.meta.env.PUBLIC_MUSIC_SERVER || "netease",
   },
   defaultLanguage: "en",
 };

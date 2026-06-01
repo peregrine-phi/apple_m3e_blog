@@ -68,6 +68,15 @@ export const translations = {
 
     // About
     "about.heading": "About",
+
+    // 404 Page
+    "404.title": "404 - Page Not Found",
+    "404.heading": "Lost in Space?",
+    "404.desc": "The page you are looking for has vanished into thin air. But since you are here, why not play with gravity?",
+    "404.back": "Back to Home",
+    "404.toggleAntigravity": "Toggle Antigravity",
+    "404.spawn": "Spawn Object",
+    "404.clear": "Reset Playground",
   },
   zh: {
     // Nav
@@ -129,5 +138,14 @@ export const translations = {
 
     // About
     "about.heading": "关于我",
+
+    // 404 Page
+    "404.title": "404 - 页面未找到",
+    "404.heading": "迷失在数字空间？",
+    "404.desc": "您访问的页面已经遁入虚无。不过既然来都来了，不如来玩一玩重力游戏吧？",
+    "404.back": "返回首页",
+    "404.toggleAntigravity": "切换反重力",
+    "404.spawn": "生成物体",
+    "404.clear": "重置游乐场",
   },
 };

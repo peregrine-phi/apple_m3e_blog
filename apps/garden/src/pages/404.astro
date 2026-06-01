@@ -1,0 +1,821 @@
+---
+// apps/garden/src/pages/404.astro
+import BaseLayout from "@m3e/layouts/BaseLayout.astro";
+import I18n from "@m3e/components/I18n.astro";
+import MDButton from "@m3e/components/MDButton.astro";
+import Icon from "@m3e/components/Icon.astro";
+import { siteConfig } from "../config/site";
+---
+
+<BaseLayout
+  title="404 — Page Not Found"
+  description="Lost in space? Discover the Antigravity Playground."
+  siteName={siteConfig.name}
+  siteCopyright={siteConfig.copyright}
+  musicMode={siteConfig.music?.mode}
+  musicApiEndpoint={siteConfig.music?.mode === 'api' ? `${siteConfig.music.metingApi}?server=${siteConfig.music.server}&type=${siteConfig.music.type}&id=${siteConfig.music.id}` : ''}
+>
+  <div class="error-page-container">
+    <!-- Absolute Canvas Sandbox background -->
+    <canvas id="physics-canvas" class="physics-canvas"></canvas>
+
+    <!-- Editorial Glassmorphic Control panel -->
+    <div class="glass-control-panel">
+      <div class="status-badge" aria-hidden="true">
+        <span class="badge-dot"></span>
+        <span class="text-mono">HTTP 404</span>
+      </div>
+
+      <h1 class="error-title text-display-large">
+        <I18n tKey="404.heading" />
+      </h1>
+      
+      <p class="error-desc text-body-large">
+        <I18n tKey="404.desc" />
+      </p>
+
+      <!-- Action & Controls Row -->
+      <div class="controls-actions">
+        <MDButton href="/" variant="filled" class="home-btn">
+          <Icon name="arrow-left" slot="icon" size={18} />
+          <I18n tKey="404.back" />
+        </MDButton>
+
+        <MDButton id="btn-spawn" variant="tonal" class="action-btn">
+          <Icon name="plus" slot="icon" size={18} />
+          <I18n tKey="404.spawn" />
+        </MDButton>
+
+        <button id="btn-gravity" class="custom-toggle-btn active-gravity" aria-label="Toggle Antigravity">
+          <span class="toggle-icon-wrap">
+            <svg class="icon-gravity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
+            <svg class="icon-antigravity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+          </span>
+          <I18n tKey="404.toggleAntigravity" />
+        </button>
+
+        <button id="btn-clear" class="custom-clear-btn" title="Reset Sandbox" aria-label="Reset Playground">
+          <Icon name="close" size={18} />
+        </button>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* ── Page Layout ── */
+  .error-page-container {
+    position: relative;
+    width: 100%;
+    min-height: calc(100vh - 180px); /* Fill space between header and footer */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--blog-color-background);
+    padding: var(--blog-space-6) var(--blog-space-page-inline);
+    box-sizing: border-box;
+  }
+
+  /* ── Interactive Physics Canvas ── */
+  .physics-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: block;
+    cursor: grab;
+  }
+
+  .physics-canvas:active {
+    cursor: grabbing;
+  }
+
+  /* ── Glassmorphic Center Card ── */
+  .glass-control-panel {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    max-width: 840px;
+    padding: var(--blog-space-8) var(--blog-space-10);
+    border-radius: var(--blog-radius-xl, 24px);
+    background: var(--blog-glass-bg);
+    border: 1px solid var(--blog-glass-border);
+    backdrop-filter: blur(24px) saturate(120%);
+    -webkit-backdrop-filter: blur(24px) saturate(120%);
+    box-shadow: var(--blog-glass-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-5);
+    text-align: center;
+    align-items: center;
+    transition: 
+      transform var(--blog-motion-duration-normal) var(--blog-motion-easing-emphasized),
+      box-shadow var(--blog-motion-duration-normal) var(--blog-motion-easing-emphasized);
+    user-select: none;
+  }
+
+  .glass-control-panel:hover {
+    box-shadow: var(--blog-glass-shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  /* Status badge indicating 404 */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+    padding: var(--blog-space-1) var(--blog-space-3);
+    background-color: var(--blog-color-primary-container);
+    color: var(--blog-color-on-primary-container);
+    border-radius: var(--blog-radius-badge, 12px);
+    font-size: var(--blog-typescale-label-medium-size, 12px);
+    font-weight: var(--blog-font-weight-medium, 500);
+    letter-spacing: 0.05em;
+  }
+
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--blog-color-primary);
+    display: inline-block;
+    animation: badge-pulse 1.8s infinite ease-in-out;
+  }
+
+  @keyframes badge-pulse {
+    0% { transform: scale(0.85); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(0.85); opacity: 0.5; }
+  }
+
+  .error-title {
+    color: var(--blog-color-text-primary);
+    font-family: var(--blog-font-serif);
+    font-weight: var(--blog-font-weight-bold, 700);
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .error-desc {
+    color: var(--blog-color-text-secondary);
+    max-width: 520px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ── Interactive Controls ── */
+  .controls-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--blog-space-3);
+    margin-top: var(--blog-space-3);
+    width: 100%;
+  }
+
+  /* Home & Spawn Buttons adjustments */
+  .home-btn, .action-btn {
+    flex-shrink: 0;
+  }
+
+  /* Custom Antigravity Toggle Switch */
+  .custom-toggle-btn {
+    height: 40px;
+    padding: 0 20px;
+    border-radius: var(--blog-radius-full, 9999px);
+    font-family: var(--blog-font-sans);
+    font-size: var(--blog-typescale-label-large-size, 14px);
+    font-weight: var(--blog-font-weight-medium, 500);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--blog-color-outline);
+    background-color: var(--blog-color-surface);
+    color: var(--blog-color-primary);
+    position: relative;
+    overflow: hidden;
+    transition: 
+      background-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+      color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+      transform var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+  }
+
+  .custom-toggle-btn:hover {
+    border-color: var(--blog-color-primary);
+    background-color: var(--blog-color-primary-container);
+  }
+
+  .custom-toggle-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* Switch icon styling */
+  .toggle-icon-wrap {
+    display: flex;
+    position: relative;
+    width: 18px;
+    height: 18px;
+    overflow: hidden;
+  }
+
+  .icon-gravity, .icon-antigravity {
+    position: absolute;
+    inset: 0;
+    transition: transform var(--blog-motion-duration-normal) var(--blog-motion-easing-emphasized);
+  }
+
+  /* Standard state (gravity active: arrow points down) */
+  .custom-toggle-btn.active-gravity .icon-gravity {
+    transform: translateY(0);
+  }
+  .custom-toggle-btn.active-gravity .icon-antigravity {
+    transform: translateY(-20px);
+  }
+
+  /* Antigravity state (active-antigravity: arrow points up) */
+  .custom-toggle-btn.active-antigravity {
+    background-color: var(--blog-color-primary);
+    color: var(--blog-color-on-primary);
+    border-color: var(--blog-color-primary);
+  }
+  .custom-toggle-btn.active-antigravity .icon-gravity {
+    transform: translateY(20px);
+  }
+  .custom-toggle-btn.active-antigravity .icon-antigravity {
+    transform: translateY(0);
+  }
+
+  /* Custom Reset/Clear Button */
+  .custom-clear-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--blog-color-outline-variant);
+    background-color: transparent;
+    color: var(--blog-color-text-secondary);
+    cursor: pointer;
+    transition: 
+      background-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+      color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+      transform var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+  }
+
+  .custom-clear-btn:hover {
+    border-color: var(--blog-color-error);
+    background-color: var(--blog-color-error-container);
+    color: var(--blog-color-error);
+  }
+
+  .custom-clear-btn:active {
+    transform: scale(0.92);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .glass-control-panel {
+      padding: var(--blog-space-6) var(--blog-space-5);
+      gap: var(--blog-space-4);
+    }
+    
+    .error-title {
+      font-size: var(--blog-typescale-headline-large-size, 32px);
+    }
+
+    .controls-actions {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--blog-space-2);
+    }
+
+    .custom-toggle-btn {
+      justify-content: center;
+    }
+
+    .custom-clear-btn {
+      width: auto;
+      border-radius: var(--blog-radius-full, 9999px);
+      aspect-ratio: auto;
+      justify-content: center;
+      gap: var(--blog-space-2);
+    }
+
+    .custom-clear-btn::after {
+      content: "Reset Playground";
+      font-family: var(--blog-font-sans);
+      font-size: var(--blog-typescale-label-large-size, 14px);
+      font-weight: var(--blog-font-weight-medium, 500);
+    }
+    
+    .i18n-zh .custom-clear-btn::after {
+      content: "重置游乐场";
+    }
+  }
+</style>
+
+<script>
+  // ── Physics Sandbox Script ──
+  document.addEventListener("astro:page-load", () => {
+    const canvas = document.getElementById("physics-canvas") as HTMLCanvasElement;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Grab Buttons & Controls
+    const btnSpawn = document.getElementById("btn-spawn");
+    const btnGravity = document.getElementById("btn-gravity");
+    const btnClear = document.getElementById("btn-clear");
+    const controlPanel = document.querySelector(".glass-control-panel") as HTMLElement;
+
+    // Physics Engine Settings
+    let gravityY = 0.4;
+    let isAntigravity = false;
+    const friction = 0.99;
+    const bounce = 0.75;
+    
+    // Canvas sizing
+    let width = 0;
+    let height = 0;
+    
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width * window.devicePixelRatio;
+      height = rect.height * window.devicePixelRatio;
+      canvas.width = width;
+      canvas.height = height;
+      ctx!.scale(window.devicePixelRatio, window.devicePixelRatio);
+      width = rect.width;
+      height = rect.height;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Retrieve active Monet CSS variables dynamically
+    function getThemeColor(variableName: string, fallback: string): string {
+      return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim() || fallback;
+    }
+
+    // Physics Object Class
+    class PhysicsObject {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      radius: number;
+      mass: number;
+      type: 'circle' | 'square' | 'apple' | 'astro' | 'text';
+      color: string;
+      text: string;
+      angle: number;
+      va: number; // angular velocity
+      isDragging: boolean;
+
+      constructor(x: number, y: number, type: PhysicsObject['type'] = 'circle', text = '') {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 8;
+        this.vy = (Math.random() - 2) * 6;
+        this.type = type;
+        this.text = text;
+        this.isDragging = false;
+        
+        // Define sizes and mass based on type
+        if (type === 'text') {
+          this.radius = text.length > 1 ? 28 : 20;
+        } else if (type === 'apple') {
+          this.radius = 22;
+        } else if (type === 'astro') {
+          this.radius = 24;
+        } else {
+          this.radius = Math.floor(Math.random() * 12) + 16; // 16 - 28
+        }
+        
+        this.mass = this.radius * this.radius; // Mass proportional to area
+        this.angle = Math.random() * Math.PI * 2;
+        this.va = (Math.random() - 0.5) * 0.05; // slow spin
+
+        // Colors mapped to Material Design Tokens
+        const colors = [
+          '--blog-color-primary',
+          '--blog-color-secondary',
+          '--blog-color-tertiary',
+          '--blog-color-success',
+          '--blog-color-warning',
+          '--blog-color-error'
+        ];
+        const randomVar = colors[Math.floor(Math.random() * colors.length)];
+        this.color = getThemeColor(randomVar, '#3b5cf6');
+      }
+
+      update() {
+        if (this.isDragging) return;
+
+        // Apply forces
+        this.vy += gravityY;
+        
+        // Apply friction
+        this.vx *= friction;
+        this.vy *= friction;
+
+        // Move
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        // Handle rotation for shapes
+        this.angle += this.va;
+
+        // Bounce off walls (boundary check)
+        const pad = 2; // small padding
+        if (this.x - this.radius < pad) {
+          this.x = this.radius + pad;
+          this.vx = -this.vx * bounce;
+          this.va += this.vy * 0.005; // transfer linear velocity to spin
+        } else if (this.x + this.radius > width - pad) {
+          this.x = width - this.radius - pad;
+          this.vx = -this.vx * bounce;
+          this.va -= this.vy * 0.005;
+        }
+
+        if (this.y - this.radius < pad) {
+          this.y = this.radius + pad;
+          this.vy = -this.vy * bounce;
+          this.va -= this.vx * 0.005;
+        } else if (this.y + this.radius > height - pad) {
+          this.y = height - this.radius - pad;
+          this.vy = -this.vy * bounce;
+          this.va += this.vx * 0.005;
+        }
+      }
+
+      draw() {
+        if (!ctx) return;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        // Highlight dragged elements with a glow
+        if (this.isDragging) {
+          ctx.shadowColor = this.color;
+          ctx.shadowBlur = 15;
+        } else {
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.04)';
+          ctx.shadowBlur = 6;
+        }
+
+        if (this.type === 'circle') {
+          // Glassy circle
+          ctx.beginPath();
+          ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          
+          // Glossy highlight shine
+          ctx.beginPath();
+          ctx.arc(-this.radius * 0.3, -this.radius * 0.3, this.radius * 0.2, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+          ctx.fill();
+
+        } else if (this.type === 'square') {
+          // Rounded rect shape
+          ctx.beginPath();
+          const r = 8; // roundedness
+          const size = this.radius * 2;
+          ctx.roundRect(-this.radius, -this.radius, size, size, r);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+
+          // Shiny line
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(-this.radius + 4, -this.radius + 4);
+          ctx.lineTo(this.radius - 4, this.radius - 4);
+          ctx.stroke();
+
+        } else if (this.type === 'apple') {
+          // Draw a gorgeous Apple design
+          // Apple Body (bumpy circle)
+          ctx.beginPath();
+          ctx.arc(-this.radius * 0.15, 0, this.radius * 0.9, 0, Math.PI * 2);
+          ctx.arc(this.radius * 0.15, 0, this.radius * 0.9, 0, Math.PI * 2);
+          ctx.fillStyle = getThemeColor('--blog-color-brand-css', '#ea4335'); // standard bright red
+          ctx.fill();
+
+          // Apple Leaf
+          ctx.beginPath();
+          ctx.ellipse(this.radius * 0.15, -this.radius * 1.05, this.radius * 0.4, this.radius * 0.2, -Math.PI / 4, 0, Math.PI * 2);
+          ctx.fillStyle = getThemeColor('--blog-color-success', '#34a853'); // vibrant green leaf
+          ctx.fill();
+
+        } else if (this.type === 'astro') {
+          // Draw Astro Spark Logo
+          ctx.beginPath();
+          const r = this.radius;
+          ctx.moveTo(0, -r);
+          // Quadratic bezier curves creating a beautiful four-pointed star / spark
+          ctx.quadraticCurveTo(0, 0, r, 0);
+          ctx.quadraticCurveTo(0, 0, 0, r);
+          ctx.quadraticCurveTo(0, 0, -r, 0);
+          ctx.quadraticCurveTo(0, 0, 0, -r);
+          
+          const grad = ctx.createLinearGradient(-r, -r, r, r);
+          grad.addColorStop(0, getThemeColor('--blog-color-brand-astro', '#ff5d01')); // orange-red
+          grad.addColorStop(1, getThemeColor('--blog-color-secondary', '#8d3bf6')); // vibrant violet
+          
+          ctx.fillStyle = grad;
+          ctx.fill();
+
+        } else if (this.type === 'text') {
+          // Bouncy physical letter circles
+          ctx.beginPath();
+          ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+          ctx.fillStyle = getThemeColor('--blog-color-surface-container-high', '#ffffff');
+          ctx.strokeStyle = this.color;
+          ctx.lineWidth = 3;
+          ctx.fill();
+          ctx.stroke();
+
+          // Render Letter text inside circle
+          ctx.fillStyle = getThemeColor('--blog-color-text-primary', '#1d1d1f');
+          ctx.font = `bold ${this.radius * 1.1}px var(--blog-font-serif), Georgia, serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowBlur = 0; // clear text shadow
+          ctx.fillText(this.text, 0, 0);
+        }
+
+        ctx.restore();
+      }
+    }
+
+    const objects: PhysicsObject[] = [];
+
+    // Initialize with standard bouncing elements: "4", "0", "4" and "ANTIGRAVITY"
+    function initPlaground() {
+      objects.length = 0;
+
+      // Spawn "4", "0", "4"
+      const errorText = ["4", "0", "4"];
+      errorText.forEach((char, idx) => {
+        const xOffset = (width / 2) - 100 + idx * 100;
+        const obj = new PhysicsObject(xOffset, height / 3, 'text', char);
+        obj.radius = 35;
+        obj.mass = obj.radius * obj.radius;
+        objects.push(obj);
+      });
+
+      // Spawn "ANTIGRAVITY"
+      const letters = "ANTIGRAVITY".split("");
+      letters.forEach((char, idx) => {
+        const step = width / (letters.length + 1);
+        const obj = new PhysicsObject(step * (idx + 1), height / 2 + (Math.random() - 0.5) * 50, 'text', char);
+        objects.push(obj);
+      });
+
+      // Spawn some decorative Apples & Astros
+      for (let i = 0; i < 4; i++) {
+        objects.push(new PhysicsObject(Math.random() * width, Math.random() * height * 0.4, 'apple'));
+        objects.push(new PhysicsObject(Math.random() * width, Math.random() * height * 0.4, 'astro'));
+      }
+    }
+
+    // Call init after width/height are set
+    initPlaground();
+
+    // Spawning a random item
+    function spawnObject(x = Math.random() * width, y = height * 0.15) {
+      const types: PhysicsObject['type'][] = ['circle', 'square', 'apple', 'astro'];
+      const randomType = types[Math.floor(Math.random() * types.length)];
+      objects.push(new PhysicsObject(x, y, randomType));
+      
+      // Limit total objects count to prevent performance degrade
+      if (objects.length > 50) {
+        objects.shift(); // remove oldest object
+      }
+    }
+
+    // Elastic Circle Collision resolution
+    function resolveCollisions() {
+      for (let i = 0; i < objects.length; i++) {
+        for (let j = i + 1; j < objects.length; j++) {
+          const o1 = objects[i];
+          const o2 = objects[j];
+
+          const dx = o2.x - o1.x;
+          const dy = o2.y - o1.y;
+          const dist = Math.hypot(dx, dy);
+          const minDist = o1.radius + o2.radius;
+
+          if (dist < minDist) {
+            // Circle collision detected
+            const overlap = minDist - dist;
+            const nx = dx / dist;
+            const ny = dy / dist;
+
+            // Simple position correction to prevent sticking
+            const correctionFactor = 0.55; 
+            const totalMass = o1.mass + o2.mass;
+            const ratio1 = o2.mass / totalMass;
+            const ratio2 = o1.mass / totalMass;
+
+            if (!o1.isDragging) {
+              o1.x -= nx * overlap * ratio1 * correctionFactor;
+              o1.y -= ny * overlap * ratio1 * correctionFactor;
+            }
+            if (!o2.isDragging) {
+              o2.x += nx * overlap * ratio2 * correctionFactor;
+              o2.y += ny * overlap * ratio2 * correctionFactor;
+            }
+
+            // Relative velocities
+            const rvx = o2.vx - o1.vx;
+            const rvy = o2.vy - o1.vy;
+
+            // Velocity along contact normal
+            const relativeNormalVel = rvx * nx + rvy * ny;
+
+            // Resolve only if separating velocities
+            if (relativeNormalVel < 0) {
+              const restitution = 0.78; // elasticity factor
+              let impulse = -(1 + restitution) * relativeNormalVel;
+              impulse /= (1 / o1.mass + 1 / o2.mass);
+
+              if (!o1.isDragging) {
+                o1.vx -= (impulse / o1.mass) * nx;
+                o1.vy -= (impulse / o1.mass) * ny;
+                // Add a bit of angular rotation transfer
+                o1.va -= (rvx * ny - rvy * nx) * 0.001;
+              }
+              if (!o2.isDragging) {
+                o2.vx += (impulse / o2.mass) * nx;
+                o2.vy += (impulse / o2.mass) * ny;
+                o2.va += (rvx * ny - rvy * nx) * 0.001;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // ── Mouse & Touch Drag Interaction ──
+    let activeDragObj: PhysicsObject | null = null;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+    let lastTime = 0;
+
+    function getMousePos(e: MouseEvent | TouchEvent) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    function onStart(e: MouseEvent | TouchEvent) {
+      const mouse = getMousePos(e);
+      activeDragObj = null;
+
+      // Scan reverse order so topmost circles are selected first
+      for (let i = objects.length - 1; i >= 0; i--) {
+        const obj = objects[i];
+        const dist = Math.hypot(obj.x - mouse.x, obj.y - mouse.y);
+        if (dist < obj.radius) {
+          activeDragObj = obj;
+          obj.isDragging = true;
+          obj.vx = 0;
+          obj.vy = 0;
+          prevMouseX = mouse.x;
+          prevMouseY = mouse.y;
+          lastTime = performance.now();
+          
+          // Move selected object to the end of the array so it renders on top
+          objects.splice(i, 1);
+          objects.push(obj);
+          break;
+        }
+      }
+
+      // If clicked on blank canvas space, spawn a new shape!
+      if (!activeDragObj) {
+        // Prevent trigger if clicking on the control panel card
+        const cardRect = controlPanel.getBoundingClientRect();
+        const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+        
+        if (
+          clientX < cardRect.left || 
+          clientX > cardRect.right || 
+          clientY < cardRect.top || 
+          clientY > cardRect.bottom
+        ) {
+          spawnObject(mouse.x, mouse.y);
+        }
+      }
+    }
+
+    function onMove(e: MouseEvent | TouchEvent) {
+      if (!activeDragObj) return;
+      
+      const mouse = getMousePos(e);
+      const now = performance.now();
+      const dt = Math.max(1, now - lastTime);
+
+      // Track drag speed momentum
+      activeDragObj.vx = (mouse.x - prevMouseX) / dt * 16.6; // Scale relative to standard 60fps frame
+      activeDragObj.vy = (mouse.y - prevMouseY) / dt * 16.6;
+
+      activeDragObj.x = mouse.x;
+      activeDragObj.y = mouse.y;
+
+      prevMouseX = mouse.x;
+      prevMouseY = mouse.y;
+      lastTime = now;
+    }
+
+    function onEnd() {
+      if (activeDragObj) {
+        activeDragObj.isDragging = false;
+        
+        // Clamp throwing speed to reasonable maximums
+        const maxThrow = 18;
+        activeDragObj.vx = Math.max(-maxThrow, Math.min(maxThrow, activeDragObj.vx));
+        activeDragObj.vy = Math.max(-maxThrow, Math.min(maxThrow, activeDragObj.vy));
+        
+        activeDragObj = null;
+      }
+    }
+
+    // Bind event listeners
+    canvas.addEventListener("mousedown", onStart);
+    canvas.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onEnd);
+
+    canvas.addEventListener("touchstart", onStart, { passive: true });
+    canvas.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
+
+    // ── Button controls hook ──
+    btnSpawn?.addEventListener("click", () => {
+      spawnObject();
+    });
+
+    btnGravity?.addEventListener("click", () => {
+      isAntigravity = !isAntigravity;
+      if (isAntigravity) {
+        gravityY = -0.32; // Floating upwards
+        btnGravity.classList.remove("active-gravity");
+        btnGravity.classList.add("active-antigravity");
+      } else {
+        gravityY = 0.4; // Falling downwards
+        btnGravity.classList.remove("active-antigravity");
+        btnGravity.classList.add("active-gravity");
+      }
+    });
+
+    btnClear?.addEventListener("click", () => {
+      initPlaground();
+    });
+
+    // ── Animation Loop ──
+    let animFrameId = 0;
+    function loop() {
+      ctx!.clearRect(0, 0, width, height);
+
+      // Update & Draw objects
+      objects.forEach(obj => {
+        obj.update();
+        obj.draw();
+      });
+
+      // Handle pairwise circle collisions
+      resolveCollisions();
+
+      animFrameId = requestAnimationFrame(loop);
+    }
+    loop();
+
+    // Clean up event listeners and loops on Astro route changes
+    document.addEventListener("astro:before-swap", () => {
+      cancelAnimationFrame(animFrameId);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mouseup", onEnd);
+      window.removeEventListener("touchend", onEnd);
+    }, { once: true });
+  });
+</script>

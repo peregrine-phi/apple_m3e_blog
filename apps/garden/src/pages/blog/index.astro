@@ -34,7 +34,7 @@ const allTags = Array.from(new Set(posts.flatMap(p => p.data.tags || []))).sort(
   siteName={siteConfig.name}
   siteCopyright={siteConfig.copyright}
   musicMode={siteConfig.music?.mode}
-  musicApiEndpoint={siteConfig.music?.mode === 'api' ? `${siteConfig.music.metingApi}?server=${siteConfig.music.server}&type=playlist&id=${siteConfig.music.playlistId}` : ''}
+  musicApiEndpoint={siteConfig.music?.mode === 'api' ? `${siteConfig.music.metingApi}?server=${siteConfig.music.server}&type=${siteConfig.music.type}&id=${siteConfig.music.id}` : ''}
 >
   {
     posts.length === 0 ? (
