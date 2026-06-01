@@ -5,14 +5,7 @@ import MonetSwitcher from "./MonetSwitcher.astro";
 import LanguageToggle from "./LanguageToggle.astro";
 import I18n from "./I18n.astro";
 import { siteConfig } from "../config/site";
-import { translations } from "../i18n/translations";
-
-interface NavItem {
-  href: string;
-  labelKey?: keyof typeof translations.en;
-  label?: string;
-  external?: boolean;
-}
+import type { NavItem } from "../types";
 
 interface Props {
   transparent?: boolean;

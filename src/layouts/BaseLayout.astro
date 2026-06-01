@@ -11,14 +11,7 @@ import "../styles/main.css";
 import { monetConfig } from "../config/monet.config.js";
 import { siteConfig } from "../config/site";
 
-import { translations } from "../i18n/translations";
-
-interface NavItem {
-  href: string;
-  labelKey?: keyof typeof translations.en;
-  label?: string;
-  external?: boolean;
-}
+import type { NavItem } from "../types";
 
 interface Props {
   title: string;
