@@ -19,6 +19,7 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -34,6 +35,15 @@ body {
       var(--blog-motion-easing-standard),
     color var(--blog-motion-duration-normal)
       var(--blog-motion-easing-standard);
+  
+  /* Flex layout to push footer to the bottom */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
 }
 
 /* ── Selection ── */

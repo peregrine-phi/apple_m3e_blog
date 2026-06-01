@@ -230,7 +230,13 @@ a:focus-visible {
 html[lang="en"] .i18n-zh {
   display: none !important;
 }
+html[lang="en"]:not([data-show-all-langs="true"]) .blog-card-wrapper[data-lang="zh"] {
+  display: none !important;
+}
 html[lang="zh"] .i18n-en {
+  display: none !important;
+}
+html[lang="zh"]:not([data-show-all-langs="true"]) .blog-card-wrapper[data-lang="en"] {
   display: none !important;
 }
 

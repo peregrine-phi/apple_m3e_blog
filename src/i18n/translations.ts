@@ -23,7 +23,7 @@ export const translations = {
 
     // Home
     "home.featured": "Featured",
-    "home.welcome": "Welcome to M3E",
+    "home.welcome": "Welcome to {siteName}",
     "home.latest": "Latest",
     "home.recent": "Recent Posts",
     "home.read": "Read the story",
@@ -35,7 +35,7 @@ export const translations = {
     "home.aboutMe": "About Me",
 
     // Blog Index
-    "blog.title": "Blog — M3E",
+    "blog.title": "Blog — {siteName}",
     "blog.overline": "Blog",
     "blog.heading": "All Posts",
     "blog.desc": "All articles on design, technology, and thoughtful living.",
@@ -59,14 +59,15 @@ export const translations = {
     "post.copiedMsg": "Code snippet copied to clipboard!",
     "post.preview": "Preview",
     "post.noDesc": "No description available.",
+    "post.connections": "Connections & Backlinks",
+
+    // Stages
+    "stage.seedling": "Seedling",
+    "stage.budding": "Budding",
+    "stage.evergreen": "Evergreen",
 
     // About
-    "about.title": "About — M3E",
     "about.heading": "About",
-    "about.philosophy": "Design Philosophy",
-    "about.colophon": "Colophon",
-    "about.sysTitle": "Design System",
-    "about.sysDesc": "A living showcase of the M3E token and component system, powered by Material Design 3.",
   },
   zh: {
     // Nav
@@ -83,7 +84,7 @@ export const translations = {
 
     // Home
     "home.featured": "精选",
-    "home.welcome": "欢迎来到 M3E",
+    "home.welcome": "欢迎来到 {siteName}",
     "home.latest": "最新发表",
     "home.recent": "最近文章",
     "home.read": "阅读文章",
@@ -95,7 +96,7 @@ export const translations = {
     "home.aboutMe": "关于我",
 
     // Blog Index
-    "blog.title": "文章 — M3E",
+    "blog.title": "文章 — {siteName}",
     "blog.overline": "文章",
     "blog.heading": "所有文章",
     "blog.desc": "所有关于设计、技术和深思熟虑生活的文章。",
@@ -119,13 +120,14 @@ export const translations = {
     "post.copiedMsg": "代码片段已复制到剪贴板！",
     "post.preview": "预览",
     "post.noDesc": "无可用描述。",
+    "post.connections": "关联与双向链接",
+
+    // Stages
+    "stage.seedling": "幼苗",
+    "stage.budding": "成长",
+    "stage.evergreen": "常青树",
 
     // About
-    "about.title": "关于 — M3E",
     "about.heading": "关于我",
-    "about.philosophy": "设计哲学",
-    "about.colophon": "结构记事",
-    "about.sysTitle": "设计系统",
-    "about.sysDesc": "这是一个展示 M3E 设计系统 Token 和组件的活动橱窗，由 Material Design 3 驱动。",
   },
 };

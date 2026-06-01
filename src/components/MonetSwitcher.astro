@@ -2,8 +2,6 @@
 // MonetSwitcher.astro — Compact header Monet dynamic color switcher
 // CSS is pre-generated in MonetCSS.astro; this is the interactive UI only.
 import { MONET_PRESETS } from "../utils/monet";
-import { monetConfig } from "../config/monet.config.js";
-const defaultSeed = monetConfig.defaultSeed;
 ---
 
 <monet-switcher>
@@ -31,21 +29,6 @@ const defaultSeed = monetConfig.defaultSeed;
           </button>
         );
       })}
-      
-      <button 
-        class="monet-preset-row monet-custom-row" 
-        type="button"
-        data-name="custom"
-        data-label="Custom Color"
-        aria-label="Select custom color"
-      >
-        <span class="monet-preset-name">Custom</span>
-        <div class="monet-capsules">
-          <span class="monet-capsule monet-custom-capsule-1" style={`background-color: var(--custom-color-1, ${defaultSeed})`}></span>
-          <span class="monet-capsule monet-custom-capsule-2" style={`background-color: var(--custom-color-2, color-mix(in srgb, var(--custom-color-1, ${defaultSeed}) 60%, var(--blog-color-tertiary)))`}></span>
-          <input type="color" class="monet-custom-picker" value={defaultSeed} aria-label="Choose custom color" />
-        </div>
-      </button>
     </div>
   </div>
 </monet-switcher>
@@ -191,28 +174,9 @@ const defaultSeed = monetConfig.defaultSeed;
     display: inline-block;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
   }
-
-  /* Custom Color picker row */
-  .monet-custom-row {
-    position: relative;
-  }
-
-  .monet-custom-picker {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    border: none;
-    padding: 0;
-    z-index: 10;
-  }
 </style>
 
 <script>
-  import { generateSchemeCSS } from "../utils/monet";
-
   class MonetSwitcher extends HTMLElement {
     private preset = "monet";
     private variant = "tonalSpot";
@@ -228,33 +192,10 @@ const defaultSeed = monetConfig.defaultSeed;
 
       // Restore saved scheme
       if (this.preset) {
-        if (this.preset.startsWith("custom-")) {
-          const hex = localStorage.getItem("monet-custom-hex");
-          if (hex) {
-            const key = `custom-${hex.replace("#", "")}-${this.variant}`;
-            const { light, dark } = generateSchemeCSS(hex, this.variant);
-            const cssStr = light.replace(
-              /\[data-monet="[^"]*"\]/,
-              `[data-monet="${key}"]`
-            ) +
-              "\n" +
-              dark.replace(
-                /\[data-theme="dark"\]\[data-monet="[^"]*"\]/,
-                `[data-theme="dark"][data-monet="${key}"]`
-              );
-            this.inject(cssStr);
-            document.documentElement.setAttribute("data-monet", key);
-            this.preset = key;
-            localStorage.setItem("monet-preset", key);
-            localStorage.setItem("monet-custom-css", cssStr);
-            this.updateActiveUI("custom");
-          }
-        } else {
-          const name = this.preset.split("--")[0];
-          this.preset = name;
-          this.apply(name, this.variant);
-          this.updateActiveUI(name);
-        }
+        const name = this.preset.split("--")[0];
+        this.preset = name;
+        this.apply(name, this.variant);
+        this.updateActiveUI(name);
       }
 
       // Toggle dropdown
@@ -273,7 +214,7 @@ const defaultSeed = monetConfig.defaultSeed;
       });
 
       // Preset buttons
-      this.querySelectorAll(".monet-preset-row:not(.monet-custom-row)").forEach((b) => {
+      this.querySelectorAll(".monet-preset-row").forEach((b) => {
         b.addEventListener("click", () => {
           const name = (b as HTMLElement).dataset.name!;
           this.preset = name;
@@ -282,60 +223,15 @@ const defaultSeed = monetConfig.defaultSeed;
           localStorage.setItem("monet-preset", name);
         });
       });
-
-      // Custom color picker
-      const picker = this.querySelector(".monet-custom-picker") as HTMLInputElement;
-      const customRow = this.querySelector(".monet-custom-row") as HTMLElement;
-      const customHex = localStorage.getItem("monet-custom-hex");
-      if (customHex && picker) {
-        picker.value = customHex;
-        customRow.style.setProperty("--custom-color-1", customHex);
-        customRow.style.setProperty("--custom-color-2", `color-mix(in srgb, ${customHex} 60%, var(--blog-color-tertiary))`);
-      }
-      
-      picker?.addEventListener("input", () => {
-        const hex = picker.value;
-        customRow.style.setProperty("--custom-color-1", hex);
-        customRow.style.setProperty("--custom-color-2", `color-mix(in srgb, ${hex} 60%, var(--blog-color-tertiary))`);
-        const key = `custom-${hex.replace("#", "")}-${this.variant}`;
-        const { light, dark } = generateSchemeCSS(hex, this.variant);
-        const cssStr = light.replace(
-          /\[data-monet="[^"]*"\]/,
-          `[data-monet="${key}"]`
-        ) +
-          "\n" +
-          dark.replace(
-            /\[data-theme="dark"\]\[data-monet="[^"]*"\]/,
-            `[data-theme="dark"][data-monet="${key}"]`
-          );
-        this.inject(cssStr);
-        document.documentElement.setAttribute("data-monet", key);
-        this.preset = key;
-        this.updateActiveUI("custom");
-        localStorage.setItem("monet-preset", key);
-        localStorage.setItem("monet-custom-hex", hex);
-        localStorage.setItem("monet-custom-css", cssStr);
-      });
     }
 
     private apply(name: string, variant: string) {
       document.documentElement.setAttribute("data-monet", `${name}--${variant}`);
-      document.getElementById("monet-custom-inline")?.remove();
-    }
-
-    private inject(css: string) {
-      let s = document.getElementById("monet-custom-inline") as HTMLStyleElement;
-      if (!s) {
-        s = document.createElement("style");
-        s.id = "monet-custom-inline";
-        document.head.appendChild(s);
-      }
-      s.textContent = css;
     }
 
     private updateActiveUI(name: string) {
       // Update active attributes on rows
-      const baseName = name.startsWith("custom-") ? "custom" : name.split("--")[0];
+      const baseName = name.split("--")[0];
       this.querySelectorAll(".monet-preset-row").forEach((b) => {
         const btn = b as HTMLElement;
         btn.toggleAttribute("data-active", btn.dataset.name === baseName);

@@ -2,10 +2,11 @@
 title: "Astro 5: The Content-First Web Framework"
 description: "How Astro's Islands architecture and content collections make it the ideal framework for content-driven websites."
 publishedAt: 2026-05-28
-tags: ["astro", "web-development", "javascript", "en"]
+tags: ["astro", "web-development", "javascript"]
 featured: false
 growthStage: budding
 knowledgeDomain: Technology
+lang: en
 ---
 
 Astro has been quietly redefining how we think about web frameworks. While the React ecosystem debates server components and streaming, Astro has been shipping a simpler, more radical idea: **zero JavaScript by default, with the ability to add interactivity exactly where you need it.**

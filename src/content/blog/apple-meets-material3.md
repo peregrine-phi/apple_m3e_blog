@@ -2,10 +2,11 @@
 title: "Apple Design Meets Material 3: A Fusion Approach"
 description: "Exploring the surprising harmony between Apple's restrained elegance and Material 3's expressive vitality in web design."
 publishedAt: 2026-05-22
-tags: ["design", "ui-ux", "apple", "material-design", "en"]
+tags: ["design", "ui-ux", "apple", "material-design"]
 featured: true
 growthStage: evergreen
 knowledgeDomain: Design
+lang: en
 ---
 
 At first glance, Apple's Human Interface Guidelines and Google's Material Design 3 seem like opposing philosophies. One is restrained, subtle, almost austere. The other is vibrant, layered, and emotionally expressive. But when you look closer, they share more DNA than you'd expect.

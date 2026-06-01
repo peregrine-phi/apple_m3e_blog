@@ -2,10 +2,11 @@
 title: "Building a Token-Based Design System"
 description: "Why CSS custom properties are the foundation of modern, themeable design systems, and how to structure them for maintainability."
 publishedAt: 2026-05-15
-tags: ["design-systems", "css", "frontend", "en"]
+tags: ["design-systems", "css", "frontend"]
 featured: true
 growthStage: evergreen
 knowledgeDomain: Design
+lang: en
 ---
 
 Design systems live and die by their foundation. Get the tokens right, and everything else follows. Get them wrong, and you'll be fighting your own abstractions for years. 

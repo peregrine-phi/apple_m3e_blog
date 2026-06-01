@@ -1,6 +1,7 @@
 // src/pages/rss.xml.js — RSS feed
 import rss from "@astrojs/rss";
 import { getCollection } from "astro:content";
+import { siteConfig } from "../config/site";
 
 export async function GET(context) {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
@@ -9,9 +10,8 @@ export async function GET(context) {
   );
 
   return rss({
-    title: "M3E Blog",
-    description:
-      "A personal blog about design, technology, and thoughtful living.",
+    title: `${siteConfig.name} Blog`,
+    description: siteConfig.description,
     site: context.site,
     items: sortedPosts.map((post) => ({
       title: post.data.title,

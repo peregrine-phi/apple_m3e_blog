@@ -1,4 +1,4 @@
-// src/content/filter-config.ts
+// src/config/filter-config.ts
 // Separation of Concerns: Content metadata configuration
 
 export interface ChipConfig {

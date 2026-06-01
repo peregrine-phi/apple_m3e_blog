@@ -2,10 +2,11 @@
 title: "苹果设计遇上 Material 3：一种融合之路"
 description: "探讨在网页设计中，苹果克制的优雅与 Material 3 表达的活力之间意想不到的和谐关系。"
 publishedAt: 2026-05-22
-tags: ["design", "ui-ux", "apple", "material-design", "zh"]
+tags: ["design", "ui-ux", "apple", "material-design"]
 featured: true
 growthStage: evergreen
 knowledgeDomain: Design
+lang: zh
 ---
 
 乍一看，苹果的《人机界面指南 (HIG)》与谷歌的《Material Design 3》似乎是背道而驰的两种设计哲学。一个克制、微妙、甚至略显朴素；另一个则充满活力、层次分明、富有情感表达。但当你凑近端详，就会发现它们共用的 DNA 远比你想象的要多。

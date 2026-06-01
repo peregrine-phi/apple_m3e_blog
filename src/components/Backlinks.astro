@@ -1,52 +1,27 @@
 ---
 // Backlinks.astro — Displays incoming links (backlinks) to the current page
-import { getCollection } from "astro:content";
+import I18n from "./I18n.astro";
 
-interface Props {
-  currentSlug: string;
+interface BacklinkItem {
+  slug: string;
+  title: string;
+  description: string;
+  growthStage: 'seedling' | 'budding' | 'evergreen';
 }
 
-const { currentSlug } = Astro.props;
+interface Props {
+  backlinks?: BacklinkItem[];
+}
 
-// Normalise the current slug (strip file extension if present)
-const cleanCurrentSlug = currentSlug.replace(/\.mdx?$/, "");
-
-// Load all non-draft posts
-const allPosts = await getCollection("blog", ({ data }) => !data.draft);
-
-// Scan all posts' bodies for [[WikiLink]] syntax pointing to the current post
-const backlinks = allPosts
-  .filter((post) => {
-    const cleanPostId = post.id.replace(/\.mdx?$/, "");
-    if (cleanPostId === cleanCurrentSlug) return false; // Skip self
-
-    const body = post.body || "";
-    // Match [[slug]] or [[slug|alias]]
-    const wikiLinkRegex = /\[\[([a-zA-Z0-9\-_#]+)(?:\|[^\]]+)?\]\]/g;
-    let match;
-
-    while ((match = wikiLinkRegex.exec(body)) !== null) {
-      const targetSlug = match[1].replace(/\.mdx?$/, "");
-      if (targetSlug === cleanCurrentSlug) {
-        return true;
-      }
-    }
-    return false;
-  })
-  .map((post) => ({
-    slug: post.id.replace(/\.mdx?$/, ""),
-    title: post.data.title,
-    description: post.data.description,
-    growthStage: post.data.growthStage,
-  }));
+const { backlinks = [] } = Astro.props;
 
 const hasBacklinks = backlinks.length > 0;
 
-// Mapping stages to emojis and names
+// Mapping stages to emojis
 const STAGE_MAP = {
-  seedling: { emoji: "🌱", label: "Seedling" },
-  budding: { emoji: "🌿", label: "Budding" },
-  evergreen: { emoji: "🌳", label: "Evergreen" },
+  seedling: "🌱",
+  budding: "🌿",
+  evergreen: "🌳",
 };
 ---
 
@@ -55,18 +30,18 @@ const STAGE_MAP = {
     <div class="backlinks-section">
       <h3 class="backlinks-title text-title-large">
         <span class="backlinks-title-dot"></span>
-        Connections & Backlinks
+        <I18n tKey="post.connections" />
       </h3>
       <div class="backlinks-grid">
         {backlinks.map((link) => {
-          const stage = STAGE_MAP[link.growthStage || "seedling"];
+          const emoji = STAGE_MAP[link.growthStage || "seedling"];
           return (
             <article class="backlink-card">
               <a href={`/blog/${link.slug}`} class="backlink-link">
                 <div class="backlink-header">
-                  <span class={`backlink-stage-badge backlink-stage--${link.growthStage}`} title={`Growth stage: ${stage.label}`}>
-                    <span class="badge-emoji">{stage.emoji}</span>
-                    <span class="badge-text">{stage.label}</span>
+                  <span class={`backlink-stage-badge backlink-stage--${link.growthStage}`} title={`Growth stage: ${link.growthStage}`}>
+                    <span class="badge-emoji">{emoji}</span>
+                    <span class="badge-text"><I18n tKey={`stage.${link.growthStage}` as any} /></span>
                   </span>
                 </div>
                 <h4 class="backlink-card-title text-title-medium">{link.title}</h4>

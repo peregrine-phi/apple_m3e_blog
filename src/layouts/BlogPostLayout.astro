@@ -21,9 +21,10 @@ interface Heading {
 interface Props {
   post: CollectionEntry<"blog">;
   headings?: Heading[];
+  backlinks?: Array<{ slug: string; title: string; description: string; growthStage: any }>;
 }
 
-const { post, headings = [] } = Astro.props;
+const { post, headings = [], backlinks = [] } = Astro.props;
 const { title, description, publishedAt, updatedAt, tags, growthStage, knowledgeDomain } = post.data;
 const formattedDate = publishedAt.toLocaleDateString("en-US", {
   year: "numeric",
@@ -32,7 +33,7 @@ const formattedDate = publishedAt.toLocaleDateString("en-US", {
 });
 
 // i18n tag classification
-const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase() !== "zh");
+const displayTags = tags;
 ---
 
 <SplitLayout title={title} description={description}>
@@ -50,15 +51,16 @@ const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase()
         </time>
         {updatedAt && (
           <span class="text-label-medium text-tertiary">
-            · <span class="i18n-en">Updated {updatedAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
-            <span class="i18n-zh">更新于 {updatedAt.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}</span>
+            · <span class="i18n-en"><I18n tKey="post.updated" /> {updatedAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+            <span class="i18n-zh"><I18n tKey="post.updated" /> {updatedAt.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}</span>
           </span>
         )}
         <span class={`post-stage post-stage--${growthStage}`} title={`Growth stage: ${growthStage}`}>
           <span class="stage-emoji">{growthStage === "evergreen" ? "🌳" : growthStage === "budding" ? "🌿" : "🌱"}</span>
           <span class="stage-label">
-            <span class="i18n-en">{growthStage} Stage</span>
-            <span class="i18n-zh">{growthStage === "evergreen" ? "常青树" : growthStage === "budding" ? "成长" : "幼苗"}阶段</span>
+            <I18n tKey={`stage.${growthStage}` as any} />
+            <span class="i18n-en"> Stage</span>
+            <span class="i18n-zh">阶段</span>
           </span>
         </span>
         {knowledgeDomain && (
@@ -84,7 +86,7 @@ const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase()
     </div>
 
     <!-- Backlinks Section -->
-    <Backlinks currentSlug={post.id} />
+    <Backlinks backlinks={backlinks} />
 
     <!-- Post Footer -->
     <footer class="post-footer">

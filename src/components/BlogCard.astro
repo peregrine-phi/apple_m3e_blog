@@ -3,8 +3,9 @@
 // Variants: "default" (clean Apple card) | "brutal" (thick border + offset shadow)
 import type { CollectionEntry } from "astro:content";
 import Chip from "./Chip.astro";
+import I18n from "./I18n.astro";
 
-import { stageConfig } from "../content/filter-config";
+import { stageConfig } from "../config/filter-config";
  
 interface Props {
   post: CollectionEntry<"blog">;
@@ -13,20 +14,13 @@ interface Props {
 }
  
 const { post, variant = "default", showImage = false } = Astro.props;
-const { title, description, publishedAt, tags, image, growthStage } = post.data;
+const { title, description, publishedAt, tags, image, growthStage, lang } = post.data;
 
-const locale = Astro.url.pathname.startsWith("/zh") ? "zh-CN" : "en-US";
-const formattedDate = publishedAt.toLocaleDateString(locale, {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
 const stageEmoji = stageConfig[growthStage]?.emoji ?? "🌱";
 const hasImage = showImage && image != null;
 
 // i18n tag classification
-const langTag = tags.find(t => t.toLowerCase() === "en" || t.toLowerCase() === "zh");
-const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase() !== "zh");
+const displayTags = tags;
 ---
 
 <article class:list={["blog-card", `blog-card--${variant}`]}>
@@ -48,15 +42,15 @@ const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase()
         }
         <div class="blog-card-meta-chips" style="display: flex; align-items: center; gap: var(--blog-space-1-5);">
           {
-            langTag && (
-              <span class={`blog-card-lang blog-card-lang--${langTag.toLowerCase()}`} title={`Language: ${langTag.toUpperCase()}`}>
-                <span class="lang-label">{langTag.toUpperCase() === "ZH" ? "中文" : "EN"}</span>
+            lang && (
+              <span class={`blog-card-lang blog-card-lang--${lang.toLowerCase()}`} title={`Language: ${lang.toUpperCase()}`}>
+                <span class="lang-label">{lang.toUpperCase() === "ZH" ? "中文" : "EN"}</span>
               </span>
             )
           }
           <span class={`blog-card-stage blog-card-stage--${growthStage}`} title={`Growth stage: ${growthStage}`}>
             <span class="stage-emoji">{stageEmoji}</span>
-            <span class="stage-label">{growthStage}</span>
+            <span class="stage-label"><I18n tKey={`stage.${growthStage}` as any} /></span>
           </span>
         </div>
       </div>
@@ -70,7 +64,8 @@ const displayTags = tags.filter(t => t.toLowerCase() !== "en" && t.toLowerCase()
           datetime={publishedAt.toISOString()}
           class="text-label-medium text-tertiary"
         >
-          {formattedDate}
+          <span class="i18n-en">{publishedAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+          <span class="i18n-zh">{publishedAt.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}</span>
         </time>
 
         {

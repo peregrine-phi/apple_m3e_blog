@@ -4,7 +4,7 @@
 
 import MDBadge from "./MDBadge.astro";
 import I18n from "./I18n.astro";
-import type { ChipConfig } from "../content/filter-config";
+import type { ChipConfig } from "../config/filter-config";
 import { translations } from "../i18n/translations";
 
 interface Props {
@@ -47,14 +47,7 @@ const { titleKey, badgeVariant, filterType, items, config, allLabelKey } = Astro
       // Personalized layout variants
       const variantClass = itemConfig.variant ? `filter-chip--${itemConfig.variant}` : "";
 
-      // Label localization check
-      const displayLabel = 
-        itemId.toLowerCase() === "zh" ? "中文" : 
-        itemId.toLowerCase() === "en" ? "EN" : 
-        itemId.toLowerCase() === "seedling" ? "幼苗期" : 
-        itemId.toLowerCase() === "budding" ? "成长中" : 
-        itemId.toLowerCase() === "evergreen" ? "常青树" : 
-        itemId;
+      const isStage = filterType === "stage";
 
       return (
         <button 
@@ -66,7 +59,9 @@ const { titleKey, badgeVariant, filterType, items, config, allLabelKey } = Astro
         >
           {emoji && <span class="chip-emoji" style="margin-right: 4px;">{emoji}</span>}
           {customIcon && <span class="chip-icon-custom" style="margin-right: 6px; display: inline-flex; align-items: center;" set:html={customIcon} />}
-          <span class="chip-label">{displayLabel}</span>
+          <span class="chip-label">
+            {isStage ? <I18n tKey={`blog.${itemId}` as any} /> : itemId}
+          </span>
           <span class="chip-icon-state">
             <svg class="chip-icon-check" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="20 6 9 17 4 12" />

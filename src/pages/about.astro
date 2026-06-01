@@ -1,12 +1,21 @@
 ---
+import { getEntry } from "astro:content";
 import PageLayout from "../layouts/PageLayout.astro";
 import Chip from "../components/Chip.astro";
 import TextField from "../components/TextField.astro";
 import MonetSwitcher from "../components/MonetSwitcher.astro";
 import I18n from "../components/I18n.astro";
+import { siteConfig } from "../config/site";
+
+// Query localized bio posts from about content collection
+const enBio = await getEntry("about", "en");
+const zhBio = await getEntry("about", "zh");
+
+const { Content: EnContent } = enBio ? await enBio.render() : { Content: null };
+const { Content: ZhContent } = zhBio ? await zhBio.render() : { Content: null };
 ---
 
-<PageLayout title="About — M3E" description="About the author behind M3E blog.">
+<PageLayout title={`About — ${siteConfig.name}`} description={`About the author behind ${siteConfig.name} blog.`}>
   <header class="page-header">
     <h1 class="text-display-small"><I18n tKey="about.heading" /></h1>
   </header>
@@ -23,72 +32,12 @@ import I18n from "../components/I18n.astro";
     <div class="about-text text-body-large">
       <!-- English Version -->
       <div class="i18n-en">
-        <p>Hi, I'm the creator of M3E — a blog at the intersection of design and technology.</p>
-
-        <p>
-          This space is where I explore the craft of building digital experiences.
-          I write about design systems, frontend architecture, and the subtle
-          details that make interfaces feel alive.
-        </p>
-
-        <p>
-          The name "M3E" reflects the blog's design philosophy — a fusion of
-          Apple's Human Interface Guidelines and Material 3 Expressive design
-          language. Clean, deliberate, and full of character.
-        </p>
-
-        <h2 class="text-headline-medium">Design Philosophy</h2>
-        <ul>
-          <li><strong>Tokens over hardcoded values.</strong> Every color, spacing, and typographic decision lives in semantic CSS custom properties.</li>
-          <li><strong>Progressive enhancement.</strong> The blog works without JavaScript, then gets better with it.</li>
-          <li><strong>Respect the reader.</strong> Clean typography, readable measure, appropriate contrast.</li>
-          <li><strong>Motion with purpose.</strong> Animation should guide attention, not distract.</li>
-        </ul>
-
-        <h2 class="text-headline-medium">Colophon</h2>
-        <ul>
-          <li>Built with <a href="https://astro.build">Astro</a></li>
-          <li>Styled with <a href="https://tailwindcss.com">Tailwind CSS v4</a> + <a href="https://daisyui.com">daisyUI v5</a></li>
-          <li>Design tokens: Apple HIG x Material 3 Expressive</li>
-          <li>Typography: System font stack with <a href="https://developer.apple.com/fonts/">SF Pro</a> priority</li>
-          <li>Hosted on the edge</li>
-        </ul>
-
-        <h2 class="text-headline-medium">Design System</h2>
-        <p>A living showcase of the M3E token and component system, powered by Material Design 3.</p>
+        {EnContent && <EnContent />}
       </div>
 
       <!-- Chinese Version -->
       <div class="i18n-zh">
-        <p>你好，我是 M3E 的创作者 —— 这是一个关于设计与技术交汇点的个人文章空间。</p>
-
-        <p>
-          在这个空间里，我探索构建数字体验的手艺。我写关于设计系统、前端架构以及让界面显得生动有趣的细微细节。
-        </p>
-
-        <p>
-          “M3E” 这个名字反映了该空间的设计理念 —— 融合了苹果的 Human Interface Guidelines (HIG) 与谷歌的 Material 3 Expressive 设计语言。简洁、克制而又充满个性。
-        </p>
-
-        <h2 class="text-headline-medium">设计哲学</h2>
-        <ul>
-          <li><strong>Token 胜过硬编码值。</strong> 每一个颜色、间距和排版决策都存在于语义化的 CSS 自定义属性中。</li>
-          <li><strong>渐进增强。</strong> 文章默认在无 JavaScript 的情况下正常工作，并在有 JS 时提供更好的体验。</li>
-          <li><strong>尊重读者。</strong> 干净的排版、易读的行宽以及合适的对比度。</li>
-          <li><strong>有目的性的动效。</strong> 动画应该引导读者的注意力，而不是令人分心。</li>
-        </ul>
-
-        <h2 class="text-headline-medium">结构记事</h2>
-        <ul>
-          <li>基于 <a href="https://astro.build">Astro</a> 构建</li>
-          <li>使用 <a href="https://tailwindcss.com">Tailwind CSS v4</a> + <a href="https://daisyui.com">daisyUI v5</a> 样式</li>
-          <li>设计 Token：Apple HIG x Material 3 Expressive</li>
-          <li>字体排版：系统字体栈，优先使用 <a href="https://developer.apple.com/fonts/">SF Pro</a></li>
-          <li>托管在边缘计算节点</li>
-        </ul>
-
-        <h2 class="text-headline-medium">设计系统</h2>
-        <p>这是一个展示 M3E 设计系统 Token 和组件的活动橱窗，由 Material Design 3 驱动。</p>
+        {ZhContent && <ZhContent />}
       </div>
 
       <!-- Monet Dynamic Color -->

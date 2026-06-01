@@ -5,20 +5,50 @@ import BlogPostLayout from "../../layouts/BlogPostLayout.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
-  return posts.map((post) => ({
-    params: { slug: post.id.replace(/\.mdx?$/, "") },
-    props: { post },
-  }));
+  return posts.map((post) => {
+    const slug = post.id.replace(/\.mdx?$/, "");
+    
+    // Calculate backlinks referencing this post
+    const backlinks = posts
+      .filter((otherPost) => {
+        const cleanOtherPostId = otherPost.id.replace(/\.mdx?$/, "");
+        if (cleanOtherPostId === slug) return false; // Skip self
+
+        const body = otherPost.body || "";
+        const wikiLinkRegex = /\[\[([a-zA-Z0-9\-_#]+)(?:\|[^\]]+)?\]\]/g;
+        let match;
+
+        while ((match = wikiLinkRegex.exec(body)) !== null) {
+          const targetSlug = match[1].replace(/\.mdx?$/, "");
+          if (targetSlug === slug) {
+            return true;
+          }
+        }
+        return false;
+      })
+      .map((otherPost) => ({
+        slug: otherPost.id.replace(/\.mdx?$/, ""),
+        title: otherPost.data.title,
+        description: otherPost.data.description,
+        growthStage: otherPost.data.growthStage,
+      }));
+
+    return {
+      params: { slug },
+      props: { post, backlinks },
+    };
+  });
 }
 
 interface Props {
   post: CollectionEntry<"blog">;
+  backlinks: Array<{ slug: string; title: string; description: string; growthStage: any }>;
 }
 
-const { post } = Astro.props;
+const { post, backlinks } = Astro.props;
 const { Content, headings } = await post.render();
 ---
 
-<BlogPostLayout post={post} headings={headings}>
+<BlogPostLayout post={post} headings={headings} backlinks={backlinks}>
   <Content />
 </BlogPostLayout>

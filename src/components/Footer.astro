@@ -1,6 +1,33 @@
 ---
 // Footer.astro — Site footer
 import I18n from "./I18n.astro";
+import { siteConfig } from "../config/site";
+import { translations } from "../i18n/translations";
+
+interface NavItem {
+  href: string;
+  labelKey?: keyof typeof translations.en;
+  label?: string;
+  external?: boolean;
+}
+
+interface Props {
+  navItems?: NavItem[];
+  connectItems?: NavItem[];
+}
+
+const defaultNavItems: NavItem[] = [
+  { href: "/", labelKey: "nav.home" },
+  { href: "/blog", labelKey: "nav.blog" },
+  { href: "/about", labelKey: "nav.about" },
+];
+
+const defaultConnectItems: NavItem[] = [
+  { href: "/rss.xml", labelKey: "footer.rss" },
+  { href: siteConfig.social?.github || "/about", label: "GitHub", external: true },
+];
+
+const { navItems = defaultNavItems, connectItems = defaultConnectItems } = Astro.props;
 ---
 
 <footer class="site-footer">
@@ -8,7 +35,7 @@ import I18n from "./I18n.astro";
     <div class="footer-brand">
       <a href="/" class="site-logo text-headline-small">
         <span class="logo-dot" aria-hidden="true"></span>
-        M3E
+        {siteConfig.name}
       </a>
       <p class="text-body-small text-secondary">
         <I18n tKey="footer.desc" />
@@ -18,14 +45,19 @@ import I18n from "./I18n.astro";
     <div class="footer-links">
       <div class="footer-col">
         <h4 class="text-label-large text-secondary"><I18n tKey="footer.nav" /></h4>
-        <a href="/" class="footer-link text-body-small"><I18n tKey="nav.home" /></a>
-        <a href="/blog" class="footer-link text-body-small"><I18n tKey="nav.blog" /></a>
-        <a href="/about" class="footer-link text-body-small"><I18n tKey="nav.about" /></a>
+        {navItems.map((item) => (
+          <a href={item.href} class="footer-link text-body-small" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+            {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+          </a>
+        ))}
       </div>
       <div class="footer-col">
         <h4 class="text-label-large text-secondary"><I18n tKey="footer.connect" /></h4>
-        <a href="/rss.xml" class="footer-link text-body-small"><I18n tKey="footer.rss" /></a>
-        <a href="/about" class="footer-link text-body-small" target="_blank" rel="noopener">GitHub</a>
+        {connectItems.map((item) => (
+          <a href={item.href} class="footer-link text-body-small" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+            {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+          </a>
+        ))}
       </div>
     </div>
   </div>
@@ -33,7 +65,7 @@ import I18n from "./I18n.astro";
   <div class="container-wide footer-bottom">
     <hr class="divider" />
     <p class="text-label-small text-tertiary">
-      &copy; {new Date().getFullYear()} M3E. <I18n tKey="footer.built" />
+      &copy; {new Date().getFullYear()} {siteConfig.copyright}. <I18n tKey="footer.built" />
     </p>
   </div>
 </footer>
@@ -55,10 +87,15 @@ import I18n from "./I18n.astro";
   }
 
   .footer-brand {
-    max-width: var(--footer-brand-max-width, 280px);
+    width: var(--footer-brand-max-width, 280px);
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     gap: var(--blog-space-3);
+  }
+
+  .footer-brand p {
+    min-height: 4.5em; /* Reserve vertical space for up to 3 lines of description text to prevent layout height shift on language toggle */
   }
 
   .site-logo {
@@ -90,6 +127,7 @@ import I18n from "./I18n.astro";
     display: flex;
     flex-direction: column;
     gap: var(--blog-space-2);
+    min-width: 100px; /* Prevent horizontal layout shift by reserving column width */
   }
 
   .footer-link {

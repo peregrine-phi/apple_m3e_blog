@@ -4,8 +4,20 @@ import { translations } from "../i18n/translations";
 
 interface Props {
   tKey: keyof typeof translations.en;
+  vars?: Record<string, string>;
 }
 
-const { tKey } = Astro.props;
+const { tKey, vars = {} } = Astro.props;
+
+function interpolate(text: string, variables: Record<string, string>) {
+  let result = text || "";
+  for (const [key, value] of Object.entries(variables)) {
+    result = result.replace(new RegExp(`{${key}}`, 'g'), value);
+  }
+  return result;
+}
+
+const enText = interpolate(translations.en[tKey], vars);
+const zhText = interpolate(translations.zh[tKey], vars);
 ---
-<span class="i18n-en">{translations.en[tKey]}</span><span class="i18n-zh">{translations.zh[tKey]}</span>
+<span class="i18n-en">{enText}</span><span class="i18n-zh">{zhText}</span>

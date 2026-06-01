@@ -13,9 +13,18 @@ const blogCollection = defineCollection({
     image: z.string().optional(),
     growthStage: z.enum(["seedling", "budding", "evergreen"]).default("seedling"),
     knowledgeDomain: z.string().optional(),
+    lang: z.enum(["en", "zh"]).default("en"),
+  }),
+});
+
+const aboutCollection = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
   }),
 });
 
 export const collections = {
   blog: blogCollection,
+  about: aboutCollection,
 };

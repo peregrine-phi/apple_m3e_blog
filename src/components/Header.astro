@@ -4,12 +4,27 @@ import ThemeToggle from "./ThemeToggle.astro";
 import MonetSwitcher from "./MonetSwitcher.astro";
 import LanguageToggle from "./LanguageToggle.astro";
 import I18n from "./I18n.astro";
+import { siteConfig } from "../config/site";
+import { translations } from "../i18n/translations";
+
+interface NavItem {
+  href: string;
+  labelKey?: keyof typeof translations.en;
+  label?: string;
+  external?: boolean;
+}
 
 interface Props {
   transparent?: boolean;
+  navItems?: NavItem[];
 }
 
-const { transparent = false } = Astro.props;
+const defaultNavItems: NavItem[] = [
+  { href: "/blog", labelKey: "nav.blog" },
+  { href: "/about", labelKey: "nav.about" },
+];
+
+const { transparent = false, navItems = defaultNavItems } = Astro.props;
 ---
 
 <header class:list={["site-header", { "site-header--transparent": transparent }]}>
@@ -18,12 +33,15 @@ const { transparent = false } = Astro.props;
     <div class="liquid-glass-inner">
       <a href="/" class="site-logo text-headline-small" aria-label="Home">
         <span class="logo-dot" aria-hidden="true"></span>
-        M3E
+        {siteConfig.name}
       </a>
 
       <nav class="site-nav hide-mobile" aria-label="Main navigation">
-        <a href="/blog" class="nav-link text-label-large"><I18n tKey="nav.blog" /></a>
-        <a href="/about" class="nav-link text-label-large"><I18n tKey="nav.about" /></a>
+        {navItems.map((item) => (
+          <a href={item.href} class="nav-link text-label-large" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+            {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+          </a>
+        ))}
       </nav>
 
       <div class="header-actions">
@@ -48,8 +66,11 @@ const { transparent = false } = Astro.props;
 
     <!-- Mobile menu -->
     <nav class="mobile-nav hide-desktop" id="mobile-nav" aria-label="Mobile navigation">
-      <a href="/blog" class="mobile-nav-link"><I18n tKey="nav.blog" /></a>
-      <a href="/about" class="mobile-nav-link"><I18n tKey="nav.about" /></a>
+      {navItems.map((item) => (
+        <a href={item.href} class="mobile-nav-link" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+          {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+        </a>
+      ))}
     </nav>
   </div>
 </header>

@@ -9,20 +9,42 @@ import MDSnackbar from "../components/MDSnackbar.astro";
 import { ClientRouter } from "astro:transitions";
 import "../styles/main.css";
 import { monetConfig } from "../config/monet.config.js";
+import { siteConfig } from "../config/site";
+
+import { translations } from "../i18n/translations";
+
+interface NavItem {
+  href: string;
+  labelKey?: keyof typeof translations.en;
+  label?: string;
+  external?: boolean;
+}
 
 interface Props {
   title: string;
   description?: string;
   image?: string;
   transparentHeader?: boolean;
+  navItems?: NavItem[];
+  footerNavItems?: NavItem[];
+  footerConnectItems?: NavItem[];
 }
 
 const {
   title,
-  description = "A personal blog about design, technology, and thoughtful living.",
+  description = siteConfig.description,
   image,
   transparentHeader = false,
+  navItems,
+  footerNavItems,
+  footerConnectItems,
 } = Astro.props;
+
+// Music configuration from siteConfig
+const musicMode = siteConfig.music?.mode || 'local';
+const musicApiEndpoint = siteConfig.music?.mode === 'api'
+  ? `${siteConfig.music.metingApi}?server=${siteConfig.music.server}&type=playlist&id=${siteConfig.music.playlistId}`
+  : '';
 ---
 
 <!doctype html>
@@ -31,7 +53,9 @@ const {
     <!-- Restore saved Lang before first paint to prevent FOUC -->
     <script is:inline>
       (function(){
-        var l = localStorage.getItem("lang") || (navigator.language && navigator.language.indexOf("zh") === 0 ? "zh" : "en");
+        var navLang = navigator.language ? navigator.language.toLowerCase() : "";
+        var isSimplifiedChinese = navLang === "zh" || navLang.startsWith("zh-cn") || navLang.startsWith("zh-sg") || navLang.indexOf("zh-hans") !== -1;
+        var l = localStorage.getItem("lang") || (isSimplifiedChinese ? "zh" : "en");
         document.documentElement.setAttribute("lang", l);
       })();
     </script>
@@ -100,14 +124,14 @@ const {
     </script>
   </head>
   <body>
-    <Header transparent={transparentHeader} />
+    <Header transparent={transparentHeader} navItems={navItems} />
     <main>
       <slot />
     </main>
     <div class="music-player-container">
-      <Music />
+      <Music mode={musicMode} apiEndpoint={musicApiEndpoint} />
     </div>
-    <Footer />
+    <Footer navItems={footerNavItems} connectItems={footerConnectItems} />
 
     <!-- "Scroll to Top" FAB component -->
     <div class="scroll-to-top-container">

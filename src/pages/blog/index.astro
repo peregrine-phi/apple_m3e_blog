@@ -5,8 +5,10 @@ import BlogCard from "../../components/BlogCard.astro";
 import SearchBar from "../../components/SearchBar.astro";
 import I18n from "../../components/I18n.astro";
 import FilterGroup from "../../components/FilterGroup.astro";
-import { tagConfig, stageConfig } from "../../content/filter-config";
+import MDSwitch from "../../components/MDSwitch.astro";
+import { tagConfig, stageConfig } from "../../config/filter-config";
 import { getCollection } from "astro:content";
+import { siteConfig } from "../../config/site";
 
 const allPosts = await getCollection("blog", ({ data }) => !data.draft);
 const posts = allPosts.sort(
@@ -17,9 +19,18 @@ const posts = allPosts.sort(
 const allTags = Array.from(new Set(posts.flatMap(p => p.data.tags || []))).sort();
 ---
 
+<script is:inline>
+  (function(){
+    var showAll = localStorage.getItem("blog-show-all-langs") === "true";
+    if (showAll) {
+      document.documentElement.setAttribute("data-show-all-langs", "true");
+    }
+  })();
+</script>
+
 <BlogListLayout
-  title="Blog — M3E"
-  description="All articles on design, technology, and thoughtful living."
+  title={`Blog — ${siteConfig.name}`}
+  description={siteConfig.description}
 >
   {
     posts.length === 0 ? (
@@ -28,8 +39,17 @@ const allTags = Array.from(new Set(posts.flatMap(p => p.data.tags || []))).sort(
       </div>
     ) : (
       <div class="blog-filter-section">
-        <div class="search-container">
-          <SearchBar id="blog-search" placeholder="Search articles, tags or descriptions..." />
+        <div class="search-and-toggle-container" style="display: flex; gap: var(--blog-space-4); align-items: center; justify-content: space-between; flex-wrap: wrap; width: 100%;">
+          <div class="search-container">
+            <SearchBar id="blog-search" placeholder="Search articles, tags or descriptions..." />
+          </div>
+          <div class="show-all-langs-toggle-container" style="display: flex; align-items: center; gap: var(--blog-space-2-5); flex-shrink: 0; padding-block: 4px;">
+            <span class="text-label-medium text-secondary">
+              <span class="i18n-en">Show All Languages</span>
+              <span class="i18n-zh">显示所有语种文章</span>
+            </span>
+            <MDSwitch id="show-all-langs-toggle" />
+          </div>
         </div>
 
         <!-- Reusable Filter Layout Group: Tags -->
@@ -61,6 +81,7 @@ const allTags = Array.from(new Set(posts.flatMap(p => p.data.tags || []))).sort(
             data-title={post.data.title.toLowerCase()}
             data-desc={post.data.description.toLowerCase()}
             data-stage={post.data.growthStage}
+            data-lang={post.data.lang}
           >
             <BlogCard post={post} />
           </div>
@@ -74,6 +95,8 @@ const allTags = Array.from(new Set(posts.flatMap(p => p.data.tags || []))).sort(
 <script>
   function initFilters() {
     const searchInput = document.getElementById("blog-search") as HTMLInputElement;
+    if (!searchInput) return;
+
     const tagChips = document.querySelectorAll(".tags-chips .filter-chip");
     const allTagChip = document.querySelector('.tags-chips .filter-chip[data-tag="all"]');
     const stageChips = document.querySelectorAll(".stages-chips .filter-chip");
@@ -101,33 +124,102 @@ const allTags = Array.from(new Set(posts.flatMap(p => p.data.tags || []))).sort(
       filterPosts();
     });
 
-    function filterPosts() {
-      let visibleCount = 0;
+    const showAllLangsToggle = document.getElementById("show-all-langs-toggle") as HTMLInputElement;
 
+    // Restore saved toggle state from memory
+    if (showAllLangsToggle) {
+      const savedShowAll = localStorage.getItem("blog-show-all-langs") === "true";
+      showAllLangsToggle.checked = savedShowAll;
+      document.documentElement.setAttribute("data-show-all-langs", savedShowAll ? "true" : "false");
+    }
+
+    function filterPosts() {
+      // 1. FIRST: Record the position of all currently visible cards before layout changes
+      const firstPositions = new Map<HTMLElement, { top: number; left: number }>();
+      cards.forEach((card) => {
+        if (card.style.display !== "none") {
+          const rect = card.getBoundingClientRect();
+          firstPositions.set(card, { top: rect.top, left: rect.left });
+        }
+      });
+
+      let visibleCount = 0;
+      const showAllLangs = showAllLangsToggle?.checked || false;
+
+      // 2. Update visibility immediately to trigger browser layout calculation (reflow)
       cards.forEach((card) => {
         const tagsStr = card.dataset.tags || "";
         const title = card.dataset.title || "";
         const desc = card.dataset.desc || "";
         const stage = card.dataset.stage || "seedling";
+        const cardLang = card.dataset.lang || "en";
+
+        const currentLang = document.documentElement.getAttribute("lang") || "en";
+        const matchesLang = showAllLangs || (cardLang === currentLang);
 
         const cardTags = tagsStr.split(",").filter(Boolean);
         const matchesTag = activeTags.size === 0 || cardTags.some(t => activeTags.has(t));
         const matchesStage = activeStages.size === 0 || activeStages.has(stage);
         const matchesSearch = title.includes(searchQuery) || desc.includes(searchQuery) || tagsStr.includes(searchQuery);
 
-        if (matchesTag && matchesStage && matchesSearch) {
-          card.style.display = "";
-          card.style.opacity = "0";
-          card.style.transform = "translateY(8px)";
-          requestAnimationFrame(() => {
-            card.style.transition = "opacity 200ms cubic-bezier(0.2, 0, 0, 1), transform 200ms cubic-bezier(0.2, 0, 0, 1)";
+        const shouldShow = matchesLang && matchesTag && matchesStage && matchesSearch;
+
+        if (shouldShow) {
+          if (card.style.display === "none") {
+            card.style.display = "";
+            card.style.opacity = "0";
+            card.style.transform = "scale(0.96) translateY(12px)";
+          } else if (!card.style.display) {
+            // Already visible; keep standard opacity/transform to prevent blank first paints
+            card.style.display = "";
             card.style.opacity = "1";
-            card.style.transform = "translateY(0)";
-          });
+            card.style.transform = "";
+          }
           visibleCount++;
         } else {
           card.style.display = "none";
         }
+      });
+
+      // 3. LAST & INVERT & PLAY: Animate shifting cards to their new positions
+      requestAnimationFrame(() => {
+        cards.forEach((card) => {
+          if (card.style.display !== "none") {
+            const firstPos = firstPositions.get(card);
+            
+            if (firstPos) {
+              // Card was already visible; calculate layout shift
+              const lastRect = card.getBoundingClientRect();
+              const dx = firstPos.left - lastRect.left;
+              const dy = firstPos.top - lastRect.top;
+
+              if (dx !== 0 || dy !== 0) {
+                // INVERT: Instantly translate it back to its original layout position
+                card.style.transition = "none";
+                card.style.transform = `translate(${dx}px, ${dy}px)`;
+                
+                // PLAY: Transition it back to its new position smoothly in the next frame
+                requestAnimationFrame(() => {
+                  card.style.transition = "transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 350ms cubic-bezier(0.2, 0.8, 0.2, 1)";
+                  card.style.transform = "";
+                  card.style.opacity = "1";
+                });
+              } else {
+                // No shift; ensure standard state
+                card.style.transition = "transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 350ms cubic-bezier(0.2, 0.8, 0.2, 1)";
+                card.style.opacity = "1";
+                card.style.transform = "";
+              }
+            } else {
+              // New Card entering: Fade in and scale up smoothly
+              requestAnimationFrame(() => {
+                card.style.transition = "transform 350ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 350ms cubic-bezier(0.2, 0.8, 0.2, 1)";
+                card.style.opacity = "1";
+                card.style.transform = "";
+              });
+            }
+          }
+        });
       });
 
       // Handle empty state
@@ -209,8 +301,17 @@ const allTags = Array.from(new Set(posts.flatMap(p => p.data.tags || []))).sort(
       searchQuery = searchInput.value.toLowerCase().trim();
       filterPosts();
     });
+
+    showAllLangsToggle?.addEventListener("change", () => {
+      const checked = showAllLangsToggle.checked;
+      localStorage.setItem("blog-show-all-langs", checked ? "true" : "false");
+      document.documentElement.setAttribute("data-show-all-langs", checked ? "true" : "false");
+      filterPosts();
+    });
+
+    // Run initial filter to align grid with the current page language
+    filterPosts();
   }
 
-  initFilters();
-  document.addEventListener("astro:after-swap", initFilters);
+  document.addEventListener("astro:page-load", initFilters);
 </script>

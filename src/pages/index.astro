@@ -6,6 +6,7 @@ import MDButton from "../components/MDButton.astro";
 import MDBadge from "../components/MDBadge.astro";
 import I18n from "../components/I18n.astro";
 import { getCollection } from "astro:content";
+import { siteConfig } from "../config/site";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 const featuredPosts = posts
@@ -22,8 +23,8 @@ const hasHero = leadStory != null;
 ---
 
 <HeroLayout
-  title="M3E — Design & Technology Blog"
-  description="A personal blog exploring the intersection of design, technology, and thoughtful living. Apple News editorial aesthetics meet Brutalist attitude."
+  title={`${siteConfig.name} — ${siteConfig.tagline}`}
+  description={siteConfig.description}
 >
   <!-- Hero slot: the editorial hero section -->
   <div slot="hero">
@@ -89,7 +90,7 @@ const hasHero = leadStory != null;
         <div class="container-narrow hero-fallback-content">
           <p class="text-kicker" style="display: flex; align-items: center; gap: var(--blog-space-2);">
             <MDBadge variant="primary" type="dot" style="flex-shrink: 0;" />
-            <I18n tKey="home.welcome" />
+            <I18n tKey="home.welcome" vars={{ siteName: siteConfig.name }} />
           </p>
           <h1 class="text-display-large">
             <I18n tKey="home.designMeets" />
