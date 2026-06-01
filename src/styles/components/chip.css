@@ -1,0 +1,9 @@
+/* Chip — 标签/Tag 组件 Token */
+:root {
+  --chip-height: 32px;
+  --chip-gap: var(--blog-space-2);
+  --chip-radius: var(--blog-radius-sm);
+  --chip-icon-size: 18px;
+  --chip-icon-size-large: 24px;
+  --chip-max-width: 200px;
+}

@@ -11,15 +11,20 @@
 
   /* ── Brutalist Accent Colors (原色色块) ── */
   --blog-brutal-yellow: #FFD700;
+  --blog-brutal-on-yellow: #1a1a1a;
   --blog-brutal-red: #FF3B30;
+  --blog-brutal-on-red: #ffffff;
   --blog-brutal-blue: #007AFF;
+  --blog-brutal-on-blue: #ffffff;
   --blog-brutal-green: #34C759;
+  --blog-brutal-on-green: #1a1a1a;
   --blog-brutal-pink: #FF2D55;
+  --blog-brutal-on-pink: #ffffff;
 
   /* Default accent for brutalist components */
   --blog-brutal-accent: var(--blog-brutal-yellow);
-  --blog-brutal-on-accent: #000000;
-  --blog-brutal-on-accent-secondary: rgba(0, 0, 0, 0.6);
+  --blog-brutal-on-accent: var(--blog-brutal-on-yellow);
+  --blog-brutal-on-accent-secondary: #48484a; /* Converted from rgba(0,0,0,0.6) to solid color */
 
   /* ── Brutalist Shadow ── */
   --blog-brutal-shadow: 6px 6px 0 var(--blog-brutal-border-color);
@@ -38,4 +43,18 @@
   --blog-brutal-border-color: #fff;
   --blog-brutal-shadow: 6px 6px 0 var(--blog-brutal-border-color);
   --blog-brutal-shadow-hover: 10px 10px 0 var(--blog-brutal-border-color);
+
+  /* 暗色模式下 brutalist 原色块调整亮度/饱和度以符合对比度要求 */
+  --blog-brutal-yellow: #FFD54F; /* 明亮暗黄 */
+  --blog-brutal-on-yellow: #1a1a1a;
+  --blog-brutal-red: #FF4F4B;    /* 鲜艳暗红 */
+  --blog-brutal-on-red: #ffffff;
+  --blog-brutal-blue: #4DABFF;   /* 明亮暗蓝 */
+  --blog-brutal-on-blue: #ffffff;
+  --blog-brutal-green: #4CD964;  /* 柔和暗绿 */
+  --blog-brutal-on-green: #1a1a1a;
+  --blog-brutal-pink: #FF5E80;   /* 明亮暗粉 */
+  --blog-brutal-on-pink: #ffffff;
+
+  --blog-brutal-on-accent-secondary: #aeaeb2; /* Converted from rgba(0,0,0,0.6) to solid color */
 }

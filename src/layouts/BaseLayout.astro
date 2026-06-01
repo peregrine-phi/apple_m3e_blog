@@ -6,6 +6,7 @@ import MonetCSS from "../components/MonetCSS.astro";
 import MDButton from "../components/MDButton.astro";
 import MDSnackbar from "../components/MDSnackbar.astro";
 import "../styles/main.css";
+import { monetConfig } from "../config/monet.config.js";
 
 interface Props {
   title: string;
@@ -50,7 +51,7 @@ const {
     {image && <meta name="twitter:image" content={image} />}
 
     <!-- Theme color -->
-    <meta name="theme-color" content="#3B5CF6" />
+    <meta name="theme-color" content={monetConfig.defaultSeed} />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 

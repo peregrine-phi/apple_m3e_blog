@@ -1,0 +1,10 @@
+/* MDSnackbar — 提示条组件 Token */
+:root {
+  --snackbar-min-width: 344px;
+  --snackbar-max-width: 568px;
+  --snackbar-gap: var(--blog-space-6);
+  --snackbar-padding-y: 14px;
+  --snackbar-padding-x: 16px;
+  --snackbar-font-size: var(--blog-typescale-body-medium-size);
+  --snackbar-letter-spacing: var(--blog-typescale-body-medium-tracking);
+}

@@ -1,0 +1,11 @@
+/* TextField — 文本输入组件 Token */
+:root {
+  --textfield-min-height: 56px;
+  --textfield-padding-top: 24px;
+  --textfield-padding-x: 16px;
+  --textfield-padding-bottom: 8px;
+  --textfield-radius: var(--blog-radius-xs);
+  --textfield-icon-size: 24px;
+  --textfield-gap: var(--blog-space-1);
+  --textfield-line-height: 1.5;
+}

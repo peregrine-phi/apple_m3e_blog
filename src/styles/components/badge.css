@@ -1,0 +1,9 @@
+/* MDBadge — 徽标组件 Token */
+:root {
+  --badge-height: 16px;
+  --badge-min-width: 16px;
+  --badge-dot-size: 6px;
+  --badge-font-size: var(--blog-typescale-label-small-size);
+  --badge-letter-spacing: var(--blog-typescale-label-small-tracking);
+  --badge-line-height: 1;
+}

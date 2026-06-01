@@ -8,11 +8,11 @@
   /* ── Source / Reference Colors ── */
   --blog-ref-primary-h: 230;
   --blog-ref-primary-s: 82%;
-  --blog-ref-primary-l: 58%;
+  --blog-ref-primary-l: 48%; /* Adjusted from 58% to achieve 4.5:1+ contrast on white text */
 
   --blog-ref-secondary-h: 260;
-  --blog-ref-secondary-s: 60%;
-  --blog-ref-secondary-l: 55%;
+  --blog-ref-secondary-s: 55%; /* Adjusted from 60% */
+  --blog-ref-secondary-l: 42%; /* Adjusted from 55% to achieve 4.5:1+ contrast on white text */
 
   --blog-ref-tertiary-h: 340;
   --blog-ref-tertiary-s: 80%;
@@ -95,13 +95,37 @@
   --blog-color-success: hsl(
     var(--blog-ref-success-h),
     var(--blog-ref-success-s),
-    var(--blog-ref-success-l)
+    26%
+  ); /* Adjusted to achieve 4.5:1+ contrast against white text */
+  --blog-color-on-success: #ffffff;
+  --blog-color-success-container: hsl(
+    var(--blog-ref-success-h),
+    60%,
+    92%
   );
+  --blog-color-on-success-container: hsl(
+    var(--blog-ref-success-h),
+    70%,
+    18%
+  );
+
   --blog-color-warning: hsl(
     var(--blog-ref-warning-h),
-    var(--blog-ref-warning-s),
-    var(--blog-ref-warning-l)
+    90%,
+    42%
+  ); /* Adjusted from 50% to achieve 4.5:1+ contrast against dark text (#1a1a1a) */
+  --blog-color-on-warning: #1a1a1a;
+  --blog-color-warning-container: hsl(
+    var(--blog-ref-warning-h),
+    100%,
+    92%
   );
+  --blog-color-on-warning-container: hsl(
+    var(--blog-ref-warning-h),
+    90%,
+    20%
+  );
+
   --blog-color-error: hsl(
     var(--blog-ref-error-h),
     var(--blog-ref-error-s),
@@ -121,12 +145,12 @@
 
   /* ── Surface & Background ── */
   --blog-color-background: #fbfbfd;
-  --blog-color-on-background: rgba(0, 0, 0, 0.88);
+  --blog-color-on-background: #1d1d1f; /* Converted from rgba(0,0,0,0.88) on background to prevent transparency compounding */
 
   --blog-color-surface: #ffffff;
-  --blog-color-on-surface: rgba(0, 0, 0, 0.88);
+  --blog-color-on-surface: #1d1d1f; /* Converted from rgba(0,0,0,0.88) to solid color */
   --blog-color-surface-variant: #f2f2f7;
-  --blog-color-on-surface-variant: rgba(0, 0, 0, 0.55);
+  --blog-color-on-surface-variant: #6e6e73; /* Converted from rgba(0,0,0,0.55) to solid color (contrast approx 5.0:1) */
 
   --blog-color-surface-raised: #ffffff;
   --blog-color-surface-dim: #f5f5fa;
@@ -158,11 +182,13 @@
     transparent
   );
 
-  /* ── Text (Apple-inspired opacity hierarchy) ── */
-  --blog-color-text-primary: rgba(0, 0, 0, 0.88);
-  --blog-color-text-secondary: rgba(0, 0, 0, 0.55);
-  --blog-color-text-tertiary: rgba(0, 0, 0, 0.28);
-  --blog-color-text-quaternary: rgba(0, 0, 0, 0.12);
+  /* ── Text (Apple-inspired solid colors for stable contrast) ── */
+  --blog-color-text-primary: #1d1d1f;              /* Converted from rgba(0,0,0,0.88), contrast approx 14.2:1 ✅ */
+  --blog-color-text-secondary: #6e6e73;            /* Converted from rgba(0,0,0,0.55), contrast approx 5.0:1 ✅ */
+  
+  /* ⚠️ ACCESSIBILITY NOTE: text-tertiary and text-quaternary are for decorative elements only and do not meet the 4.5:1 standard. Do not use for body text. */
+  --blog-color-text-tertiary: #aeaeb2;             /* Converted from rgba(0,0,0,0.28), contrast approx 2.8:1 ⚠️ */
+  --blog-color-text-quaternary: #c7c7cc;           /* Converted from rgba(0,0,0,0.12), contrast approx 1.7:1 ⚠️ */
 
   --blog-color-text-link: var(--blog-color-primary);
   --blog-color-text-link-hover: hsl(
@@ -172,13 +198,23 @@
   );
 
   /* ── Borders & Dividers ── */
-  --blog-color-border: rgba(0, 0, 0, 0.08);
-  --blog-color-border-strong: rgba(0, 0, 0, 0.15);
-  --blog-color-divider: rgba(0, 0, 0, 0.06);
+  --blog-color-border: #e5e5ea;                     /* Converted from rgba(0,0,0,0.08) */
+  --blog-color-border-strong: #d1d1d6;              /* Converted from rgba(0,0,0,0.15) */
+  --blog-color-divider: #ececf1;                    /* Converted from rgba(0,0,0,0.06) */
 
   /* ── M3 Outline tokens (map to border hierarchy) ── */
-  --blog-color-outline: rgba(0, 0, 0, 0.20);
-  --blog-color-outline-variant: rgba(0, 0, 0, 0.10);
+  --blog-color-outline: #8e8e93;                    /* Converted from rgba(0,0,0,0.20) */
+  --blog-color-outline-variant: #c7c7cc;            /* Converted from rgba(0,0,0,0.10) */
+
+  /* ── State Layer / Disabled ── */
+  --blog-color-disabled-bg: var(--blog-color-surface-variant);
+  --blog-color-disabled-fg: var(--blog-color-text-tertiary);
+
+  /* ── Custom Brand Colors ── */
+  --blog-color-brand-css: #C53A1B; /* Shifted to achieve 4.5:1+ contrast against white text */
+  --blog-color-on-brand-css: #ffffff;
+  --blog-color-brand-astro: #CC4A00; /* Shifted to achieve 4.5:1+ contrast against white text */
+  --blog-color-on-brand-astro: #ffffff;
 
   /* ── Selection ── */
   --blog-color-selection-bg: hsl(

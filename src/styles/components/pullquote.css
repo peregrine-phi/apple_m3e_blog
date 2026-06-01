@@ -1,0 +1,5 @@
+/* PullQuote — 引言组件 Token */
+:root {
+  --pullquote-max-width-compact: 540px;
+  --pullquote-max-width-wide: 640px;
+}

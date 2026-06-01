@@ -1,0 +1,12 @@
+/* MDButton — Material 3 Button 组件 Token */
+:root {
+  --btn-height: 40px;
+  --btn-height-fab: 56px;
+  --btn-min-width-fab: 56px;
+  --btn-gap: var(--blog-space-2);
+  --btn-padding-x: var(--blog-space-6);
+  --btn-radius: var(--blog-radius-full);
+  --btn-radius-fab: var(--blog-radius-lg);
+  --btn-font-size: var(--blog-typescale-label-large-size);
+  --btn-letter-spacing: var(--blog-typescale-label-large-tracking);
+}

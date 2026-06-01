@@ -1,0 +1,9 @@
+/* MDSwitch — 开关组件 Token */
+:root {
+  --switch-track-width: 52px;
+  --switch-track-height: 32px;
+  --switch-thumb-size: 16px;
+  --switch-icon-size: 12px;
+  --switch-thumb-checked-size: 24px;
+  --switch-thumb-dragging-width: 28px;
+}

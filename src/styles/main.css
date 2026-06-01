@@ -3,8 +3,12 @@
    Layers: Tokens → Theme → Tailwind/daisyUI → Base
    ============================================ */
 
+/* Layer 0.5: Semantic Breakpoints */
+@import "./semantic/breakpoints.css";
+
 /* Layer 1: Design Tokens (CSS Custom Properties) */
 @import "./tokens/index.css";
+@import "./components/index.css";
 
 /* Layer 2: Theme Variants */
 @import "./themes/light.css";

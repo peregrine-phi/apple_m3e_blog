@@ -261,22 +261,7 @@ export function generateSchemeCSS(seedHex: string, variant: string = "tonalSpot"
   };
 }
 
-// Pre-built presets
-export const MONET_PRESETS = [
-  { name: "M3 Default", seed: "#6750A4" },
-  { name: "Ocean",      seed: "#006C52" },
-  { name: "Coral",      seed: "#BA1A1A" },
-  { name: "Sapphire",   seed: "#3B5CF6" },
-  { name: "Amber",      seed: "#825500" },
-  { name: "Rose",       seed: "#A0004B" },
-  { name: "Mint",       seed: "#006C4C" },
-  { name: "Plum",       seed: "#7A0065" },
-];
+import { monetConfig } from "../config/monet.config.js";
 
-export const MONET_VARIANTS = [
-  { value: "tonalSpot",  label: "Tonal Spot" },
-  { value: "expressive", label: "Expressive" },
-  { value: "vibrant",    label: "Vibrant" },
-  { value: "content",    label: "Content" },
-  { value: "monochrome", label: "Monochrome" },
-];
+export const MONET_PRESETS = monetConfig.presets;
+export const MONET_VARIANTS = monetConfig.variants;

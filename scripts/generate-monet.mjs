@@ -11,15 +11,11 @@
  * the generation as a standalone CommonJS process.
  */
 
-import { createRequire } from "module";
 import { writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const require = createRequire(import.meta.url);
-
-const {
+import { monetConfig } from "../src/config/monet.config.js";
+import {
   Hct,
   SchemeTonalSpot,
   SchemeContent,
@@ -27,30 +23,29 @@ const {
   SchemeVibrant,
   SchemeMonochrome,
   MaterialDynamicColors,
-} = require("@material/material-color-utilities");
+} from "@material/material-color-utilities";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // ── Config ──
 
 const OUTPUT_DIR = resolve(__dirname, "..", "public", "monet");
 
-const PRESETS = [
-  { name: "m3-default",   seed: 0xFF6750A4 },
-  { name: "ocean",        seed: 0xFF006C52 },
-  { name: "coral",        seed: 0xFFBA1A1A },
-  { name: "sapphire",     seed: 0xFF3B5CF6 },
-  { name: "amber",        seed: 0xFF825500 },
-  { name: "rose",         seed: 0xFFA0004B },
-  { name: "mint",         seed: 0xFF006C4C },
-  { name: "plum",         seed: 0xFF7A0065 },
-];
+const PRESETS = monetConfig.presets.map(p => ({
+  name: p.name,
+  seed: parseInt(p.seed.replace("#", ""), 16) | 0xFF000000
+}));
 
-const VARIANTS = [
-  { key: "tonalSpot",  factory: SchemeTonalSpot },
-  { key: "expressive", factory: SchemeExpressive },
-  { key: "vibrant",    factory: SchemeVibrant },
-  { key: "content",    factory: SchemeContent },
-  { key: "monochrome", factory: SchemeMonochrome },
-];
+const VARIANTS = monetConfig.variants.map(v => ({
+  key: v.value,
+  factory: {
+    tonalSpot: SchemeTonalSpot,
+    expressive: SchemeExpressive,
+    vibrant: SchemeVibrant,
+    content: SchemeContent,
+    monochrome: SchemeMonochrome,
+  }[v.value]
+}));
 
 const SCHEME_ROLES = [
   // Primary
@@ -125,8 +120,8 @@ for (const preset of PRESETS) {
   for (const { key, factory } of VARIANTS) {
     const prefix = `${preset.name}--${key}`;
 
-    const light = new factory({ sourceColorHct: sourceHct, isDark: false, contrastLevel: 0.0 });
-    const dark = new factory({ sourceColorHct: sourceHct, isDark: true, contrastLevel: 0.0 });
+    const light = new factory(sourceHct, false, 0.0);
+    const dark = new factory(sourceHct, true, 0.0);
 
     allCSS += generateSchemeCSS(light, `[data-monet="${prefix}"]`);
     allCSS += "\n";
@@ -144,8 +139,8 @@ for (const preset of PRESETS) {
   for (const { key, factory } of VARIANTS) {
     const prefix = `${preset.name}--${key}`;
     const sourceHct = Hct.fromInt(preset.seed);
-    const light = new factory({ sourceColorHct: sourceHct, isDark: false, contrastLevel: 0.0 });
-    const dark = new factory({ sourceColorHct: sourceHct, isDark: true, contrastLevel: 0.0 });
+    const light = new factory(sourceHct, false, 0.0);
+    const dark = new factory(sourceHct, true, 0.0);
 
     presetCSS += generateSchemeCSS(light, `[data-monet="${prefix}"]`);
     presetCSS += "\n";

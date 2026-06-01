@@ -89,47 +89,62 @@
 /* ── Custom Layout Variants ── */
 
 /* 1. New Brutalist Variant */
-.filter-chip--brutal {
-  border: 2px solid var(--chip-border-color, var(--blog-brutal-border-color)) !important;
+.filter-chip.filter-chip--brutal {
+  border: 2px solid var(--chip-border-color, var(--blog-brutal-border-color));
   box-shadow: 2px 2px 0px var(--chip-border-color, var(--blog-brutal-border-color));
-  border-radius: var(--blog-radius-xs, 4px) !important;
-  font-weight: var(--blog-font-weight-bold, 700) !important;
+  border-radius: var(--blog-radius-xs, 4px);
+  font-weight: var(--blog-font-weight-bold, 700);
 }
 
-.filter-chip--brutal:hover {
-  transform: translate(-1px, -1px) !important;
+.filter-chip.filter-chip--brutal:hover {
+  transform: translate(-1px, -1px);
   box-shadow: 3px 3px 0px var(--chip-border-color, var(--blog-brutal-border-color));
+  border-color: var(--chip-border-color, var(--blog-brutal-border-color));
 }
 
-.filter-chip--brutal:active {
-  transform: translate(1px, 1px) !important;
+.filter-chip.filter-chip--brutal:active {
+  transform: translate(1px, 1px);
   box-shadow: 1px 1px 0px var(--chip-border-color, var(--blog-brutal-border-color));
 }
 
-.filter-chip--brutal.active {
-  background-color: var(--chip-color, var(--blog-color-primary-container)) !important;
-  color: var(--chip-on-color, var(--blog-color-on-primary-container)) !important;
-  border-color: var(--chip-border-color, var(--blog-brutal-border-color)) !important;
+.filter-chip.filter-chip--brutal.active {
+  background-color: var(--chip-color, var(--blog-brutal-accent, var(--blog-color-primary-container)));
+  color: var(--chip-on-color, var(--blog-brutal-on-accent, var(--blog-color-on-primary-container)));
+  border-color: var(--chip-border-color, var(--blog-brutal-border-color));
+}
+
+.filter-chip.filter-chip--brutal.active:hover {
+  background-color: var(--chip-hover-color, var(--blog-brutal-accent, var(--blog-color-primary-container)));
+  color: var(--chip-on-color, var(--blog-brutal-on-accent, var(--blog-color-on-primary-container)));
+  border-color: var(--chip-border-color, var(--blog-brutal-border-color));
 }
 
 /* 2. Elevated MD3 Variant */
-.filter-chip--elevated {
-  background-color: var(--blog-color-surface-container-high) !important;
-  border-color: transparent !important;
-  box-shadow: var(--blog-elevation-1) !important;
+.filter-chip.filter-chip--elevated {
+  background-color: var(--blog-color-surface-container-high, var(--blog-color-surface-variant));
+  border-color: transparent;
+  box-shadow: var(--blog-elevation-1);
 }
 
-.filter-chip--elevated:hover {
-  background-color: var(--blog-color-surface-container-highest) !important;
-  box-shadow: var(--blog-elevation-3) !important;
-  transform: translateY(-1.5px) !important;
+.filter-chip.filter-chip--elevated:hover {
+  background-color: var(--blog-color-surface-container-highest, var(--blog-color-surface-variant));
+  box-shadow: var(--blog-elevation-3);
+  transform: translateY(-1.5px);
+  border-color: transparent;
 }
 
-.filter-chip--elevated.active {
-  background-color: var(--chip-color, var(--blog-color-primary-container)) !important;
-  color: var(--chip-on-color, var(--blog-color-on-primary-container)) !important;
-  border-color: transparent !important;
-  box-shadow: none !important;
+.filter-chip.filter-chip--elevated.active {
+  background-color: var(--chip-color, var(--blog-color-primary-container));
+  color: var(--chip-on-color, var(--blog-color-on-primary-container));
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.filter-chip.filter-chip--elevated.active:hover {
+  background-color: var(--blog-color-primary-container);
+  color: var(--blog-color-on-primary-container);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* ── Check & Close State Icon Transitions ── */

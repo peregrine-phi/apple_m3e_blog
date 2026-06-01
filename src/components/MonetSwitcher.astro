@@ -2,6 +2,8 @@
 // MonetSwitcher.astro — Compact header Monet dynamic color switcher
 // CSS is pre-generated in MonetCSS.astro; this is the interactive UI only.
 import { generateSchemeCSS, MONET_PRESETS } from "../utils/monet";
+import { monetConfig } from "../config/monet.config.js";
+const defaultSeed = monetConfig.defaultSeed;
 ---
 
 <monet-switcher>
@@ -30,7 +32,7 @@ import { generateSchemeCSS, MONET_PRESETS } from "../utils/monet";
         aria-label="Select custom color"
       >
         <span class="monet-plus-icon">+</span>
-        <input type="color" class="monet-custom-picker" value="#3B5CF6" aria-label="Choose custom color" />
+        <input type="color" class="monet-custom-picker" value={defaultSeed} aria-label="Choose custom color" />
       </button>
     </div>
     <div class="monet-theme-info">
@@ -156,7 +158,7 @@ import { generateSchemeCSS, MONET_PRESETS } from "../utils/monet";
 
   /* Custom Color picker dot */
   .monet-custom-dot {
-    background: var(--custom-color, linear-gradient(135deg, #ff0055, #00ffaa, #0055ff));
+    background: var(--custom-color, linear-gradient(135deg, var(--blog-color-tertiary), var(--blog-color-success), var(--blog-color-primary)));
     border: 2px solid var(--blog-color-surface-container-high);
     color: var(--blog-color-on-primary);
     font-size: 20px;

@@ -38,7 +38,7 @@ const { titleKey, badgeVariant, filterType, items, config, allLabelKey } = Astro
       // Personalized inline variables
       const inlineStyle = [
         itemConfig.color ? `--chip-color: ${itemConfig.color}` : null,
-        itemConfig.color ? `--chip-on-color: var(--blog-color-on-primary-container)` : null,
+        itemConfig.onColor ? `--chip-on-color: ${itemConfig.onColor}` : (itemConfig.color ? `--chip-on-color: var(--blog-color-on-primary-container)` : null),
         itemConfig.borderColor ? `--chip-border-color: ${itemConfig.borderColor}` : null,
         itemConfig.hoverColor ? `--chip-hover-color: ${itemConfig.hoverColor}` : null,
       ].filter(Boolean).join("; ");

@@ -1,0 +1,4 @@
+/* ThemeToggle — 主题切换按钮组件 Token */
+:root {
+  --toggle-size: 40px;
+}

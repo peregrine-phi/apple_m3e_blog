@@ -1,0 +1,5 @@
+/* SearchBar — 搜索栏组件 Token */
+:root {
+  --searchbar-height: 48px;
+  --searchbar-icon-size: 28px;
+}
