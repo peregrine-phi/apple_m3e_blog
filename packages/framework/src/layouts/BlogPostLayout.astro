@@ -1,0 +1,355 @@
+---
+// BlogPostLayout.astro (Layer 3)
+// Extends SplitLayout with blog post article chrome.
+// Inherits: sidebar+main grid from SplitLayout, HTML shell from BaseLayout.
+//
+// Nesting: BaseLayout ← SplitLayout ← BlogPostLayout
+
+import type { CollectionEntry } from "astro:content";
+import SplitLayout from "./SplitLayout.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import Chip from "../components/Chip.astro";
+import Backlinks from "../components/Backlinks.astro";
+import I18n from "../components/I18n.astro";
+import Icon from "../components/Icon.astro";
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+  headings?: Heading[];
+  backlinks?: Array<{ slug: string; title: string; description: string; growthStage: any }>;
+  [key: string]: any;
+}
+
+const { post, headings = [], backlinks = [], ...rest } = Astro.props;
+const { title, description, publishedAt, updatedAt, tags, growthStage, knowledgeDomain } = post.data;
+const formattedDate = publishedAt.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+
+// i18n tag classification
+const displayTags = tags;
+---
+
+<SplitLayout title={title} description={description} {...rest}>
+  <!-- Sidebar slot → SplitLayout places it in the sidebar column -->
+  <TableOfContents headings={headings} slot="sidebar" />
+
+  <!-- Default slot → SplitLayout places it in the main column -->
+  <article class="blog-post">
+    <!-- Post Header -->
+    <header class="post-header">
+      <div class="post-meta">
+        <time datetime={publishedAt.toISOString()} class="text-label-large text-tertiary">
+          <span class="i18n-en">{formattedDate}</span>
+          <span class="i18n-zh">{publishedAt.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}</span>
+        </time>
+        {updatedAt && (
+          <span class="text-label-medium text-tertiary">
+            · <span class="i18n-en"><I18n tKey="post.updated" /> {updatedAt.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+            <span class="i18n-zh"><I18n tKey="post.updated" /> {updatedAt.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })}</span>
+          </span>
+        )}
+        <span class={`post-stage post-stage--${growthStage}`} title={`Growth stage: ${growthStage}`}>
+          <span class="stage-emoji">{growthStage === "evergreen" ? "🌳" : growthStage === "budding" ? "🌿" : "🌱"}</span>
+          <span class="stage-label">
+            <I18n tKey={`stage.${growthStage}` as any} />
+            <span class="i18n-en"> Stage</span>
+            <span class="i18n-zh">阶段</span>
+          </span>
+        </span>
+        {knowledgeDomain && (
+          <span class="post-domain-badge">
+            <span class="domain-label">{knowledgeDomain}</span>
+          </span>
+        )}
+      </div>
+      <h1 class="post-title text-display-small">{title}</h1>
+      {description && <p class="post-subtitle text-body-large text-secondary">{description}</p>}
+      {displayTags.length > 0 && (
+        <div class="post-tags">
+          {displayTags.map((tag) => <Chip variant="filter">{tag}</Chip>)}
+        </div>
+      )}
+    </header>
+
+    <hr class="divider" />
+
+    <!-- Post Content -->
+    <div class="post-content">
+      <slot />
+    </div>
+
+    <!-- Backlinks Section -->
+    <Backlinks backlinks={backlinks} />
+
+    <!-- Post Footer -->
+    <footer class="post-footer">
+      <hr class="divider" />
+      <nav class="post-nav" aria-label="Post navigation">
+        <a href="/blog" class="btn btn-ghost text-label-large">
+          <Icon name="arrow-left" size={16} />
+          <I18n tKey="post.back" />
+        </a>
+      </nav>
+    </footer>
+  </article>
+</SplitLayout>
+
+<style>
+  .post-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-4);
+    margin-bottom: var(--blog-space-8);
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+    flex-wrap: wrap;
+  }
+
+  .post-title {
+    color: var(--blog-color-text-primary);
+  }
+
+  .post-subtitle {
+    margin-top: var(--blog-space-2);
+  }
+
+  .post-tags {
+    display: flex;
+    gap: var(--blog-space-2);
+    flex-wrap: wrap;
+    margin-top: var(--blog-space-2);
+  }
+
+  /* Article typography — token-driven prose styles */
+  .post-content {
+    padding-block: var(--blog-space-8);
+    font-size: var(--blog-typescale-body-large-size);
+    line-height: var(--blog-typescale-body-large-leading);
+    color: var(--blog-color-text-primary);
+  }
+
+  .post-content :global(h2) {
+    font-size: var(--blog-typescale-headline-medium-size);
+    line-height: var(--blog-typescale-headline-medium-leading);
+    font-weight: var(--blog-font-weight-semibold);
+    color: var(--blog-color-text-primary);
+    margin-top: var(--blog-space-10);
+    margin-bottom: var(--blog-space-4);
+  }
+
+  .post-content :global(h3) {
+    font-size: var(--blog-typescale-headline-small-size);
+    line-height: var(--blog-typescale-headline-small-leading);
+    font-weight: var(--blog-font-weight-semibold);
+    color: var(--blog-color-text-primary);
+    margin-top: var(--blog-space-8);
+    margin-bottom: var(--blog-space-3);
+  }
+
+  .post-content :global(p)  { margin-bottom: var(--blog-space-5); }
+  .post-content :global(a)   { color: var(--blog-color-text-link); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .post-content :global(a:hover) { color: var(--blog-color-text-link-hover); }
+  .post-content :global(blockquote) { border-left: 3px solid var(--blog-color-primary); padding-left: var(--blog-space-5); margin-block: var(--blog-space-6); color: var(--blog-color-text-secondary); font-style: italic; }
+  .post-content :global(ul), .post-content :global(ol) { padding-left: var(--blog-space-6); margin-bottom: var(--blog-space-5); }
+  .post-content :global(li)  { margin-bottom: var(--blog-space-2); }
+  .post-content :global(img)  { border-radius: var(--blog-radius-md); margin-block: var(--blog-space-6); }
+  .post-content :global(pre)  { position: relative; margin-block: var(--blog-space-6); padding: var(--blog-space-5); padding-top: calc(var(--blog-space-5) + 16px); background-color: var(--blog-color-surface-variant); border: 1px solid var(--blog-color-border); border-radius: var(--blog-radius-md); }
+  .post-content :global(code) { font-family: var(--blog-font-mono); font-size: var(--blog-typescale-code-size); }
+  .post-content :global(:not(pre) > code) { background-color: var(--blog-color-surface-variant); padding: 0.1em 0.3em; border-radius: var(--blog-radius-xs); border: 1px solid var(--blog-color-border); }
+  .post-content :global(hr)   { border: none; border-top: 1px solid var(--blog-color-divider); margin-block: var(--blog-space-8); }
+
+  /* Floating Copy Code Button */
+  .post-content :global(.copy-code-btn) {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    height: 28px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: var(--blog-font-weight-medium);
+    text-transform: uppercase;
+    border-radius: var(--blog-radius-sm, 4px);
+    background-color: var(--blog-color-surface);
+    color: var(--blog-color-primary);
+    border: 1px solid var(--blog-color-outline-variant);
+    cursor: pointer;
+    z-index: 10;
+    opacity: 0;
+    transition: 
+      opacity var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+      background-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+  }
+
+  .post-content :global(pre:hover .copy-code-btn),
+  .post-content :global(.copy-code-btn:focus-visible) {
+    opacity: 1;
+  }
+
+  .post-content :global(.copy-code-btn:hover) {
+    background-color: var(--blog-color-primary-container);
+    color: var(--blog-color-on-primary-container);
+  }
+
+  .post-footer { margin-top: var(--blog-space-10); }
+  .post-nav    { padding-top: var(--blog-space-6); }
+</style>
+
+<script>
+  function initCopyButtons() {
+    const isZh = document.documentElement.getAttribute("lang") === "zh";
+    const copyText = isZh ? "复制" : "Copy";
+    const copiedText = isZh ? "已复制！" : "Copied!";
+    const snackbarMsg = isZh ? "代码片段已复制到剪贴板！" : "Code snippet copied to clipboard!";
+
+    document.querySelectorAll(".post-content pre").forEach((preEl) => {
+      let btn = preEl.querySelector(".copy-code-btn") as HTMLButtonElement;
+      if (btn) {
+        btn.textContent = copyText;
+        btn.setAttribute("aria-label", isZh ? "复制代码片段" : "Copy code snippet");
+        return;
+      }
+
+      btn = document.createElement("button");
+      btn.className = "copy-code-btn";
+      btn.type = "button";
+      btn.textContent = copyText;
+      btn.setAttribute("aria-label", isZh ? "复制代码片段" : "Copy code snippet");
+
+      preEl.appendChild(btn);
+
+      btn.addEventListener("click", async () => {
+        const codeEl = preEl.querySelector("code");
+        if (!codeEl) return;
+
+        const codeText = codeEl.innerText.trim();
+        try {
+          await navigator.clipboard.writeText(codeText);
+          btn.textContent = copiedText;
+          
+          window.dispatchEvent(
+            new CustomEvent("md-snackbar-show", {
+              detail: {
+                message: snackbarMsg,
+                duration: 3000,
+              },
+            })
+          );
+
+          setTimeout(() => {
+            const freshIsZh = document.documentElement.getAttribute("lang") === "zh";
+            btn.textContent = freshIsZh ? "复制" : "Copy";
+          }, 2000);
+        } catch (err) {
+          console.error("Failed to copy code: ", err);
+        }
+      });
+    });
+  }
+
+  function initWikiPopovers() {
+    const internalLinks = document.querySelectorAll(".post-content a.internal");
+    if (internalLinks.length === 0) return;
+
+    let popover = document.getElementById("wiki-popover-el");
+    if (!popover) {
+      popover = document.createElement("div");
+      popover.id = "wiki-popover-el";
+      popover.className = "wiki-popover";
+      document.body.appendChild(popover);
+    }
+
+    const cache = new Map<string, { title: string; desc: string }>();
+
+    internalLinks.forEach((linkEl) => {
+      const link = linkEl as HTMLAnchorElement;
+      const url = link.href;
+
+      let hoverTimer: number | null = null;
+
+      const onEnter = async () => {
+        if (hoverTimer) clearTimeout(hoverTimer);
+
+        hoverTimer = window.setTimeout(async () => {
+          let data = cache.get(url);
+          const isZh = document.documentElement.getAttribute("lang") === "zh";
+          const kickerText = isZh ? "预览" : "Preview";
+          const defaultDesc = isZh ? "无可用描述。" : "No description available.";
+
+          if (!data) {
+            try {
+              const res = await fetch(url);
+              if (!res.ok) return;
+              const html = await res.text();
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(html, "text/html");
+              const title = doc.querySelector("h1.post-title")?.textContent?.trim() || doc.title || "Untitled";
+              const desc = doc.querySelector("p.post-subtitle")?.textContent?.trim() || 
+                           doc.querySelector("meta[name='description']")?.getAttribute("content")?.trim() || 
+                           defaultDesc;
+              data = { title, desc };
+              cache.set(url, data);
+            } catch (err) {
+              console.error("Failed to load popover preview", err);
+              return;
+            }
+          }
+
+          if (popover && data) {
+            popover.innerHTML = `
+              <div class="wiki-popover-inner">
+                <div class="wiki-popover-header">
+                  <span class="wiki-popover-dot"></span>
+                  <span class="wiki-popover-kicker">${kickerText}</span>
+                </div>
+                <h5 class="wiki-popover-title">${data.title}</h5>
+                <p class="wiki-popover-desc">${data.desc}</p>
+              </div>
+            `;
+
+            const linkRect = link.getBoundingClientRect();
+
+            const top = window.scrollY + linkRect.bottom + 8;
+            const left = window.scrollX + linkRect.left + (linkRect.width / 2) - (280 / 2);
+
+            popover.style.top = `${top}px`;
+            popover.style.left = `${left}px`;
+            popover.classList.add("visible");
+          }
+        }, 150); // small debounce delay
+      };
+
+      const onLeave = () => {
+        if (hoverTimer) clearTimeout(hoverTimer);
+        popover?.classList.remove("visible");
+      };
+
+      link.addEventListener("mouseenter", onEnter);
+      link.addEventListener("mouseleave", onLeave);
+    });
+  }
+
+  function initAll() {
+    initCopyButtons();
+    initWikiPopovers();
+  }
+
+  initAll();
+  
+  // Listen for language toggles so button labels refresh instantly
+  window.addEventListener("lang-change", initAll);
+  
+  document.addEventListener("astro:after-swap", initAll);
+</script>

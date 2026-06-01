@@ -1,0 +1,217 @@
+---
+// BaseLayout.astro — Root layout for all pages
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Music from "../components/Music.astro";
+import MonetCSS from "../components/MonetCSS.astro";
+import MDButton from "../components/MDButton.astro";
+import MDSnackbar from "../components/MDSnackbar.astro";
+import { ClientRouter } from "astro:transitions";
+import Icon from "../components/Icon.astro";
+import "../styles/main.css";
+import { monetConfig } from "../config/monet.config.js";
+
+import type { NavItem } from "../types";
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  transparentHeader?: boolean;
+  navItems?: NavItem[];
+  footerNavItems?: NavItem[];
+  footerConnectItems?: NavItem[];
+  siteName?: string;
+  siteCopyright?: string;
+  musicMode?: 'local' | 'api';
+  musicApiEndpoint?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  transparentHeader = false,
+  navItems,
+  footerNavItems,
+  footerConnectItems,
+  siteName,
+  siteCopyright,
+  musicMode = 'local',
+  musicApiEndpoint = '',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme>
+  <head>
+    <!-- Restore saved Lang before first paint to prevent FOUC -->
+    <script is:inline>
+      (function(){
+        var navLang = navigator.language ? navigator.language.toLowerCase() : "";
+        var isSimplifiedChinese = navLang === "zh" || navLang.startsWith("zh-cn") || navLang.startsWith("zh-sg") || navLang.indexOf("zh-hans") !== -1;
+        var l = localStorage.getItem("lang") || (isSimplifiedChinese ? "zh" : "en");
+        document.documentElement.setAttribute("lang", l);
+      })();
+    </script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    {image && <meta property="og:image" content={image} />}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {image && <meta name="twitter:image" content={image} />}
+
+    <!-- Theme color -->
+    <meta name="theme-color" content={monetConfig.defaultSeed} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Monet Dynamic Color CSS (pre-generated at build time) -->
+    <MonetCSS />
+
+    <!-- Restore saved Monet scheme before first paint to prevent FOUC -->
+    <script is:inline>
+      (function(){
+        var s = localStorage.getItem("monet-preset");
+        if (s) {
+          if (s.indexOf("custom-") === 0) {
+            document.documentElement.setAttribute("data-monet", s);
+            var css = localStorage.getItem("monet-custom-css");
+            if (css) {
+              var style = document.createElement("style");
+              style.id = "monet-custom-inline";
+              style.textContent = css;
+              document.head.appendChild(style);
+            }
+          } else {
+            var v = localStorage.getItem("monet-variant") || "tonalSpot";
+            document.documentElement.setAttribute("data-monet", s + "--" + v);
+          }
+        }
+      })();
+    </script>
+
+    <title>{title}</title>
+
+    <!-- Enable Astro SPA Client Router for smooth, white-flash-free cross-page persisted playback -->
+    <ClientRouter />
+
+    <!-- Prevent FOUC (Flash of Unstyled Content) with theme -->
+    <script is:inline>
+      (function () {
+        const theme =
+          localStorage.getItem("theme") ||
+          (window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <Header transparent={transparentHeader} navItems={navItems} siteName={siteName} />
+    <main>
+      <slot />
+    </main>
+    <div class="music-player-container">
+      <Music mode={musicMode} apiEndpoint={musicApiEndpoint} />
+    </div>
+    <Footer navItems={footerNavItems} connectItems={footerConnectItems} siteName={siteName} copyright={siteCopyright} />
+
+    <!-- "Scroll to Top" FAB component -->
+    <div class="scroll-to-top-container">
+      <MDButton id="scroll-to-top-btn" variant="fab" aria-label="Scroll to top">
+        <Icon name="chevron-up" slot="icon" size={24} />
+      </MDButton>
+    </div>
+
+    <!-- Global MDSnackbar notification container -->
+    <MDSnackbar />
+
+    <style is:global>
+      /* Scroll to Top container styling */
+      .scroll-to-top-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 90;
+        opacity: 0;
+        transform: scale(0) translateY(12px);
+        transition: 
+          opacity var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-emphasized),
+          transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-emphasized);
+        pointer-events: none;
+      }
+
+      .scroll-to-top-container.visible {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        pointer-events: auto;
+      }
+
+      /* 音乐播放器容器 */
+      .music-player-container {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 90;
+        width: 320px;
+        max-width: calc(100vw - 48px);
+        overflow: visible;
+        transition: 
+          transform var(--blog-motion-duration-normal) var(--blog-motion-easing-emphasized),
+          opacity var(--blog-motion-duration-normal) var(--blog-motion-easing-standard);
+      }
+
+      /* 当播放器处于胶囊状态时，让容器自动收缩，防止阻挡左下角点击 */
+      .music-player-container:has(.is-capsule) {
+        width: auto;
+      }
+
+      /* 移动端适配 */
+      @media (max-width: 768px) {
+        .music-player-container {
+          bottom: 16px;
+          right: 16px;
+          left: 16px;
+          width: auto;
+          max-width: none;
+        }
+      }
+    </style>
+
+    <script>
+      document.addEventListener("astro:page-load", () => {
+        const scrollContainer = document.querySelector(".scroll-to-top-container") as HTMLElement;
+        const scrollBtn = document.getElementById("scroll-to-top-btn");
+
+        if (scrollContainer && scrollBtn) {
+          window.addEventListener("scroll", () => {
+            if (window.scrollY > 300) {
+              scrollContainer.classList.add("visible");
+            } else {
+              scrollContainer.classList.remove("visible");
+            }
+          });
+
+          scrollBtn.addEventListener("click", () => {
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

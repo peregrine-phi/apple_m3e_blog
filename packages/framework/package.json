@@ -1,0 +1,12 @@
+{
+  "name": "@m3e/framework",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@material/material-color-utilities": "^0.4.0",
+    "svelte": "^5.56.0"
+  },
+  "peerDependencies": {
+    "astro": "^5.7.0"
+  }
+}

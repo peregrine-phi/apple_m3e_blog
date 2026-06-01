@@ -1,0 +1,37 @@
+---
+// HeroLayout.astro (Layer 2)
+// Extends BaseLayout with a hero section above foldable content.
+// The hero slot is full-bleed; content slot is narrow-centered.
+// Use for: home page, landing pages, featured article pages.
+
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  transparentHeader?: boolean;
+  [key: string]: any;
+}
+
+const { title, description, transparentHeader = true, ...rest } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} transparentHeader={transparentHeader} {...rest}>
+  <section class="hero-layout-hero">
+    <slot name="hero" />
+  </section>
+  <main class="container-wide hero-layout-content">
+    <slot />
+  </main>
+</BaseLayout>
+
+<style>
+  .hero-layout-hero {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-layout-content {
+    padding-block-end: var(--blog-space-16);
+  }
+</style>

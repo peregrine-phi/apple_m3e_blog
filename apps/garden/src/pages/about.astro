@@ -1,0 +1,283 @@
+---
+import { getEntry } from "astro:content";
+import PageLayout from "@m3e/layouts/PageLayout.astro";
+import Chip from "@m3e/components/Chip.astro";
+import TextField from "@m3e/components/TextField.astro";
+import MonetSwitcher from "@m3e/components/MonetSwitcher.astro";
+import I18n from "@m3e/components/I18n.astro";
+import Icon from "@m3e/components/Icon.astro";
+import PullQuote from "@m3e/components/PullQuote.astro";
+import { siteConfig } from "../config/site";
+
+// Query localized bio posts from about content collection
+const enBio = await getEntry("about", "en");
+const zhBio = await getEntry("about", "zh");
+
+const { Content: EnContent } = enBio ? await enBio.render() : { Content: null };
+const { Content: ZhContent } = zhBio ? await zhBio.render() : { Content: null };
+---
+
+<PageLayout 
+  title={`About — ${siteConfig.name}`} 
+  description={`About the author behind ${siteConfig.name} blog.`}
+  siteName={siteConfig.name}
+  siteCopyright={siteConfig.copyright}
+  musicMode={siteConfig.music?.mode}
+  musicApiEndpoint={siteConfig.music?.mode === 'api' ? `${siteConfig.music.metingApi}?server=${siteConfig.music.server}&type=playlist&id=${siteConfig.music.playlistId}` : ''}
+>
+  <header class="page-header">
+    <h1 class="text-display-small"><I18n tKey="about.heading" /></h1>
+  </header>
+
+  <div class="about-content">
+    <div class="about-avatar" aria-hidden="true">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="40" fill="var(--blog-color-primary-container)" />
+        <circle cx="40" cy="32" r="12" fill="var(--blog-color-primary)" />
+        <ellipse cx="40" cy="62" rx="22" ry="14" fill="var(--blog-color-primary)" />
+      </svg>
+    </div>
+
+    <div class="about-text text-body-large">
+      <!-- English Version -->
+      <div class="i18n-en">
+        {EnContent && <EnContent />}
+      </div>
+
+      <!-- Chinese Version -->
+      <div class="i18n-zh">
+        {ZhContent && <ZhContent />}
+      </div>
+
+      <!-- Monet Dynamic Color -->
+      <div class="showcase-section">
+        <h3 class="text-title-large">Monet Dynamic Color</h3>
+        <MonetSwitcher />
+      </div>
+
+      <!-- Chip Showcase -->
+      <div class="showcase-section">
+        <h3 class="text-title-large">Chips</h3>
+        <div class="showcase-row">
+          <Chip variant="assist">
+            <Icon slot="icon" name="search" size={18} />
+            <span class="i18n-en">Search Posts</span>
+            <span class="i18n-zh">搜索文章</span>
+          </Chip>
+          <Chip variant="filter" selected>
+            <span class="i18n-en">Design Systems</span>
+            <span class="i18n-zh">设计系统</span>
+          </Chip>
+          <Chip variant="filter">
+            <span class="i18n-en">Frontend</span>
+            <span class="i18n-zh">前端开发</span>
+          </Chip>
+          <Chip variant="filter">
+            <span class="i18n-en">Typography</span>
+            <span class="i18n-zh">排版艺术</span>
+          </Chip>
+          <Chip variant="input" closable>astro</Chip>
+          <Chip variant="suggestion">Tailwind CSS v4</Chip>
+        </div>
+      </div>
+
+      <!-- Button Showcase -->
+      <div class="showcase-section">
+        <h3 class="text-title-large">Buttons (M3 State Layer)</h3>
+        <div class="showcase-row">
+          <button class="btn btn-primary">
+            <Icon slot="icon" name="plus" size={18} />
+            <span class="i18n-en">Filled</span>
+            <span class="i18n-zh">填色按钮</span>
+          </button>
+          <button class="btn btn-secondary">
+            <span class="i18n-en">Tonal</span>
+            <span class="i18n-zh">色调按钮</span>
+          </button>
+          <button class="btn btn-ghost">
+            <span class="i18n-en">Text</span>
+            <span class="i18n-zh">文本按钮</span>
+          </button>
+          <button class="btn btn-outline">
+            <span class="i18n-en">Outlined</span>
+            <span class="i18n-zh">描边按钮</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- TextField Showcase -->
+      <div class="showcase-section">
+        <h3 class="text-title-large">Text Fields</h3>
+        <div class="showcase-row" style="flex-direction: column; gap: var(--blog-space-4); max-width: 400px;">
+          <!-- Wrap in container so label is language-sensitive -->
+          <div class="i18n-en">
+            <TextField label="Your Name" name="demo-name-en" supporting="Enter your full name" />
+          </div>
+          <div class="i18n-zh">
+            <TextField label="您的姓名" name="demo-name-zh" supporting="请在此输入您的真实姓名" />
+          </div>
+          <div class="i18n-en">
+            <TextField variant="outlined" label="Email Address" inputmode="email" name="demo-email-en" />
+          </div>
+          <div class="i18n-zh">
+            <TextField variant="outlined" label="电子邮箱" inputmode="email" name="demo-email-zh" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Surface Container Showcase -->
+      <div class="showcase-section">
+        <h3 class="text-title-large">Surface Containers (Tonal Elevation)</h3>
+        <div class="surface-showcase">
+          <div class="surface-swatch" style="background: var(--blog-color-surface-container-lowest);">
+            <span>
+              <span class="i18n-en">lowest</span>
+              <span class="i18n-zh">极低</span>
+            </span>
+          </div>
+          <div class="surface-swatch" style="background: var(--blog-color-surface-container-low);">
+            <span>
+              <span class="i18n-en">low</span>
+              <span class="i18n-zh">低</span>
+            </span>
+          </div>
+          <div class="surface-swatch" style="background: var(--blog-color-surface-container);">
+            <span>
+              <span class="i18n-en">default</span>
+              <span class="i18n-zh">默认</span>
+            </span>
+          </div>
+          <div class="surface-swatch" style="background: var(--blog-color-surface-container-high);">
+            <span>
+              <span class="i18n-en">high</span>
+              <span class="i18n-zh">高</span>
+            </span>
+          </div>
+          <div class="surface-swatch" style="background: var(--blog-color-surface-container-highest);">
+            <span>
+              <span class="i18n-en">highest</span>
+              <span class="i18n-zh">极高</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PullQuote Showcase -->
+      <div class="showcase-section">
+        <h3 class="text-title-large">Pull Quotes</h3>
+        <div class="showcase-row" style="flex-direction: column; gap: var(--blog-space-4); align-items: stretch; width: 100%;">
+          <div class="i18n-en">
+            <PullQuote 
+              quote="A personal blog exploring the intersection of design, technology, and thoughtful living." 
+              cite="M3E Design philosophy" 
+              variant="classic" 
+            />
+          </div>
+          <div class="i18n-zh">
+            <PullQuote 
+              quote="探讨在网页设计中，苹果克制的优雅与 Material 3 表达的活力之间意想不到的和谐关系。" 
+              cite="M3E 融合哲学" 
+              variant="classic" 
+            />
+          </div>
+          <div class="i18n-en">
+            <PullQuote 
+              quote="Design is not just what it looks like and feels like. Design is how it works." 
+              cite="Steve Jobs" 
+              variant="brutal" 
+            />
+          </div>
+          <div class="i18n-zh">
+            <PullQuote 
+              quote="设计不仅仅是外表和感觉。设计是它是如何工作的。" 
+              cite="史蒂夫·乔布斯" 
+              variant="brutal" 
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</PageLayout>
+
+<style>
+  .page-header {
+    margin-bottom: var(--blog-space-10);
+  }
+
+  .about-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-8);
+  }
+
+  .about-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .about-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-5);
+    color: var(--blog-color-text-primary);
+  }
+
+  .about-text h2 {
+    margin-top: var(--blog-space-6);
+    color: var(--blog-color-text-primary);
+  }
+
+  .about-text ul {
+    padding-left: var(--blog-space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-2);
+  }
+
+  .about-text a {
+    color: var(--blog-color-text-link);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* ── M3 Showcase ── */
+  .showcase-section {
+    margin-top: var(--blog-space-8);
+  }
+
+  .showcase-section h3 {
+    color: var(--blog-color-text-secondary);
+    margin-bottom: var(--blog-space-4);
+  }
+
+  .showcase-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--blog-space-3);
+  }
+
+  .surface-showcase {
+    display: flex;
+    gap: 4px;
+  }
+
+  .surface-swatch {
+    flex: 1;
+    height: 64px;
+    border-radius: var(--blog-radius-md);
+    border: 1px solid var(--blog-color-border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: var(--blog-space-2);
+  }
+
+  .surface-swatch span {
+    font-size: var(--blog-typescale-label-small-size);
+    color: var(--blog-color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+</style>

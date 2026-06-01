@@ -1,0 +1,297 @@
+---
+// Header.astro — Site header with high-fidelity, pure CSS Liquid Glass navigation bar
+import ThemeToggle from "./ThemeToggle.astro";
+import MonetSwitcher from "./MonetSwitcher.astro";
+import LanguageToggle from "./LanguageToggle.astro";
+import I18n from "./I18n.astro";
+import Icon from "./Icon.astro";
+import type { NavItem } from "../types";
+
+interface Props {
+  transparent?: boolean;
+  navItems?: NavItem[];
+  siteName?: string;
+}
+
+const defaultNavItems: NavItem[] = [
+  { href: "/blog", labelKey: "nav.blog" },
+  { href: "/about", labelKey: "nav.about" },
+];
+
+const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro.props;
+---
+
+<header class:list={["site-header", { "site-header--transparent": transparent }]}>
+  <div class="liquid-glass-bar">
+    <div class="liquid-glass-bg-layer"></div>
+    <div class="liquid-glass-inner">
+      <a href="/" class="site-logo text-headline-small" aria-label="Home">
+        <span class="logo-dot" aria-hidden="true"></span>
+        {siteName}
+      </a>
+
+      <nav class="site-nav hide-mobile" aria-label="Main navigation">
+        {navItems.map((item) => (
+          <a href={item.href} class="nav-link text-label-large" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+            {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+          </a>
+        ))}
+      </nav>
+
+      <div class="header-actions">
+        <MonetSwitcher />
+        <LanguageToggle />
+        <ThemeToggle />
+        <!-- Mobile menu button -->
+        <button
+          class="btn btn-ghost hide-desktop"
+          id="mobile-menu-btn"
+          aria-label="Toggle menu"
+          type="button"
+        >
+          <Icon name="menu" size={24} />
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <nav class="mobile-nav hide-desktop" id="mobile-nav" aria-label="Mobile navigation">
+      {navItems.map((item) => (
+        <a href={item.href} class="mobile-nav-link" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+          {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* ── Outer sticky wrapper ── */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: var(--header-padding-y) var(--header-padding-x) 0;
+    pointer-events: none; /* clicks pass through the padding area */
+    transition: padding var(--blog-motion-duration-normal, 250ms)
+      var(--blog-motion-easing-standard);
+  }
+
+  /* ── The floating glass bar container ── */
+  .liquid-glass-bar {
+    pointer-events: auto;
+    position: relative;
+    max-width: var(--header-max-width);
+    margin: 0 auto;
+    border-radius: var(--header-radius);
+
+    /* ── High-Fidelity Frosted Liquid Glass ── */
+    background: var(--blog-glass-bg);
+    backdrop-filter: saturate(190%) blur(24px);
+    -webkit-backdrop-filter: saturate(190%) blur(24px);
+
+    /* Liquid glass borders — specular outer rim & bevels */
+    border: 1px solid var(--blog-glass-border);
+    box-shadow: var(--blog-glass-shadow);
+
+    transition:
+      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ── Background clip layer for gloss sweep ── */
+  .liquid-glass-bg-layer {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Liquid Glass Specular Sweep shine effect on hover */
+  .liquid-glass-bg-layer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: var(--blog-glass-sweep-gradient);
+    transform: skewX(-25deg);
+    transition: left var(--blog-motion-duration-expressive, 0.75s) var(--blog-motion-easing-emphasized, cubic-bezier(0.16, 1, 0.3, 1));
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .liquid-glass-bar:hover {
+    transform: translateY(1px);
+    background: var(--blog-glass-bg-hover);
+    border-color: var(--blog-glass-border-hover);
+    box-shadow: var(--blog-glass-shadow-hover);
+  }
+
+  .liquid-glass-bar:hover .liquid-glass-bg-layer::before {
+    left: 150%;
+  }
+
+  /* ── Transparent state when scrolled to top (home page) ── */
+  .site-header--transparent:not(.scrolled) .liquid-glass-bar {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .site-header--transparent:not(.scrolled) .liquid-glass-bg-layer::before {
+    display: none;
+  }
+
+  /* ── Inner flex container ── */
+  .liquid-glass-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--header-height);
+    padding: 0 var(--header-padding-x-inner);
+    position: relative;
+    z-index: 1; /* keep contents on top of the sweep */
+  }
+
+  /* ── Logo ── */
+  .site-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+    color: var(--blog-color-text-primary);
+    font-weight: var(--blog-font-weight-bold);
+    text-decoration: none;
+    letter-spacing: var(--logo-letter-spacing);
+    border-radius: var(--blog-radius-xs);
+  }
+
+  .site-logo:focus-visible {
+    outline: 2px solid var(--blog-color-primary);
+    outline-offset: 2px;
+  }
+
+  .logo-dot {
+    width: var(--logo-dot-size);
+    height: var(--logo-dot-size);
+    border-radius: var(--blog-radius-full);
+    background: linear-gradient(
+      135deg,
+      var(--blog-color-primary),
+      var(--blog-color-tertiary)
+    );
+  }
+
+  /* ── Navigation ── */
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-1);
+  }
+
+  .nav-link {
+    padding: var(--blog-space-2) var(--blog-space-3);
+    color: var(--blog-color-text-secondary);
+    border-radius: var(--nav-link-radius);
+    text-decoration: none;
+    transition:
+      color var(--blog-space-2) var(--blog-motion-easing-standard),
+      background-color var(--blog-space-2) var(--blog-motion-easing-standard);
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current="page"] {
+    color: var(--blog-color-text-primary);
+    background-color: var(--blog-color-surface-variant);
+  }
+
+  .nav-link:focus-visible {
+    outline: 2px solid var(--blog-color-primary);
+    outline-offset: 2px;
+  }
+
+  /* ── Header actions ── */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+  }
+
+  /* ── Mobile menu ── */
+  .mobile-nav {
+    display: none;
+    flex-direction: column;
+    padding: var(--blog-space-3) var(--blog-space-4);
+    border-top: 1px solid var(--blog-glass-border);
+  }
+
+  .mobile-nav.open {
+    display: flex;
+  }
+
+  .mobile-nav-link {
+    padding: var(--blog-space-3) var(--blog-space-4);
+    color: var(--blog-color-text-primary);
+    font-size: var(--blog-typescale-title-medium-size);
+    font-weight: var(--blog-font-weight-medium);
+    text-decoration: none;
+    border-radius: var(--nav-link-radius);
+  }
+
+  .mobile-nav-link:hover {
+    background-color: var(--blog-color-surface-variant);
+  }
+
+  :global([data-theme="dark"]) .mobile-nav {
+    border-top-color: var(--blog-color-border);
+  }
+
+  /* ── Scrolled state: slightly reduce top padding ── */
+  .site-header.scrolled {
+    padding-top: var(--header-scrolled-padding-top);
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .site-header {
+      padding: var(--blog-space-2) var(--blog-space-2-5) 0;
+    }
+ 
+    .liquid-glass-bar {
+      border-radius: var(--header-radius-mobile);
+    }
+ 
+    .liquid-glass-inner {
+      height: var(--header-height-mobile);
+      padding: 0 var(--blog-space-3-5);
+    }
+  }
+</style>
+
+<script>
+  // Mobile menu toggle
+  document.getElementById("mobile-menu-btn")?.addEventListener("click", () => {
+    document.getElementById("mobile-nav")?.classList.toggle("open");
+  });
+
+  // Add scrolled class for subtle padding change on scroll
+  const header = document.querySelector(".site-header") as HTMLElement;
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 20) {
+        header.classList.add("scrolled");
+      } else {
+        header.classList.remove("scrolled");
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll(); // initial state
+  }
+</script>

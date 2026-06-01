@@ -1,0 +1,169 @@
+---
+// Footer.astro — Site footer
+import I18n from "./I18n.astro";
+import type { NavItem } from "../types";
+
+interface Props {
+  navItems?: NavItem[];
+  connectItems?: NavItem[];
+  siteName?: string;
+  copyright?: string;
+  githubUrl?: string;
+}
+
+const defaultNavItems: NavItem[] = [
+  { href: "/", labelKey: "nav.home" },
+  { href: "/blog", labelKey: "nav.blog" },
+  { href: "/about", labelKey: "nav.about" },
+];
+
+const { 
+  navItems = defaultNavItems, 
+  connectItems, 
+  siteName = "", 
+  copyright = "", 
+  githubUrl = "/about" 
+} = Astro.props;
+
+const defaultConnectItems: NavItem[] = [
+  { href: "/rss.xml", labelKey: "footer.rss" },
+  { href: githubUrl, label: "GitHub", external: true },
+];
+
+const finalConnectItems = connectItems || defaultConnectItems;
+---
+
+<footer class="site-footer">
+  <div class="container-wide footer-inner">
+    <div class="footer-brand">
+      <a href="/" class="site-logo text-headline-small">
+        <span class="logo-dot" aria-hidden="true"></span>
+        {siteName}
+      </a>
+      <p class="text-body-small text-secondary">
+        <I18n tKey="footer.desc" />
+      </p>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4 class="text-label-large text-secondary"><I18n tKey="footer.nav" /></h4>
+        {navItems.map((item) => (
+          <a href={item.href} class="footer-link text-body-small" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+            {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+          </a>
+        ))}
+      </div>
+      <div class="footer-col">
+        <h4 class="text-label-large text-secondary"><I18n tKey="footer.connect" /></h4>
+        {finalConnectItems.map((item) => (
+          <a href={item.href} class="footer-link text-body-small" target={item.external ? "_blank" : undefined} rel={item.external ? "noopener" : undefined}>
+            {item.labelKey ? <I18n tKey={item.labelKey} /> : item.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="container-wide footer-bottom">
+    <hr class="divider" />
+    <p class="text-label-small text-tertiary">
+      &copy; {new Date().getFullYear()} {copyright}. <I18n tKey="footer.built" />
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--blog-space-section-gap);
+    padding-top: var(--blog-space-16);
+    padding-bottom: var(--blog-space-8);
+    border-top: 1px solid var(--blog-color-divider);
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--blog-space-12);
+    flex-wrap: wrap;
+    margin-bottom: var(--blog-space-8);
+  }
+
+  .footer-brand {
+    width: var(--footer-brand-max-width, 280px);
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-3);
+  }
+
+  .footer-brand p {
+    min-height: 4.5em; /* Reserve vertical space for up to 3 lines of description text to prevent layout height shift on language toggle */
+  }
+
+  .site-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2);
+    color: var(--blog-color-text-primary);
+    font-weight: var(--blog-font-weight-bold);
+    text-decoration: none;
+  }
+
+  .logo-dot {
+    width: var(--logo-dot-size, 10px);
+    height: var(--logo-dot-size, 10px);
+    border-radius: var(--blog-radius-full);
+    background: linear-gradient(
+      135deg,
+      var(--blog-color-primary),
+      var(--blog-color-tertiary)
+    );
+  }
+
+  .footer-links {
+    display: flex;
+    gap: var(--blog-space-12);
+  }
+
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-2);
+    min-width: 100px; /* Prevent horizontal layout shift by reserving column width */
+  }
+
+  .footer-link {
+    color: var(--blog-color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--blog-radius-xs);
+    transition: color var(--blog-motion-duration-fast)
+      var(--blog-motion-easing-standard);
+  }
+
+  .footer-link:hover {
+    color: var(--blog-color-text-primary);
+  }
+
+  .footer-link:focus-visible {
+    outline: 2px solid var(--blog-color-primary);
+    outline-offset: 2px;
+  }
+
+  .footer-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: var(--blog-space-4);
+  }
+
+  @media (max-width: 600px) {
+    .footer-inner {
+      flex-direction: column;
+      gap: var(--blog-space-8);
+    }
+
+    .footer-links {
+      gap: var(--blog-space-8);
+    }
+  }
+</style>

@@ -1,0 +1,26 @@
+---
+// PageLayout.astro (Layer 2)
+// Extends BaseLayout with centered narrow content area.
+// Use for: about, contact, simple text pages.
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  [key: string]: any;
+}
+
+const { title, description, ...rest } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} {...rest}>
+  <div class="container-narrow page-layout">
+    <slot />
+  </div>
+</BaseLayout>
+
+<style>
+  .page-layout {
+    padding-block: var(--blog-space-12) var(--blog-space-16);
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+// WideLayout.astro (Layer 2)
+// Extends BaseLayout with full-width content (1200px max).
+// Use for: gallery pages, wide dashboards, immersive layouts.
+
+import BaseLayout from "./BaseLayout.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  [key: string]: any;
+}
+
+const { title, description, ...rest } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} {...rest}>
+  <div class="container-wide wide-layout">
+    <slot />
+  </div>
+</BaseLayout>
+
+<style>
+  .wide-layout {
+    padding-block: var(--blog-space-12) var(--blog-space-16);
+  }
+</style>

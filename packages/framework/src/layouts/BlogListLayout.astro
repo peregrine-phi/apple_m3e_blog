@@ -1,0 +1,45 @@
+---
+// BlogListLayout.astro (Layer 2)
+// Extends BaseLayout with hero header + card grid.
+// Use for: /blog listing, category pages.
+import BaseLayout from "./BaseLayout.astro";
+import I18n from "../components/I18n.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  overline?: string;
+  heading?: string;
+  [key: string]: any;
+}
+
+const { title, description, ...rest } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} {...rest}>
+  <div class="container-wide blog-list-layout">
+    <header class="blog-list-hero">
+      <p class="text-kicker"><I18n tKey="blog.overline" /></p>
+      <h1 class="text-display-small"><I18n tKey="blog.heading" /></h1>
+      <p class="text-deck" style="max-width: 48ch; margin-top: var(--blog-space-2);">
+        <I18n tKey="blog.desc" />
+      </p>
+    </header>
+
+    <slot />
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-list-layout {
+    padding-block: var(--blog-space-12) var(--blog-space-16);
+  }
+
+  .blog-list-hero {
+    margin-bottom: var(--blog-space-10);
+  }
+
+  .blog-list-hero h1 {
+    margin: var(--blog-space-2) 0 0 0;
+  }
+</style>
