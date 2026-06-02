@@ -21,13 +21,15 @@ const hasToc = tocItems.length > 0;
 
 {hasToc && (
   <>
-    <!-- Mobile: collapsible toggle -->
-    <details class="toc-mobile">
-      <summary class="toc-toggle">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toc-icon-list"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/></svg>
-        <span>Table of Contents</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toc-chevron"><polyline points="6 9 12 15 18 9"/></svg>
-      </summary>
+    <!-- Mobile: collapsible toggle + floating dropdown (sibling, not nested — avoids backdrop-filter conflict) -->
+    <div class="toc-mobile-wrapper">
+      <details class="toc-mobile">
+        <summary class="toc-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toc-icon-list"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/></svg>
+          <span>Table of Contents</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="toc-chevron"><polyline points="6 9 12 15 18 9"/></svg>
+        </summary>
+      </details>
       <nav class="toc-nav-mobile" aria-label="Table of Contents">
         <ol>
           {tocItems.map((item) => (
@@ -37,7 +39,7 @@ const hasToc = tocItems.length > 0;
           ))}
         </ol>
       </nav>
-    </details>
+    </div>
 
     <!-- Desktop: sticky sidebar -->
     <aside class="toc-sidebar">
@@ -57,6 +59,10 @@ const hasToc = tocItems.length > 0;
 
 <style>
   /* ── Mobile TOC ── */
+  .toc-mobile-wrapper {
+    display: none;
+  }
+
   .toc-mobile {
     display: none;
     margin-bottom: var(--blog-space-6);
@@ -115,13 +121,10 @@ const hasToc = tocItems.length > 0;
   }
 
   /* ── Desktop Sidebar TOC ── */
+  /* Sticky handled by parent .split-sidebar — no need to double-sticky here */
   .toc-sidebar {
-    position: sticky;
-    top: 5.5rem;
     width: var(--toc-width, 220px);
     flex-shrink: 0;
-    max-height: calc(100vh - 5.5rem - var(--blog-space-16));
-    overflow-y: auto;
     padding-right: var(--blog-space-4);
     padding-left: var(--blog-space-2);
     border-left: 1px solid var(--blog-color-divider);
@@ -185,21 +188,26 @@ const hasToc = tocItems.length > 0;
       display: none;
     }
 
-    .toc-mobile {
+    .toc-mobile-wrapper {
       display: block;
       position: sticky;
-      top: 64px;
+      top: calc(var(--header-height) + var(--header-padding-y) + var(--blog-space-3));
       z-index: 80;
       width: fit-content;
       margin-inline: auto;
+      margin-bottom: var(--blog-space-4);
+    }
+
+    .toc-mobile {
+      display: block;
+      width: fit-content;
       background: var(--blog-glass-bg);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: var(--blog-space-px) solid var(--blog-glass-border);
-      border-radius: var(--blog-radius-full); /* Perfectly matches the brand capsule shape */
+      border-radius: var(--blog-radius-full);
       box-shadow: var(--blog-glass-shadow);
-      margin-bottom: var(--blog-space-4);
-      position: relative; /* Establish positioning context for the absolute dropdown */
+      margin-bottom: 0;
     }
 
     .toc-mobile .toc-toggle {
@@ -214,7 +222,7 @@ const hasToc = tocItems.length > 0;
       border-bottom: none;
     }
 
-    /* Style the absolute positioned floating dropdown list to prevent DOM layout shift on expansion */
+    /* Floating dropdown — sibling of capsule, no nested backdrop-filter conflict */
     .toc-nav-mobile {
       position: absolute;
       top: calc(100% + var(--blog-space-2));
@@ -231,6 +239,11 @@ const hasToc = tocItems.length > 0;
       box-shadow: var(--blog-glass-shadow);
       padding: var(--blog-space-4) var(--blog-space-5);
       z-index: 90;
+      display: none; /* toggled via JS */
+    }
+
+    .toc-mobile-wrapper.open .toc-nav-mobile {
+      display: block;
     }
   }
 </style>
@@ -271,16 +284,39 @@ const hasToc = tocItems.length > 0;
     });
   }
 
-  // Close mobile TOC details when a link is clicked
+  // Close mobile TOC when a link is clicked or when clicking outside
   function initMobileTocCollapse() {
     const mobileToc = document.querySelector('.toc-mobile') as HTMLDetailsElement;
-    if (!mobileToc) return;
+    const wrapper = document.querySelector('.toc-mobile-wrapper') as HTMLElement;
+    if (!mobileToc || !wrapper) return;
 
-    const links = mobileToc.querySelectorAll('.toc-link');
+    // Sync <details open> to wrapper class
+    const syncOpen = () => {
+      if (mobileToc.hasAttribute('open')) {
+        wrapper.classList.add('open');
+      } else {
+        wrapper.classList.remove('open');
+      }
+    };
+
+    mobileToc.addEventListener('toggle', syncOpen);
+    syncOpen(); // initial state
+
+    // Close on link click — links now live in .toc-nav-mobile (sibling), not inside <details>
+    const links = wrapper.querySelectorAll('.toc-link');
     links.forEach((link) => {
       link.addEventListener('click', () => {
         mobileToc.removeAttribute('open');
       });
+    });
+
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+      if (!wrapper.classList.contains('open')) return;
+      const target = e.target as HTMLElement;
+      if (!wrapper.contains(target)) {
+        mobileToc.removeAttribute('open');
+      }
     });
   }
 

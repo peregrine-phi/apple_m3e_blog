@@ -30,6 +30,10 @@ const { title, description, transparentHeader = true, ...rest } = Astro.props;
     position: relative;
     overflow: hidden;
     background-color: var(--blog-color-background);
+    /* Push the hero clipping boundary below the header's backdrop-filter
+       zone (20px blur radius) to prevent the editorial blob's clipped
+       gradient edge from being sampled and amplified by the glass blur */
+    padding-top: 24px;
   }
 
   .hero-layout-content {
