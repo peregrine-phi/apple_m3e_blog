@@ -190,14 +190,16 @@ const hasToc = tocItems.length > 0;
       position: sticky;
       top: 64px;
       z-index: 80;
+      width: fit-content;
       margin-inline: auto;
       background: var(--blog-glass-bg);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: var(--blog-space-px) solid var(--blog-glass-border);
-      border-radius: var(--blog-radius-container, 16px);
+      border-radius: var(--blog-radius-full); /* Perfectly matches the brand capsule shape */
       box-shadow: var(--blog-glass-shadow);
       margin-bottom: var(--blog-space-4);
+      position: relative; /* Establish positioning context for the absolute dropdown */
     }
 
     .toc-mobile .toc-toggle {
@@ -205,6 +207,30 @@ const hasToc = tocItems.length > 0;
       padding: var(--blog-space-0) var(--blog-space-5);
       font-size: var(--blog-typescale-label-medium-size);
       gap: var(--blog-space-2);
+    }
+
+    /* Remove the divider line on the pill toggle since the menu is now floating and detached */
+    .toc-mobile[open] .toc-toggle {
+      border-bottom: none;
+    }
+
+    /* Style the absolute positioned floating dropdown list to prevent DOM layout shift on expansion */
+    .toc-nav-mobile {
+      position: absolute;
+      top: calc(100% + var(--blog-space-2));
+      left: 50%;
+      transform: translateX(-50%);
+      width: max-content;
+      min-width: 240px;
+      max-width: calc(100vw - 32px);
+      background: var(--blog-glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: var(--blog-space-px) solid var(--blog-glass-border);
+      border-radius: var(--blog-radius-container, 16px);
+      box-shadow: var(--blog-glass-shadow);
+      padding: var(--blog-space-4) var(--blog-space-5);
+      z-index: 90;
     }
   }
 </style>

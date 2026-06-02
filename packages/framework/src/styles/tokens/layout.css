@@ -1,0 +1,51 @@
+/* ==========================================================================
+   Design Tokens — Layout Positioning
+   ========================================================================== */
+
+:root {
+  /* ── Seed Tokens ── */
+  --layout-baseline: var(--blog-space-unit);  /* 0.25rem = 4px */
+  --layout-base-unit: 11;                     /* 44px touch target base */
+  --layout-gutter: 4;                         /* Spacing base multiplier */
+
+  /* ── Map Tokens ── */
+  --layout-size-xs: calc(var(--layout-baseline) * (var(--layout-base-unit) - 2));  /* 36px */
+  --layout-size-sm: calc(var(--layout-baseline) * (var(--layout-base-unit) - 1));  /* 40px */
+  --layout-size-md: calc(var(--layout-baseline) * var(--layout-base-unit));        /* 44px */
+  --layout-size-lg: calc(var(--layout-baseline) * (var(--layout-base-unit) + 1));  /* 48px */
+  --layout-size-xl: calc(var(--layout-baseline) * (var(--layout-base-unit) + 3));  /* 56px */
+
+  --layout-gap-sm: calc(var(--layout-baseline) * var(--layout-gutter) * 1);        /* 16px */
+  --layout-gap-md: calc(var(--layout-baseline) * var(--layout-gutter) * 1.5);      /* 24px */
+  --layout-gap-lg: calc(var(--layout-baseline) * var(--layout-gutter) * 2);        /* 32px */
+
+  /* ── Alias Tokens ── */
+  /* Heights & Sizes */
+  --layout-bar-height:          var(--layout-size-md);   /* Bottom Nav Tab = 44px */
+  --layout-capsule-height:      var(--layout-size-sm);   /* Player capsule = 40px */
+  --layout-fab-size:            var(--layout-size-sm);   /* Scroll-to-top FAB = 40px */
+  --layout-header-height:       var(--layout-size-lg);   /* Desktop Header = 48px */
+  --layout-header-height-mobile: var(--layout-size-lg);  /* Mobile Header = 48px */
+
+  /* Responsive Alias Margins (Mobile first) */
+  --layout-bottom-gutter: calc(var(--layout-gap-sm) + env(safe-area-inset-bottom, 0px)); /* 16px + safe-area */
+  --layout-edge-margin:   var(--layout-gap-sm);          /* 16px */
+
+  /* Row spacing */
+  --layout-element-row-gap: var(--layout-gap-sm);        /* 16px */
+
+  /* Z-Index Hierarchy */
+  --layout-z-header:          100;
+  --layout-z-player:          90;
+  --layout-z-bottom-bar:      1000;
+  --layout-z-fab:             1010;
+  --layout-z-player-expanded: 2000;
+}
+
+/* ── Desktop Overrides ── */
+@media (min-width: 769px) {
+  :root {
+    --layout-bottom-gutter: var(--layout-gap-md);        /* 24px */
+    --layout-edge-margin:   var(--layout-gap-md);        /* 24px */
+  }
+}

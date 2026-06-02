@@ -22,10 +22,9 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
 ---
 
 <header class:list={["site-header", { "site-header--transparent": transparent }]}>
-  <div class="liquid-glass-bar">
-    <div class="liquid-glass-bg-layer"></div>
+  <div class="header-bar">
     <div class="liquid-glass-inner">
-      <a href="/" class="site-logo text-headline-small" aria-label="Home">
+      <a href="/" class="site-logo glass-surface-interactive text-headline-small" aria-label="Home">
         <span class="logo-dot" aria-hidden="true">
           <svg class="logo-sprout-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M7 20h10" />
@@ -38,7 +37,7 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
         <I18n tKey="nav.siteName" />
       </a>
 
-      <nav class="site-nav" aria-label="Main navigation">
+      <nav class="site-nav glass-surface-interactive" aria-label="Main navigation">
         {navItems.map((item) => {
           const isCurrent = Astro.url.pathname === item.href || (item.href !== "/" && Astro.url.pathname.startsWith(item.href));
           return (
@@ -68,7 +67,7 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     </div>
 
     <!-- Mobile menu -->
-    <nav class="mobile-nav hide-desktop" id="mobile-nav" aria-label="Mobile navigation">
+    <nav class="mobile-nav glass-surface hide-desktop" id="mobile-nav" aria-label="Mobile navigation">
       <div class="mobile-menu-actions">
         <MonetSwitcher />
         <LanguageToggle />
@@ -83,14 +82,14 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
   .site-header {
     position: sticky;
     top: var(--blog-space-0);
-    z-index: 100;
+    z-index: var(--layout-z-header);
     padding: var(--header-padding-y) var(--header-padding-x) var(--blog-space-0);
     pointer-events: none;
     transition: padding var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
   }
 
   /* ── The floating glass bar container (Now transparent layout wrapper) ── */
-  .liquid-glass-bar {
+  .header-bar {
     pointer-events: auto;
     max-width: var(--header-max-width);
     margin: var(--blog-space-0) auto;
@@ -99,11 +98,6 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     box-shadow: none;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-
-  /* Background sweep is disabled to support flat styling */
-  .liquid-glass-bg-layer {
-    display: none;
   }
 
   .liquid-glass-inner {
@@ -115,33 +109,66 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     position: relative;
   }
 
+  /* ── Glass surfaces (Consolidated glass design styles) ── */
+  .glass-surface,
+  .mobile-nav {
+    background: var(--blog-glass-bg);
+    backdrop-filter: var(--blog-glass-backdrop);
+    -webkit-backdrop-filter: var(--blog-glass-backdrop);
+    border: var(--blog-space-px) solid var(--blog-glass-border);
+    box-shadow: var(--blog-glass-shadow);
+  }
+
+  .glass-surface-interactive,
+  .site-logo,
+  .site-nav,
+  .header-actions :global(#theme-toggle),
+  .header-actions :global(#lang-toggle),
+  .header-actions :global(.monet-toggle),
+  #mobile-menu-btn,
+  .mobile-menu-actions :global(#theme-toggle),
+  .mobile-menu-actions :global(#lang-toggle),
+  .mobile-menu-actions :global(.monet-toggle) {
+    background: var(--blog-glass-bg);
+    backdrop-filter: var(--blog-glass-backdrop);
+    -webkit-backdrop-filter: var(--blog-glass-backdrop);
+    border: var(--blog-space-px) solid var(--blog-glass-border);
+    box-shadow: var(--blog-glass-shadow);
+    will-change: transform;
+    transition: 
+      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      translate var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
+  }
+
+  .glass-surface-interactive:hover,
+  .site-logo:hover,
+  .site-nav:hover,
+  .header-actions :global(#theme-toggle):hover,
+  .header-actions :global(#lang-toggle):hover,
+  .header-actions :global(.monet-toggle):hover,
+  #mobile-menu-btn:hover,
+  .mobile-menu-actions :global(#theme-toggle):hover,
+  .mobile-menu-actions :global(#lang-toggle):hover,
+  .mobile-menu-actions :global(.monet-toggle):hover {
+    transform: translateY(-1px);
+    background: var(--blog-glass-bg-hover);
+    border-color: var(--blog-glass-border-hover);
+    box-shadow: var(--blog-glass-shadow-hover);
+  }
+
   /* ── Brand Capsule (Left floating island) ── */
   .site-logo {
     justify-self: start;
     display: inline-flex;
     align-items: center;
-    height: var(--blog-space-11); /* 44px capsule height */
+    height: var(--layout-capsule-height);
     border-radius: var(--blog-radius-full);
     padding: var(--blog-space-1) var(--blog-space-4) var(--blog-space-1) var(--blog-space-1);
-    background: var(--blog-glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: var(--blog-space-px) solid var(--blog-glass-border);
-    box-shadow: var(--blog-glass-shadow);
     text-decoration: none;
     gap: var(--blog-space-2);
-    transition: 
-      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
-  }
-
-  .site-logo:hover {
-    transform: translateY(-1px);
-    background: var(--blog-glass-bg-hover);
-    border-color: var(--blog-glass-border-hover);
-    box-shadow: var(--blog-glass-shadow-hover);
   }
 
   /* Solid circular wrapper inside logo */
@@ -173,27 +200,10 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     justify-self: center;
     display: flex;
     align-items: center;
-    height: var(--blog-space-11); /* 44px capsule height */
+    height: var(--layout-capsule-height);
     border-radius: var(--blog-radius-full);
     padding: var(--blog-space-1);
     gap: var(--blog-space-1);
-    background: var(--blog-glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: var(--blog-space-px) solid var(--blog-glass-border);
-    box-shadow: var(--blog-glass-shadow);
-    transition: 
-      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
-  }
-
-  .site-nav:hover {
-    transform: translateY(-1px);
-    background: var(--blog-glass-bg-hover);
-    border-color: var(--blog-glass-border-hover);
-    box-shadow: var(--blog-glass-shadow-hover);
   }
 
   .nav-link {
@@ -238,18 +248,8 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: var(--blog-space-11); /* 44px circular capsule height */
+    height: var(--layout-capsule-height);
     border-radius: var(--blog-radius-full);
-    background: var(--blog-glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: var(--blog-space-px) solid var(--blog-glass-border);
-    box-shadow: var(--blog-glass-shadow);
-    transition: 
-      background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
     cursor: pointer;
     overflow: visible;
   }
@@ -257,29 +257,19 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
   /* Specific overrides for buttons widths & paddings utilizing ID specificity */
   .header-actions :global(#theme-toggle),
   .header-actions :global(.monet-toggle) {
-    width: var(--blog-space-11); /* 44px strict circle */
+    width: var(--layout-capsule-height); /* Strict circle */
     padding: var(--blog-space-0);
   }
 
   .header-actions :global(#lang-toggle) {
-    min-width: var(--blog-space-11);
+    min-width: var(--layout-capsule-height);
     width: auto;
-    padding-inline: var(--blog-space-3); /* 12px dynamic padding */
+    padding-inline: var(--blog-space-3); /* Dynamic padding */
   }
 
   #mobile-menu-btn {
-    width: var(--blog-space-11); /* 44px mobile menu circle */
+    width: var(--layout-capsule-height); /* Mobile menu circle */
     padding: var(--blog-space-0);
-  }
-
-  .header-actions :global(#theme-toggle):hover,
-  .header-actions :global(#lang-toggle):hover,
-  .header-actions :global(.monet-toggle):hover,
-  #mobile-menu-btn:hover {
-    transform: translateY(-1px);
-    background: var(--blog-glass-bg-hover);
-    border-color: var(--blog-glass-border-hover);
-    box-shadow: var(--blog-glass-shadow-hover);
   }
 
   /* ── Mobile menu ── */
@@ -288,12 +278,7 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     flex-direction: column;
     margin-top: var(--blog-space-3);
     padding: var(--blog-space-2);
-    background: var(--blog-glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: var(--blog-space-px) solid var(--blog-glass-border);
     border-radius: var(--blog-radius-container);
-    box-shadow: var(--blog-glass-shadow);
     pointer-events: auto;
   }
 
@@ -356,16 +341,18 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     .site-logo {
       position: absolute;
       left: 50%;
-      transform: translateX(-50%);
+      translate: -50% 0;
+      transform: none;
       justify-self: auto;
       white-space: nowrap;
-      height: var(--blog-space-11); /* Expanded to 44px premium capsule height matching navigation and player controls */
+      height: var(--layout-capsule-height); /* Matching floating element heights */
       padding: var(--blog-space-1) var(--blog-space-5) var(--blog-space-1) var(--blog-space-1.5);
       font-size: var(--blog-typescale-body-large-size) !important; /* Slightly larger text */
     }
 
     .site-logo:hover {
-      transform: translateX(-50%) translateY(-1px);
+      translate: -50% -1px;
+      transform: none;
     }
 
     .logo-dot {
@@ -380,20 +367,17 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
 
     .site-nav {
       position: fixed;
-      bottom: var(--blog-space-5);
+      bottom: var(--layout-bottom-gutter);
       left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
+      translate: -50% 0;
+      transform: none;
+      z-index: var(--layout-z-bottom-bar);
       justify-self: auto;
-      background: var(--blog-glass-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: var(--blog-space-px) solid var(--blog-glass-border);
-      box-shadow: var(--blog-glass-shadow);
     }
 
     .site-nav:hover {
-      transform: translateX(-50%) translateY(-1px);
+      translate: -50% -1px;
+      transform: none;
     }
 
     .header-actions {
@@ -432,17 +416,7 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
       justify-content: center;
       height: var(--blog-space-10); /* 40px mobile capsule height */
       border-radius: var(--blog-radius-full);
-      background: var(--blog-glass-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: var(--blog-space-px) solid var(--blog-glass-border);
-      box-shadow: var(--blog-glass-shadow);
       cursor: pointer;
-      transition: 
-        background var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-        border-color var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-        box-shadow var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
-        transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
     }
 
     .mobile-menu-actions :global(#theme-toggle),
@@ -455,15 +429,6 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
       min-width: var(--blog-space-10);
       width: auto;
       padding-inline: var(--blog-space-3);
-    }
-
-    .mobile-menu-actions :global(#theme-toggle):hover,
-    .mobile-menu-actions :global(#lang-toggle):hover,
-    .mobile-menu-actions :global(.monet-toggle):hover {
-      transform: translateY(-1px);
-      background: var(--blog-glass-bg-hover);
-      border-color: var(--blog-glass-border-hover);
-      box-shadow: var(--blog-glass-shadow-hover);
     }
   }
 </style>

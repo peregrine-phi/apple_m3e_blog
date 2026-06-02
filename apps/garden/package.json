@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Apple-style personal blog with Material 3 Expressive flair, built on Astro",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --host",
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",

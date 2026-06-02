@@ -13,9 +13,10 @@
 
 /* ── Scroll to Top Button (Liquid Glass Style) ── */
 #scroll-to-top-btn {
-  width: var(--scroll-btn-size, 44px);
-  height: var(--scroll-btn-size, 44px);
-  min-width: var(--scroll-btn-size, 44px);
+  --scroll-btn-size: var(--layout-bar-height, 44px);
+  width: var(--scroll-btn-size);
+  height: var(--scroll-btn-size);
+  min-width: var(--scroll-btn-size);
   border-radius: 50%;
   padding: 0;
   background-color: var(--blog-glass-bg);
@@ -47,7 +48,7 @@
 
 @media (max-width: 768px) {
   #scroll-to-top-btn {
-    --scroll-btn-size: 40px; /* Match 40px secondary controls (brand / action switchers) on mobile */
+    --scroll-btn-size: var(--layout-fab-size); /* Match 40px secondary controls (brand / action switchers) on mobile */
   }
 }
 

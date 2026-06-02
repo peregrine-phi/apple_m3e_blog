@@ -2,7 +2,6 @@
 :root {
   --header-max-width: 1200px;
   --header-height: 54px;
-  --header-height-mobile: 48px;
   --header-padding-y: var(--blog-space-3);
   --header-padding-x: var(--blog-space-4);
   --header-padding-x-inner: var(--blog-space-6);

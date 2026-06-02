@@ -163,6 +163,8 @@
   --blog-glass-bg-hover: rgba(255, 255, 255, 0.48);
   --blog-glass-border: rgba(255, 255, 255, 0.58);
   --blog-glass-border-hover: rgba(255, 255, 255, 0.7);
+  --blog-glass-blur: 20px;
+  --blog-glass-backdrop: blur(var(--blog-glass-blur)) saturate(180%);
   --blog-glass-shadow:
     0 10px 30px -10px rgba(0, 0, 0, 0.08),
     0 1px 3px rgba(0, 0, 0, 0.02),
@@ -173,6 +175,7 @@
     0 2px 6px rgba(0, 0, 0, 0.04),
     inset 0 1.5px 0px rgba(255, 255, 255, 0.8),
     inset 0 -1.5px 0px rgba(0, 0, 0, 0.04);
+  /* TODO: Reserved for future liquid glass sweep animation — not yet consumed */
   --blog-glass-sweep-gradient: linear-gradient(
     90deg,
     transparent,

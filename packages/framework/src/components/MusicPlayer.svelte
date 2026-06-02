@@ -1,16 +1,22 @@
 <!--
-  MusicPlayer.svelte - Premium 音乐播放器组件（Svelte 5 极美重构版）
-  
-  特征：
-  - 极美双重模式：胶囊微型态 (Mini Capsule) & 展开玻璃卡片态 (Expanded Glass Card)
-  - 高可用交互：带音量滑条与歌单抽屉 (Playlist Drawer)，自定义 iOS 风格滑块
-  - 炫酷动效：唱片旋转带阴影发光特效、浮动音符粒子、加载扫光
-  - 底层稳固性：拦截自动播放策略、歌单完结报错断点拦截（彻底修复无限报错切歌死循环）
+  MusicPlayer.svelte — Apple 极简 × M3 Shape 音乐播放器 (v2)
+
+  三态混合模型：Capsule → Strip → Card
+
+  设计语言：
+  - Apple Music 式克制留白与精致玻璃态
+  - Material Design 3 形状系统：药丸容器 (Full)、圆角方形封面 (Large)、
+    卡片容器 (M3 XL)、圆形控制器 (Full)
+  - 液态玻璃基底 (--blog-glass-*)，saturate 增强
+  - clip-path: inset() round 驱动无割裂形状过渡
+
+  状态流：
+    Capsule (88×40 pill)  ──click──▶  Strip (300×44 pill)  ──click cover/title──▶  Card (280×auto rounded rect)
+    ◀──outside/ESC───────────────────  ◀──outside/ESC────────────────────────────────┘
 -->
 
 <script>
-  import { onMount } from 'svelte';
-  import { tick } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { slide } from 'svelte/transition';
 
   // ════════════════════════════════════════════
@@ -23,48 +29,49 @@
   } = $props();
 
   // ════════════════════════════════════════════
-  // 状态变量
+  // Audio State
   // ════════════════════════════════════════════
-  let audio = $state(null);                // Audio 对象
-  let tracks = $state([]);                // 曲目列表
-  let currentIndex = $state(0);           // 当前索引
-  let playing = $state(false);             // 播放状态
-  let duration = $state(0);               // 总时长
-  let current = $state(0);                // 当前时长
-  let buffered = $state(0);               // 缓冲百分比 (0-1)
-  let buffering = $state(false);           // 是否缓冲中
-  
-  // 重构新增状态
-  let expanded = $state(false);            // 播放面板展开状态
-  let volume = $state(0.8);                // 音量 (0-1)
-  let muted = $state(false);               // 是否静音
-  let playlistOpen = $state(false);        // 歌单抽屉是否展开
-  let consecutiveErrors = $state(0);       // 连续报错次数统计
-  let error = $state('');                 // 报错信息显示
+  let audio = $state(null);
+  let tracks = $state([]);
+  let currentIndex = $state(0);
+  let playing = $state(false);
+  let duration = $state(0);
+  let current = $state(0);
+  let buffered = $state(0);
+  let buffering = $state(false);
 
-  // 标题滚动状态
+  // ════════════════════════════════════════════
+  // Three-State Mode: 'capsule' | 'strip' | 'card'
+  // ════════════════════════════════════════════
+  /** @type {'capsule'|'strip'|'card'} */
+  let mode = $state('capsule');
+  let stripTimer = null;
+  let containerEl = $state(null);
+
+  // ════════════════════════════════════════════
+  // UI State
+  // ════════════════════════════════════════════
+  let volume = $state(0.8);
+  let muted = $state(false);
+  let playlistOpen = $state(false);
+  let consecutiveErrors = $state(0);
+  let error = $state('');
+  let loading = $state(true);
+
+  // ════════════════════════════════════════════
+  // Title Marquee Scroll
+  // ════════════════════════════════════════════
   let offset = $state(0);
   let scrollDistance = $state(0);
   let dir = $state(1);
   let titleElement = $state(null);
-  let containerElement = $state(null);
-  
-  let loading = $state(true);             // 载入指示
+  let titleContainer = $state(null);
+  let scrollInterval = null;
 
   // ════════════════════════════════════════════
-  // 国际化 (i18n) 支持
+  // i18n
   // ════════════════════════════════════════════
   let lang = $state('en');
-  
-  function handleLangChange(e) {
-    lang = e.detail.lang;
-  }
-
-  function handleOutsideClick(e) {
-    if (expanded) {
-      expanded = false;
-    }
-  }
 
   const dict = $derived({
     unknownTrack: lang === 'zh' ? '未知曲目' : 'Unknown Track',
@@ -85,36 +92,147 @@
     volume: lang === 'zh' ? '音量' : 'Volume',
   });
 
+  function handleLangChange(e) {
+    lang = e.detail.lang;
+  }
+
   // ════════════════════════════════════════════
-  // 生命周期：挂载
+  // Mode Switching — Direction-aware timing
+  //
+  // Capsule→Strip: small pill-to-pill change → snappy 280ms
+  // Strip→Card: major layout expansion → deliberate 500ms
+  // Collapse (any→capsule): quick dismissal → 250ms
+  //
+  // --_size-dur is consumed by CSS transition for width/clip-path/shadow.
+  // Height is handled separately by animateHeight() via WAAPI because
+  // CSS transition cannot interpolate between fixed px and auto.
+  // ════════════════════════════════════════════
+  let heightAnim = null;
+
+  function setTimingFor(targetMode) {
+    if (!containerEl) return;
+    const ms = targetMode === 'card' ? '500ms' : targetMode === 'strip' ? '280ms' : '250ms';
+    containerEl.style.setProperty('--_size-dur', ms);
+  }
+
+  function animateHeight(from, to, ms) {
+    if (!containerEl) return;
+    if (heightAnim) { heightAnim.cancel(); heightAnim = null; }
+    heightAnim = containerEl.animate(
+      [{ height: from + 'px' }, { height: to + 'px' }],
+      {
+        duration: ms,
+        easing: 'cubic-bezier(0, 0, 0, 1)', /* M3 decelerate */
+        fill: 'forwards'
+      }
+    );
+    heightAnim.onfinish = () => {
+      containerEl.style.height = (to === 'auto') ? '' : to + 'px';
+      heightAnim = null;
+    };
+  }
+
+  function goStrip() {
+    setTimingFor('strip');
+    const fromH = containerEl?.getBoundingClientRect().height;
+    mode = 'strip';
+    playlistOpen = false;
+    clearTimeout(stripTimer);
+    if (containerEl && fromH && fromH !== 44) {
+      animateHeight(fromH, 44, 280);
+    }
+    stripTimer = setTimeout(() => {
+      if (mode === 'strip') goCapsule();
+    }, 8000);
+  }
+
+  function goCard() {
+    setTimingFor('card');
+    const fromH = containerEl?.getBoundingClientRect().height;
+    mode = 'card';
+    playlistOpen = false;
+    clearTimeout(stripTimer);
+    // Measure card's natural height after DOM update, then animate
+    requestAnimationFrame(() => {
+      const toH = containerEl?.scrollHeight;
+      if (containerEl && fromH && toH) {
+        animateHeight(fromH, toH, 500);
+      }
+    });
+  }
+
+  function goCapsule() {
+    setTimingFor('capsule');
+    const fromH = containerEl?.getBoundingClientRect().height;
+    mode = 'capsule';
+    playlistOpen = false;
+    clearTimeout(stripTimer);
+    if (containerEl && fromH && fromH !== 40) {
+      animateHeight(fromH, 40, 250);
+    }
+  }
+
+  function handleOutsideClick() {
+    if (mode !== 'capsule') goCapsule();
+  }
+
+  function handleKeydown(e) {
+    if (e.key === 'Escape' && mode !== 'capsule') goCapsule();
+  }
+
+  function resetStripTimer() {
+    if (mode === 'strip') {
+      clearTimeout(stripTimer);
+      stripTimer = setTimeout(() => {
+        if (mode === 'strip') goCapsule();
+      }, 8000);
+    }
+  }
+
+  // Re-measure card height when drawer toggles (changes content size)
+  $effect(() => {
+    if (mode === 'card' && containerEl) {
+      const _drawer = playlistOpen; // dependency
+      requestAnimationFrame(() => {
+        const newH = containerEl.scrollHeight;
+        if (newH) {
+          const curH = containerEl.getBoundingClientRect().height;
+          if (Math.abs(curH - newH) > 2) {
+            animateHeight(curH, newH, 350);
+          }
+        }
+      });
+    }
+  });
+
+  // ════════════════════════════════════════════
+  // Lifecycle
   // ════════════════════════════════════════════
   onMount(async () => {
-    // 0. 初始化语言状态
     if (typeof document !== 'undefined') {
       lang = document.documentElement.getAttribute('lang') || 'en';
     }
     if (typeof window !== 'undefined') {
       window.addEventListener('lang-change', handleLangChange);
+      window.addEventListener('keydown', handleKeydown);
     }
     if (typeof document !== 'undefined') {
       document.addEventListener('click', handleOutsideClick);
     }
 
-    // 1. 初始化 Audio
     audio = new Audio();
     audio.preload = 'metadata';
     audio.volume = volume;
 
-    // 2. 绑定核心事件
+    // Named handlers for proper cleanup
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
-    audio.addEventListener('waiting', () => { buffering = true; });
-    audio.addEventListener('canplay', () => { buffering = false; });
+    audio.addEventListener('waiting', handleBufferingStart);
+    audio.addEventListener('canplay', handleBufferingEnd);
     audio.addEventListener('progress', handleProgress);
 
-    // 3. 载入曲目数据
     if (apiEndpoint) {
       await loadFromAPI();
     } else {
@@ -122,17 +240,15 @@
       loading = false;
     }
 
-    // 4. 加载第一首歌曲（不自动播，只初始化元数据）
     if (tracks.length > 0) {
       initCurrent();
     }
   });
 
-  // 销毁清理
-  import { onDestroy } from 'svelte';
   onDestroy(() => {
     if (typeof window !== 'undefined') {
       window.removeEventListener('lang-change', handleLangChange);
+      window.removeEventListener('keydown', handleKeydown);
     }
     if (typeof document !== 'undefined') {
       document.removeEventListener('click', handleOutsideClick);
@@ -144,16 +260,18 @@
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
-      audio.removeEventListener('waiting', () => { buffering = true; });
-      audio.removeEventListener('canplay', () => { buffering = false; });
+      audio.removeEventListener('waiting', handleBufferingStart);
+      audio.removeEventListener('canplay', handleBufferingEnd);
       audio.removeEventListener('progress', handleProgress);
       audio = null;
     }
     if (scrollInterval) clearInterval(scrollInterval);
+    clearTimeout(stripTimer);
+    if (heightAnim) { heightAnim.cancel(); heightAnim = null; }
   });
 
   // ════════════════════════════════════════════
-  // API 请求及缓存
+  // API Loading & Cache (1 hour TTL)
   // ════════════════════════════════════════════
   async function loadFromAPI() {
     try {
@@ -170,14 +288,13 @@
 
       console.log('[Music] 请求 API:', apiEndpoint);
       const res = await fetch(`${apiEndpoint}&r=${Date.now()}`);
-      
+
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}`);
       }
 
       const data = await res.json();
-      
-      // 转换为播放器标准格式
+
       const formatted = data.map(item => ({
         name: item.title || item.name || dict.unknownTrack,
         artist: item.author || item.artist || dict.unknownArtist,
@@ -203,13 +320,12 @@
   }
 
   // ════════════════════════════════════════════
-  // 音频状态控制函数
+  // Audio Control
   // ════════════════════════════════════════════
   function initCurrent() {
     if (tracks.length === 0) return;
     const track = tracks[currentIndex];
     if (!track || !audio) return;
-
     audio.src = track.src;
     audio.load();
     playing = false;
@@ -220,18 +336,13 @@
     if (tracks.length === 0) return;
     const track = tracks[currentIndex];
     if (!track || !audio) return;
-
     audio.src = track.src;
     audio.play()
-      .then(() => {
-        playing = true;
-        error = '';
-      })
+      .then(() => { playing = true; error = ''; })
       .catch((err) => {
         console.warn('[Music] 播放失败 (通常由浏览器限制引起):', err);
         playing = false;
       });
-
     setupScroll();
   }
 
@@ -245,9 +356,7 @@
         playCurrent();
       } else {
         audio.play()
-          .then(() => {
-            playing = true;
-          })
+          .then(() => { playing = true; })
           .catch((err) => {
             console.warn('[Music] 播放失败:', err);
             playing = false;
@@ -260,26 +369,29 @@
     if (tracks.length === 0) return;
     currentIndex = (currentIndex - 1 + tracks.length) % tracks.length;
     playCurrent();
+    resetStripTimer();
   }
 
   function next() {
     if (tracks.length === 0) return;
     currentIndex = (currentIndex + 1) % tracks.length;
     playCurrent();
+    resetStripTimer();
   }
 
   function selectTrack(index) {
     currentIndex = index;
     playCurrent();
     playlistOpen = false;
+    resetStripTimer();
   }
 
   // ════════════════════════════════════════════
-  // 音视频事件处理器
+  // Audio Event Handlers (named for proper cleanup)
   // ════════════════════════════════════════════
   function handleLoadedMetadata() {
     duration = audio.duration;
-    consecutiveErrors = 0; // 加载成功，重置错误次数
+    consecutiveErrors = 0;
     if (error && error !== dict.fallbackLoaded) {
       error = '';
     }
@@ -296,8 +408,7 @@
   function handleError() {
     console.warn('[Music] 音频源加载失败:', tracks[currentIndex]?.name);
     consecutiveErrors++;
-    
-    // 如果失败数超过歌单长度，说明全军覆没，拦截自动切歌，防止无限报错导致页面死机
+
     if (consecutiveErrors >= tracks.length) {
       consecutiveErrors = 0;
       playing = false;
@@ -305,43 +416,43 @@
       return;
     }
 
-    // 尝试切到下一首
     next();
   }
 
+  function handleBufferingStart() {
+    buffering = true;
+  }
+
+  function handleBufferingEnd() {
+    buffering = false;
+  }
+
   function handleProgress() {
-    if (audio && audio.buffered.length > 0) {
+    if (audio && audio.buffered.length > 0 && audio.duration) {
       buffered = audio.buffered.end(audio.buffered.length - 1) / audio.duration;
     }
   }
 
   // ════════════════════════════════════════════
-  // 音量与静音
+  // Volume & Mute
   // ════════════════════════════════════════════
   function handleVolumeChange(e) {
     const val = parseFloat(e.target.value);
     volume = val;
-    if (audio) {
-      audio.volume = val;
-    }
-    if (val > 0) {
-      muted = false;
-    }
+    if (audio) audio.volume = val;
+    if (val > 0) muted = false;
   }
 
   function toggleMute() {
     muted = !muted;
-    if (audio) {
-      audio.muted = muted;
-    }
+    if (audio) audio.muted = muted;
   }
 
   // ════════════════════════════════════════════
-  // 进度条交互
+  // Seek
   // ════════════════════════════════════════════
   function seekByClick(e) {
     if (!audio || !duration) return;
-    
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = (e.clientX - rect.left) / rect.width;
     audio.currentTime = ratio * duration;
@@ -349,10 +460,8 @@
   }
 
   // ════════════════════════════════════════════
-  // 标题滚动逻辑
+  // Title Marquee Scroll
   // ════════════════════════════════════════════
-  let scrollInterval = null;
-
   function setupScroll() {
     if (scrollInterval) {
       clearInterval(scrollInterval);
@@ -363,70 +472,91 @@
     dir = 1;
 
     tick().then(() => {
-      if (!titleElement || !containerElement) return;
+      if (!titleElement || !titleContainer) return;
 
-      scrollDistance = titleElement.scrollWidth - containerElement.clientWidth;
+      scrollDistance = titleElement.scrollWidth - titleContainer.clientWidth;
 
       if (scrollDistance > 0) {
         scrollInterval = setInterval(() => {
           offset += dir;
-
           if (offset <= 0) {
             dir = 1;
           } else if (offset >= scrollDistance) {
             dir = -1;
           }
-        }, 80); 
+        }, 80);
       }
     });
   }
 
+  // ════════════════════════════════════════════
+  // Utilities
+  // ════════════════════════════════════════════
   function formatTime(seconds) {
-    if (!seconds || isNaN(seconds)) return '00:00';
+    if (!seconds || isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
+
+  // ════════════════════════════════════════════
+  // Derived: current track
+  // ════════════════════════════════════════════
+  let currentTrack = $derived(tracks[currentIndex] || null);
+  let coverUrl = $derived(currentTrack?.cover || '/music/default-cover.svg');
+  let progressRatio = $derived(duration ? current / duration : 0);
 </script>
 
+<!-- ═══════════════════════════════════════════════
+     LOADING STATE
+     ═══════════════════════════════════════════════ -->
 {#if loading}
-  <!-- 加载状态 -->
-  <div class="player-container loading-state">
+  <div class="player-container is-capsule loading-state">
     <div class="md-progress" role="progressbar" aria-label={dict.loading}>
       <div class="md-progress__primary"><div class="md-progress__bar-inner"></div></div>
       <div class="md-progress__secondary"><div class="md-progress__bar-inner"></div></div>
     </div>
   </div>
+
+<!-- ═══════════════════════════════════════════════
+     EMPTY STATE: no tracks → nothing rendered
+     ═══════════════════════════════════════════════ -->
 {:else if tracks.length === 0}
-  <!-- 无曲目不显示 -->
+
+<!-- ═══════════════════════════════════════════════
+     THREE-STATE PLAYER
+     ═══════════════════════════════════════════════ -->
 {:else}
-  <!-- 容器 -->
-  <div class="player-container {expanded ? 'is-expanded' : 'is-capsule'}" onclick={(e) => e.stopPropagation()}>
-    
-    {#if !expanded}
-      <!-- ==========================================
-           1. 胶囊微型态 (Mini Capsule)
-           ========================================== -->
-      <div 
-        class="capsule-layout" 
-        onclick={() => expanded = true}
-        onkeydown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            expanded = true;
-          }
-        }}
+  <div
+    bind:this={containerEl}
+    class="player-container is-{mode}"
+    onclick={(e) => e.stopPropagation()}
+  >
+
+    <!-- ═══════════════════════════════════════
+         CAPSULE — 88×40 pill micro player
+         M3 Full (pill shell) + XS (cover thumb)
+         ═══════════════════════════════════════ -->
+    {#if mode === 'capsule'}
+      <div
+        class="capsule-body"
+        onclick={goStrip}
+        onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') goStrip(); }}
         role="button"
         tabindex="0"
+        aria-label="{dict.play} — {currentTrack?.name || dict.unknownTrack}"
       >
-        <div class="capsule-disk-wrapper">
-          <img
-            class="capsule-cover {playing ? 'spinning' : ''}"
-            src={tracks[currentIndex]?.cover || '/music/default-cover.svg'}
-            alt=""
-          />
-          <div class="capsule-pulse {playing ? 'is-playing' : ''}"></div>
+        <!-- M3 XS: cover thumbnail (rounded square) -->
+        <div class="art-thumb">
+          <img src={coverUrl} alt="" />
         </div>
-        <button class="capsule-play-btn" onclick={(e) => { e.stopPropagation(); togglePlay(); }} aria-label={playing ? dict.pause : dict.play}>
+
+        <!-- Play/pause button with progress ring -->
+        <button
+          class="mini-play"
+          onclick={(e) => { e.stopPropagation(); togglePlay(); }}
+          aria-label={playing ? dict.pause : dict.play}
+        >
           {#if playing}
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
@@ -436,184 +566,200 @@
               <path d="M8 5v14l11-7z"/>
             </svg>
           {/if}
+          <!-- M3 Full: progress ring -->
+          <svg class="progress-ring" viewBox="0 0 28 28">
+            <circle
+              cx="14" cy="14" r="12"
+              stroke-dasharray="75.4"
+              stroke-dashoffset={75.4 * (1 - progressRatio)}
+            />
+          </svg>
         </button>
       </div>
-    {:else}
-      <!-- ==========================================
-           2. 展开毛玻璃卡片态 (Expanded Glass Card)
-           ========================================== -->
-      <div class="card-layout">
-        <!-- 头部标题及关闭 -->
-        <div class="card-header">
-          <div class="header-logo-group">
-            <span class="pulse-dot {playing ? 'is-active' : ''}"></span>
-            <span class="card-header-tag">{dict.musicBox}</span>
-          </div>
-          <button class="card-close-btn" onclick={() => expanded = false} aria-label={dict.collapse}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9" />
+
+    <!-- ═══════════════════════════════════════
+         STRIP — 300×44 pill quick-control bar
+         M3 Full (pill shell) + XS (cover)
+         Auto-dismiss after 8s of inactivity
+         ═══════════════════════════════════════ -->
+    {:else if mode === 'strip'}
+      <div class="strip-body">
+        <!-- Cover: clickable to enter card mode -->
+        <div class="art-strip" onclick={goCard} role="button" tabindex="0"
+             onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') goCard(); }}
+             aria-label="Expand player">
+          <img src={coverUrl} alt="" />
+        </div>
+
+        <!-- Track info: single-line "Title — Artist", clickable to enter card -->
+        <div class="track-info" onclick={goCard} role="button" tabindex="0"
+             onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') goCard(); }}>
+          <span class="info-text">
+            {currentTrack?.name || dict.unknownTrack}
+            <span class="info-sep"> — </span>
+            {currentTrack?.artist || dict.unknownArtist}
+          </span>
+        </div>
+
+        <!-- Transport controls -->
+        <div class="strip-ctrls">
+          <button class="ctrl-btn" onclick={prev} aria-label={dict.prev}>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          <button class="ctrl-btn ctrl-btn--primary" onclick={togglePlay} aria-label={playing ? dict.pause : dict.play}>
+            {#if playing}
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            {:else}
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            {/if}
+          </button>
+          <button class="ctrl-btn" onclick={next} aria-label={dict.next}>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+    <!-- ═══════════════════════════════════════
+         CARD — 280px rounded-rect expanded player
+         M3 Large (cover) + Full (buttons/progress)
+         Grid layout with playlist drawer support
+         ═══════════════════════════════════════ -->
+    {:else if mode === 'card'}
+      <div class="card-body {playlistOpen ? 'has-drawer' : ''}">
+
+        <!-- M3 Large: cover art spanning full left column -->
+        <div class="art-card">
+          <img src={coverUrl} alt="" />
+        </div>
+
+        <!-- Card title (row 1, col 2) -->
+        <div class="card-title-wrap" bind:this={titleContainer}>
+          <span class="card-title" bind:this={titleElement} style="transform: translateX(-{offset}px)">
+            {currentTrack?.name || dict.unknownTrack}
+          </span>
+        </div>
+
+        <!-- Card artist (row 2, col 2) -->
+        <div class="card-artist">{currentTrack?.artist || dict.unknownArtist}</div>
+
+        <!-- Error notification (row 3, full width) -->
+        {#if error}
+          <div class="error-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
+            <span>{error}</span>
+          </div>
+        {/if}
+
+        <!-- M3 Full: progress bar (row 4, full width) -->
+        <div class="progress-row">
+          <div
+            class="progress-track"
+            onclick={seekByClick}
+            onkeydown={(e) => {
+              if (!audio || !duration) return;
+              if (e.key === 'ArrowRight') { audio.currentTime = Math.min(audio.currentTime + 5, duration); current = audio.currentTime; }
+              if (e.key === 'ArrowLeft') { audio.currentTime = Math.max(audio.currentTime - 5, 0); current = audio.currentTime; }
+            }}
+            role="button"
+            tabindex="0"
+          >
+            <div class="progress-buffer" style="transform: scaleX({buffered || 0})"></div>
+            <div class="progress-fill" style="transform: scaleX({progressRatio})"></div>
+            {#if buffering}
+              <div class="progress-scan"></div>
+            {/if}
+          </div>
+          <div class="time-row">
+            <span>{formatTime(current)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+        </div>
+
+        <!-- Transport controls (row 5, full width) -->
+        <div class="ctrl-group">
+          <button class="ctrl-icon {playlistOpen ? 'active' : ''}" onclick={() => { playlistOpen = !playlistOpen; }} aria-label={dict.playlist}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+              <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+            </svg>
+          </button>
+
+          <div class="transport">
+            <button class="ctrl-icon" onclick={prev} aria-label={dict.prev}>
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+            </button>
+            <button class="ctrl-play" onclick={togglePlay} aria-label={playing ? dict.pause : dict.play}>
+              {#if playing}
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+              {:else}
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              {/if}
+            </button>
+            <button class="ctrl-icon" onclick={next} aria-label={dict.next}>
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
+          </div>
+
+          <button class="ctrl-icon" onclick={toggleMute} aria-label={muted ? dict.unmute : dict.mute}>
+            {#if muted || volume === 0}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+              </svg>
+            {:else if volume < 0.5}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              </svg>
+            {:else}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              </svg>
+            {/if}
           </button>
         </div>
 
-        <!-- 唱片转盘及发光 -->
-        <div class="card-body">
-          <div class="disk-glow-container">
-            <div class="vinyl-disk {playing ? 'spinning' : ''}">
-              <img src={tracks[currentIndex]?.cover || '/music/default-cover.svg'} alt="" class="vinyl-img" />
-              <div class="vinyl-groove"></div>
-              <div class="vinyl-center"></div>
-            </div>
-            <!-- 音符粒子动画 -->
-            {#if playing}
-              <div class="music-notes">
-                <span class="note note-1">♫</span>
-                <span class="note note-2">♪</span>
-                <span class="note note-3">♩</span>
-              </div>
-            {/if}
-            <div class="disk-shadow-glow" style="background-image: url({tracks[currentIndex]?.cover || '/music/default-cover.svg'})"></div>
-          </div>
+        <!-- Volume slider (row 6, full width) -->
+        <div class="vol-row">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            oninput={handleVolumeChange}
+            class="vol-input"
+            style="background: linear-gradient(90deg, var(--blog-color-primary) {volume * 100}%, var(--blog-color-surface-variant) {volume * 100}%)"
+            aria-label={dict.volume}
+          />
         </div>
 
-        <!-- 播放器脚部与详细控制 -->
-        <div class="card-footer">
-          <!-- 歌名与作者 -->
-          <div class="track-details">
-            <div class="title-scroller" bind:this={containerElement}>
-              <span class="title-text" bind:this={titleElement} style="transform: translateX(-{offset}px)">
-                {tracks[currentIndex]?.name || dict.unknownTrack}
-              </span>
-            </div>
-            <span class="artist-text">{tracks[currentIndex]?.artist || dict.unknownArtist}</span>
-          </div>
-
-          <!-- 错误或警告通知条 -->
-          {#if error}
-            <div class="playback-error-banner">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              <span>{error}</span>
-            </div>
-          {/if}
-
-          <!-- 进度条及数字时间 -->
-          <div class="progress-section">
-            <div 
-              class="progress-bar-container" 
-              onclick={seekByClick}
-              onkeydown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  // 键盘事件占位，防止无障碍性检查警告，主要通过点击触发
-                }
-              }}
-              role="button"
-              tabindex="0"
-            >
-              <div class="progress-bar-track">
-                <div class="progress-buffered" style="transform: scaleX({buffered || 0})"></div>
-                <div class="progress-filled" style="transform: scaleX({(current / duration) || 0})"></div>
-                {#if buffering}
-                  <div class="progress-bar-scan"></div>
-                {/if}
-              </div>
-            </div>
-            <div class="time-display">
-              <span>{formatTime(current)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
-
-          <!-- 核心控制面板（上首、播放、下首、音量、列表） -->
-          <div class="player-controls">
-            <!-- 列表图标 -->
-            <button class="icon-btn {playlistOpen ? 'is-active' : ''}" onclick={() => playlistOpen = !playlistOpen} aria-label={dict.playlist}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
-                <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-              </svg>
-            </button>
-
-            <!-- 按钮组 -->
-            <div class="playback-buttons">
-              <button class="control-btn prev" onclick={prev} aria-label={dict.prev}>
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-              </button>
-              <button class="control-btn play-pause" onclick={togglePlay} aria-label={playing ? dict.pause : dict.play}>
-                {#if playing}
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                {:else}
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                {/if}
-              </button>
-              <button class="control-btn next" onclick={next} aria-label={dict.next}>
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-              </button>
-            </div>
-
-            <!-- 静音/音量 -->
-            <button class="icon-btn" onclick={toggleMute} aria-label={muted ? dict.unmute : dict.mute}>
-              {#if muted || volume === 0}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
-                </svg>
-              {:else if volume < 0.5}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                </svg>
-              {:else}
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                </svg>
-              {/if}
-            </button>
-          </div>
-
-          <!-- 音量控制轨道 -->
-          <div class="volume-slider-bar">
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              oninput={handleVolumeChange}
-              class="volume-slider-input"
-              style="background: linear-gradient(90deg, var(--blog-color-primary) {volume * 100}%, var(--blog-color-surface-variant) {volume * 100}%)"
-              aria-label={dict.volume}
-            />
-          </div>
-        </div>
-
-        <!-- 歌单列表抽屉 overlay -->
+        <!-- Playlist drawer (slides up from bottom of card) -->
         {#if playlistOpen}
-          <div class="playlist-drawer" transition:slide={{ duration: 250 }}>
-            <div class="drawer-header">
+          <div class="drawer" transition:slide={{ duration: 250 }}>
+            <div class="drawer-head">
               <span>{dict.playlist} ({tracks.length})</span>
-              <button class="drawer-close" onclick={() => playlistOpen = false}>✕</button>
+              <button class="drawer-close" onclick={() => { playlistOpen = false; }}>✕</button>
             </div>
-            <div class="drawer-items">
+            <div class="drawer-list">
               {#each tracks as t, idx}
-                <div 
-                  class="drawer-row {idx === currentIndex ? 'is-active' : ''}" 
+                <div
+                  class="drawer-row {idx === currentIndex ? 'active' : ''}"
                   onclick={() => selectTrack(idx)}
-                  onkeydown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      selectTrack(idx);
-                    }
-                  }}
+                  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') selectTrack(idx); }}
                   role="button"
                   tabindex="0"
                 >
-                  <img class="drawer-row-cover" src={t.cover || '/music/default-cover.svg'} alt="" />
-                  <div class="drawer-row-content">
-                    <span class="drawer-row-title">{t.name}</span>
-                    <span class="drawer-row-artist">{t.artist || dict.unknown}</span>
+                  <img class="drawer-cover" src={t.cover || '/music/default-cover.svg'} alt="" />
+                  <div class="drawer-meta">
+                    <span class="drawer-title">{t.name}</span>
+                    <span class="drawer-artist">{t.artist || dict.unknown}</span>
                   </div>
                   {#if idx === currentIndex && playing}
-                    <div class="sound-wave-bars">
-                      <span class="wave-bar wave-bar-1"></span>
-                      <span class="wave-bar wave-bar-2"></span>
-                      <span class="wave-bar wave-bar-3"></span>
+                    <div class="wave-bars">
+                      <span class="wave wave-1"></span>
+                      <span class="wave wave-2"></span>
+                      <span class="wave wave-3"></span>
                     </div>
                   {/if}
                 </div>
@@ -621,29 +767,72 @@
             </div>
           </div>
         {/if}
+
       </div>
     {/if}
-    
+
   </div>
 {/if}
 
+
 <style>
-  /* ════════════════════════════════════════════
-     整体容器布局（毛玻璃玻璃态）
-     ════════════════════════════════════════════ */
+  /* ═══════════════════════════════════════════════════════════
+     DESIGN: Apple Minimal × Material Design 3 Shape System (v2)
+
+     Three-State Model:
+       Capsule → Strip → Card
+       88×40    → 300×44 → 280×auto
+
+     Shape Mapping:
+       M3 Full  (9999px)  → capsule/strip shells, buttons, progress
+       M3 Large (12px)    → cover art (card mode)
+       M3 XS    (4px)     → cover thumbnails (capsule/strip)
+       Player Card (16px) → card shell (--player-card-radius)
+
+     Animation Pipeline:
+       clip-path: inset() round drives shape transitions.
+       Capsule→Strip: pill-to-pill (no visual radius change).
+       Strip→Card: pill-to-rect (clip-path interpolates smoothly).
+
+     Token Source:
+       --player-capsule-radius  = 20px (height/2)
+       --player-strip-radius    = 22px (height/2)
+       --player-card-radius     = 16px (--blog-radius-lg)
+       --player-strip-width     = 300px
+       --player-card-width      = 280px
+  ═══════════════════════════════════════════════════════════ */
+
+  /* ── Container Base: Glass Morphism ── */
   .player-container {
-    width: 100%;
+    --_size-dur: 280ms; /* default: snappy for capsule↔strip */
     box-sizing: border-box;
     background: var(--blog-glass-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: var(--blog-glass-backdrop);
+    -webkit-backdrop-filter: var(--blog-glass-backdrop);
     border: 1px solid var(--blog-glass-border);
-    box-shadow: var(--blog-glass-shadow);
     color: var(--blog-color-on-surface);
-    transition: 
-      all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-      background var(--blog-motion-duration-normal) var(--blog-motion-easing-standard);
     overflow: hidden;
+
+    /* ── Transition pipeline (direction-aware via --_size-dur) ──
+       Height is NOT listed here — WAAPI handles it in JS because
+       CSS transition cannot interpolate fixed px ↔ auto.
+
+       --_size-dur is set per-transition by goStrip/goCard/goCapsule:
+         capsule→strip:  280ms  (snappy pill stretch)
+         strip→card:    500ms  (deliberate expansion, decelerate landing)
+         any→capsule:    250ms  (quick dismissal)
+    */
+    transition:
+      /* Shape: 350ms emphasized — always settles before size */
+      clip-path var(--blog-motion-duration-slow) var(--blog-motion-easing-emphasized),
+      /* Size: direction-aware duration, decelerate for smooth arrival */
+      width var(--_size-dur) var(--blog-motion-easing-decelerate),
+      /* Padding: match size duration */
+      padding var(--_size-dur) var(--blog-motion-easing-decelerate),
+      /* Surface: glass glow */
+      box-shadow var(--_size-dur) var(--blog-motion-easing-standard),
+      background var(--blog-motion-duration-normal) var(--blog-motion-easing-standard),
+      border-color var(--blog-motion-duration-normal) var(--blog-motion-easing-standard);
   }
 
   .player-container:hover {
@@ -651,404 +840,336 @@
     border-color: var(--blog-glass-border-hover);
   }
 
-  /* 状态容器 */
+  /* Loading state (capsule-sized pill) */
   .loading-state {
     padding: var(--blog-space-4);
-    border-radius: var(--blog-shape-medium);
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  /* 1. 极简胶囊态 */
+
+  /* ══════════════════════════════════════════════════
+     MODE: CAPSULE — 88×40 pill
+     ══════════════════════════════════════════════════ */
   .is-capsule {
-    border-radius: 40px;
-    padding: 6px;
-    width: 106px;
-    height: 52px;
+    --player-radius: var(--player-capsule-radius); /* 20px */
+    width: 88px;
+    height: var(--layout-capsule-height); /* 40px */
+    padding: var(--blog-space-1); /* 4px */
     cursor: pointer;
+    clip-path: inset(0 round var(--player-radius));
+    border-radius: var(--player-radius); /* fallback */
+    box-shadow: var(--blog-glass-shadow);
   }
 
-  .capsule-layout {
+  .capsule-body {
     display: flex;
     align-items: center;
-    gap: var(--blog-space-2);
+    gap: 6px;
     width: 100%;
     height: 100%;
-    position: relative;
   }
 
-  .capsule-disk-wrapper {
-    position: relative;
-    width: 38px;
-    height: 38px;
-    flex-shrink: 0;
-  }
-
-  .capsule-cover {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--blog-color-primary);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    z-index: 2;
-    position: relative;
-  }
-
-  /* 胶囊微型呼吸光晕 */
-  .capsule-pulse {
-    position: absolute;
-    inset: -2px;
-    border-radius: 50%;
-    background: var(--blog-color-primary);
-    opacity: 0;
-    z-index: 1;
-    transform: scale(1);
-    transition: all 0.3s;
-  }
-
-  .capsule-pulse.is-playing {
-    animation: capsulePulse 2s infinite ease-out;
-  }
-
-  @keyframes capsulePulse {
-    0% {
-      opacity: 0.4;
-      transform: scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(1.28);
-    }
-  }
-
-  .capsule-play-btn {
+  /* M3 Full: cover thumbnail (circle) */
+  .art-thumb {
     width: 32px;
     height: 32px;
+    border-radius: var(--blog-radius-full); /* circle */
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  .art-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Play button + progress ring */
+  .mini-play {
+    position: relative;
+    width: 28px;
+    height: 28px;
     border: none;
-    border-radius: 50%;
-    background: var(--blog-color-primary);
-    color: var(--blog-color-on-primary);
+    border-radius: var(--blog-radius-full); /* M3 Full */
+    background: color-mix(in srgb, var(--blog-color-primary) 12%, transparent);
+    color: var(--blog-color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: 0;
   }
 
-  .capsule-play-btn:hover {
-    transform: scale(1.08);
-    background: var(--blog-color-primary-hover);
+  .mini-play:hover {
+    background: color-mix(in srgb, var(--blog-color-primary) 22%, transparent);
+    transform: scale(1.06);
   }
 
-  .capsule-play-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  /* 2. 展开卡片态 */
-  .is-expanded {
-    border-radius: var(--blog-shape-medium);
-    padding: var(--blog-space-3);
-    width: 100%;
-  }
-
-  .card-layout {
-    display: flex;
-    flex-direction: column;
+  .mini-play svg:not(.progress-ring) {
+    width: 11px;
+    height: 11px;
     position: relative;
+    z-index: 1;
+  }
+
+  /* M3 Full: micro progress ring inside capsule */
+  .progress-ring {
+    position: absolute;
+    inset: 0;
+    width: 28px;
+    height: 28px;
+    transform: rotate(-90deg);
+    pointer-events: none;
+  }
+
+  .progress-ring circle {
+    fill: none;
+    stroke: var(--blog-color-primary);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+
+  /* ══════════════════════════════════════════════════
+     MODE: STRIP — 300×44 pill quick-control bar
+     ══════════════════════════════════════════════════ */
+  .is-strip {
+    --player-radius: var(--player-strip-radius); /* 22px */
+    width: var(--player-strip-width); /* 300px */
+    max-width: calc(100vw - var(--layout-edge-margin) * 2);
+    height: var(--layout-bar-height); /* 44px */
+    padding-inline: var(--blog-space-2); /* 8px */
+    padding-block: var(--blog-space-1);  /* 4px */
+    clip-path: inset(0 round var(--player-radius));
+    border-radius: var(--player-radius); /* fallback */
+    box-shadow: var(--blog-elevation-3);
+  }
+
+  .strip-body {
+    display: flex;
+    align-items: center;
+    gap: var(--blog-space-2); /* 8px */
     width: 100%;
+    height: 100%;
   }
 
-  /* 顶部控制头 */
-  .card-header {
+  /* M3 Full: strip cover thumbnail (circle) */
+  .art-strip {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--blog-radius-full); /* circle */
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: transform 0.15s ease;
+  }
+
+  .art-strip:hover {
+    transform: scale(1.06);
+  }
+
+  .art-strip img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Track info: single-line truncation */
+  .track-info {
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .info-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--blog-color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    letter-spacing: -0.01em;
+  }
+
+  .info-sep {
+    font-weight: 400;
+    opacity: 0.5;
+  }
+
+  /* Strip transport controls */
+  .strip-ctrls {
+    flex-shrink: 0;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--blog-space-3);
+    gap: var(--blog-space-1); /* 4px — tighter in strip */
   }
 
-  .header-logo-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .pulse-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--blog-color-text-secondary);
-  }
-
-  .pulse-dot.is-active {
-    background: var(--blog-color-primary);
-    animation: activeDot 1.5s infinite alternate;
-  }
-
-  @keyframes activeDot {
-    0% { transform: scale(1); opacity: 0.6; }
-    100% { transform: scale(1.4); opacity: 1; }
-  }
-
-  .card-header-tag {
-    font-size: 0.625rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    color: var(--blog-color-text-secondary);
-  }
-
-  .card-close-btn {
+  .ctrl-btn {
     background: none;
     border: none;
-    cursor: pointer;
     color: var(--blog-color-text-secondary);
-    padding: 2px;
-    border-radius: 50%;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: var(--blog-radius-full); /* M3 Full */
     transition: all 0.2s;
+    padding: 0;
   }
 
-  .card-close-btn:hover {
+  .ctrl-btn:hover {
     background: var(--blog-color-surface-variant);
     color: var(--blog-color-text-primary);
   }
 
-  .card-close-btn svg {
-    width: 18px;
-    height: 18px;
+  .ctrl-btn svg {
+    width: 14px;
+    height: 14px;
   }
 
-  /* 卡片唱片中部 */
+  .ctrl-btn--primary {
+    background: color-mix(in srgb, var(--blog-color-primary) 12%, transparent);
+    color: var(--blog-color-primary);
+  }
+
+  .ctrl-btn--primary:hover {
+    background: color-mix(in srgb, var(--blog-color-primary) 22%, transparent);
+    transform: scale(1.06);
+  }
+
+
+  /* ══════════════════════════════════════════════════
+     MODE: CARD — 280px rounded-rect expanded player
+     Grid layout: cover | title / artist / progress / controls
+     ══════════════════════════════════════════════════ */
+  .is-card {
+    --player-radius: var(--player-card-radius); /* 16px */
+    width: var(--player-card-width); /* 280px */
+    max-width: calc(100vw - var(--layout-edge-margin) * 2);
+    padding: var(--blog-space-2); /* 8px */
+    /* height intentionally omitted: auto by default, animated via WAAPI
+       in goCard() to avoid CSS transition's inability to lerp px↔auto. */
+    clip-path: inset(0 round var(--player-radius));
+    border-radius: var(--player-radius); /* fallback */
+    box-shadow: var(--blog-elevation-4);
+  }
+
   .card-body {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    grid-template-rows: auto auto;
+    gap: var(--blog-space-1-5); /* 6px */
     align-items: center;
-    margin-bottom: var(--blog-space-3);
-  }
-
-  .disk-glow-container {
     position: relative;
-    width: 110px;
-    height: 110px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
-  /* 3D黑胶唱片设计 */
-  .vinyl-disk {
+  /* When playlist drawer is open, expand to accommodate it */
+  .card-body.has-drawer {
+    grid-template-rows: auto auto;
+    padding-bottom: 210px; /* space for drawer overlay */
+  }
+
+  /* M3 Large: cover art (rounded square, spanning left column) */
+  .art-card {
+    grid-column: 1;
+    grid-row: 1 / 3; /* span title + artist rows */
+    width: 56px;
+    height: 56px;
+    border-radius: var(--blog-radius-md); /* 12px */
+    overflow: hidden;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .art-card img {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-    position: relative;
-    background: #111;
-    border: 3px solid #222;
-    box-shadow: 
-      0 10px 25px rgba(0,0,0,0.3),
-      inset 0 0 10px rgba(255,255,255,0.05);
-    overflow: hidden;
-    z-index: 3;
-  }
-
-  .vinyl-img {
-    width: 66%;
-    height: 66%;
-    border-radius: 50%;
-    position: absolute;
-    top: 17%;
-    left: 17%;
     object-fit: cover;
-    z-index: 1;
+    display: block;
   }
 
-  .vinyl-groove {
-    position: absolute;
-    inset: 6px;
-    border-radius: 50%;
-    border: 1px double rgba(255, 255, 255, 0.04);
-    background: repeating-radial-gradient(
-      circle,
-      transparent 0,
-      transparent 3px,
-      rgba(255, 255, 255, 0.015) 3px,
-      rgba(255, 255, 255, 0.015) 4px
-    );
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .vinyl-center {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: #fff;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
-    border: 2.5px solid #000;
-    z-index: 3;
-  }
-
-  .spinning {
-    animation: vinylSpin 15s linear infinite;
-  }
-
-  @keyframes vinylSpin {
-    to { transform: rotate(360deg); }
-  }
-
-  /* 炫酷自适应发光背影 */
-  .disk-shadow-glow {
-    position: absolute;
-    inset: 12px;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-    filter: blur(18px);
-    opacity: 0.58;
-    z-index: 1;
-    transition: all 0.3s;
-  }
-
-  .spinning ~ .disk-shadow-glow {
-    transform: rotate(360deg);
-    animation: glowPulse 4s infinite alternate;
-  }
-
-  @keyframes glowPulse {
-    0% { transform: rotate(0deg) scale(0.95); opacity: 0.52; }
-    100% { transform: rotate(360deg) scale(1.08); opacity: 0.68; }
-  }
-
-  /* 音符粒子特效 */
-  .music-notes {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 5;
-  }
-
-  .note {
-    position: absolute;
-    font-size: 1rem;
-    color: var(--blog-color-primary);
-    opacity: 0;
-    transform: scale(0.6);
-  }
-
-  .note-1 {
-    top: 10%;
-    left: -10px;
-    animation: floatNote 3.5s infinite linear;
-  }
-
-  .note-2 {
-    top: 40%;
-    right: -12px;
-    animation: floatNote 4s infinite linear 1s;
-  }
-
-  .note-3 {
-    bottom: 5%;
-    left: 20%;
-    animation: floatNote 3.8s infinite linear 2s;
-  }
-
-  @keyframes floatNote {
-    0% {
-      opacity: 0;
-      transform: translateY(20px) rotate(0deg) scale(0.6);
-    }
-    15% {
-      opacity: 0.75;
-    }
-    85% {
-      opacity: 0.75;
-    }
-    100% {
-      opacity: 0;
-      transform: translateY(-50px) rotate(45deg) scale(1.1);
-    }
-  }
-
-  /* 底部播放详情 */
-  .card-footer {
-    display: flex;
-    flex-direction: column;
-    gap: var(--blog-space-2);
-  }
-
-  .track-details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    text-align: center;
-    margin-bottom: 2px;
-  }
-
-  .title-scroller {
+  /* Card title with marquee scroll support */
+  .card-title-wrap {
+    grid-column: 2;
+    grid-row: 1;
     overflow: hidden;
-    width: 100%;
     height: 18px;
     display: flex;
-    justify-content: center;
+    align-items: center;
   }
 
-  .title-text {
+  .card-title {
     display: inline-block;
     white-space: nowrap;
-    font-size: var(--blog-typescale-label-medium-size);
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--blog-color-text-primary);
+    letter-spacing: -0.01em;
     transition: transform 0.08s linear;
   }
 
-  .artist-text {
-    font-size: var(--blog-typescale-label-small-size);
+  /* Card artist */
+  .card-artist {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 12px;
     color: var(--blog-color-text-secondary);
+    font-weight: 400;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  /* 报错面板条 */
-  .playback-error-banner {
+  /* Error bar (M3 Small) — spans full width */
+  .error-bar {
+    grid-column: 1 / -1;
     display: flex;
     align-items: center;
     gap: 6px;
     background: var(--blog-color-error-container);
     color: var(--blog-color-on-error-container);
     padding: 6px 10px;
-    border-radius: var(--blog-shape-small);
-    font-size: 0.6875rem;
-    animation: shakeErr 0.4s ease;
+    border-radius: var(--blog-radius-sm); /* 8px */
+    font-size: 11px;
+    animation: shake 0.4s ease;
   }
 
-  .playback-error-banner svg {
+  .error-bar svg {
     width: 14px;
     height: 14px;
     flex-shrink: 0;
   }
 
-  @keyframes shakeErr {
+  @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
   }
 
-  /* 进度条板块 */
-  .progress-section {
+  /* ── M3 Full: Progress Bar ── spans full width */
+  .progress-row {
+    grid-column: 1 / -1;
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
-  .progress-bar-container {
+  .progress-track {
     position: relative;
     width: 100%;
     height: 14px;
@@ -1057,307 +1178,329 @@
     cursor: pointer;
   }
 
-  .progress-bar-track {
-    position: relative;
-    width: 100%;
+  .progress-track::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
     height: 3px;
     background: var(--blog-color-surface-variant);
-    border-radius: 2px;
-    overflow: hidden;
+    border-radius: var(--blog-radius-full); /* M3 Full */
     transition: height 0.15s ease;
   }
 
-  .progress-bar-container:hover .progress-bar-track {
+  .progress-track:hover::before {
     height: 5px;
   }
 
-  .progress-buffered {
+  .progress-buffer {
     position: absolute;
-    inset: 0;
-    background: color-mix(in srgb, var(--blog-color-surface-variant) 45%, var(--blog-color-primary));
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: color-mix(in srgb, var(--blog-color-primary) 25%, var(--blog-color-surface-variant));
+    border-radius: var(--blog-radius-full);
     transform-origin: left;
+    pointer-events: none;
+    transition: height 0.15s ease;
   }
 
-  .progress-filled {
+  .progress-track:hover .progress-buffer {
+    height: 5px;
+  }
+
+  .progress-fill {
     position: absolute;
-    inset: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
     background: var(--blog-color-primary);
+    border-radius: var(--blog-radius-full);
     transform-origin: left;
+    pointer-events: none;
+    transition: height 0.15s ease;
   }
 
-  /* 进度条前导亮斑 */
-  .progress-filled::after {
+  .progress-track:hover .progress-fill {
+    height: 5px;
+  }
+
+  /* Progress leading dot */
+  .progress-fill::after {
     content: '';
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 8px;
-    height: 100%;
-    background: #fff;
-    opacity: 0.4;
-    filter: blur(1px);
+    top: -1px;
+    right: -2px;
+    width: 5px;
+    height: 5px;
+    background: var(--blog-color-primary);
+    border-radius: var(--blog-radius-full);
+    box-shadow: 0 0 4px color-mix(in srgb, var(--blog-color-primary) 40%, transparent);
+    opacity: 0;
+    transition: opacity 0.15s;
   }
 
-  .progress-bar-scan {
+  .progress-track:hover .progress-fill::after {
+    opacity: 1;
+  }
+
+  /* Buffering scan animation */
+  .progress-scan {
     position: absolute;
-    inset: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255,255,255,0.25) 50%,
+      rgba(255, 255, 255, 0.2) 50%,
       transparent 100%
     );
-    animation: progressScan 1.8s infinite ease-in-out;
+    border-radius: var(--blog-radius-full);
+    animation: scan 1.8s infinite ease-in-out;
+    pointer-events: none;
   }
 
-  @keyframes progressScan {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+  @keyframes scan {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
   }
 
-  .time-display {
+  .time-row {
     display: flex;
     justify-content: space-between;
-    font-size: 0.625rem;
-    color: var(--blog-color-text-secondary);
+    font-size: 10px;
+    color: var(--blog-color-text-tertiary);
     font-variant-numeric: tabular-nums;
+    font-weight: 500;
   }
 
-  /* 核心播放控制器 */
-  .player-controls {
+  /* ── M3 Full: Transport Controls ── spans full width */
+  .ctrl-group {
+    grid-column: 1 / -1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 2px;
-    margin-bottom: 2px;
   }
 
-  .icon-btn {
+  .transport {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Icon button (reused from strip, with card-specific sizing) */
+  .ctrl-icon {
     background: none;
     border: none;
     color: var(--blog-color-text-secondary);
     cursor: pointer;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.2s;
-  }
-
-  .icon-btn:hover {
-    background: var(--blog-color-surface-variant);
-    color: var(--blog-color-text-primary);
-  }
-
-  .icon-btn.is-active {
-    color: var(--blog-color-primary);
-    background: var(--blog-color-primary-container);
-  }
-
-  .icon-btn svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  .playback-buttons {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .control-btn {
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .control-btn.prev,
-  .control-btn.next {
-    background: none;
     width: 32px;
     height: 32px;
-    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--blog-radius-full); /* M3 Full */
+    transition: all 0.2s;
+    padding: 0;
+  }
+
+  .ctrl-icon:hover {
+    background: var(--blog-color-surface-variant);
     color: var(--blog-color-text-primary);
   }
 
-  .control-btn.prev:hover,
-  .control-btn.next:hover {
-    background: var(--blog-color-surface-variant);
+  .ctrl-icon.active {
+    color: var(--blog-color-primary);
+    background: color-mix(in srgb, var(--blog-color-primary) 10%, transparent);
   }
 
-  .control-btn.prev svg,
-  .control-btn.next svg {
-    width: 15px;
-    height: 15px;
+  .ctrl-icon svg {
+    width: 16px;
+    height: 16px;
   }
 
-  .control-btn.play-pause {
+  /* Primary play button (M3 Full, elevated) */
+  .ctrl-play {
     background: var(--blog-color-primary);
     color: var(--blog-color-on-primary);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(var(--blog-ref-primary-h), 50%, 30%, 0.2);
-  }
-
-  .control-btn.play-pause:hover {
-    transform: scale(1.08);
-    background: var(--blog-color-primary-hover);
-  }
-
-  .control-btn.play-pause:active {
-    transform: scale(0.95);
-  }
-
-  .control-btn.play-pause svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  /* 音量调节滑块 */
-  .volume-slider-bar {
-    width: 100%;
-    padding: 0 4px;
-    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--blog-radius-full);
+    border: none;
     display: flex;
     align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    box-shadow:
+      0 4px 12px color-mix(in srgb, var(--blog-color-primary) 25%, transparent);
+    padding: 0;
   }
 
-  .volume-slider-input {
+  .ctrl-play:hover {
+    transform: scale(1.06);
+    box-shadow:
+      0 6px 18px color-mix(in srgb, var(--blog-color-primary) 35%, transparent);
+  }
+
+  .ctrl-play:active {
+    transform: scale(0.96);
+  }
+
+  .ctrl-play svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* ── Volume Slider ── spans full width */
+  .vol-row {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    padding: 0 2px;
+  }
+
+  .vol-input {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 4px;
-    border-radius: 2px;
+    height: 3px;
+    border-radius: var(--blog-radius-full);
     outline: none;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: height 0.15s;
   }
 
-  .volume-slider-input::-webkit-slider-runnable-track {
-    width: 100%;
+  .vol-input:hover {
     height: 4px;
+  }
+
+  .vol-input::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 100%;
     background: transparent;
   }
 
-  .volume-slider-input::-webkit-slider-thumb {
+  .vol-input::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 10px;
     height: 10px;
-    border-radius: 50%;
+    border-radius: var(--blog-radius-full);
     background: var(--blog-color-primary);
     border: 2px solid var(--blog-color-surface);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
-    margin-top: -3px;
-    transition: transform 0.1s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    margin-top: -3.5px;
+    transition: transform 0.15s;
   }
 
-  .volume-slider-input:hover::-webkit-slider-thumb {
-    transform: scale(1.25);
+  .vol-input:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
   }
 
-  /* 3. 歌单抽屉设计 */
-  .playlist-drawer {
+
+  /* ══════════════════════════════════════════════════
+     PLAYLIST DRAWER — slides up from bottom of card
+     M3 Large (top radius) + Small (row items)
+     ══════════════════════════════════════════════════ */
+  .drawer {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 240px;
+    height: 200px;
     background: var(--blog-color-surface);
-    border-top: 1px solid var(--blog-color-border);
-    border-radius: var(--blog-shape-medium) var(--blog-shape-medium) 0 0;
+    border-top: 1px solid var(--blog-color-divider);
+    border-radius: var(--blog-radius-md) var(--blog-radius-md) 0 0; /* M3 Large top */
     z-index: 10;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 -8px 24px rgba(0,0,0,0.12);
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.08);
     overflow: hidden;
   }
 
-  .drawer-header {
+  .drawer-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-bottom: 1px solid var(--blog-color-divider);
     flex-shrink: 0;
   }
 
-  .drawer-header span {
-    font-size: 0.6875rem;
+  .drawer-head span {
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 1px;
     color: var(--blog-color-text-secondary);
+    text-transform: uppercase;
   }
 
   .drawer-close {
     background: none;
     border: none;
-    font-size: 0.8125rem;
-    color: var(--blog-color-text-secondary);
+    font-size: 13px;
+    color: var(--blog-color-text-tertiary);
     cursor: pointer;
     padding: 2px 6px;
+    border-radius: var(--blog-radius-full);
+    transition: all 0.15s;
   }
 
   .drawer-close:hover {
     color: var(--blog-color-text-primary);
+    background: var(--blog-color-surface-variant);
   }
 
-  .drawer-items {
+  .drawer-list {
     flex: 1;
     overflow-y: auto;
-    padding: var(--blog-space-1) 0;
+    padding: 4px 0;
   }
 
-  /* 自定义抽屉内滚动条 */
-  .drawer-items::-webkit-scrollbar {
-    width: 4px;
+  .drawer-list::-webkit-scrollbar {
+    width: 3px;
   }
 
-  .drawer-items::-webkit-scrollbar-track {
+  .drawer-list::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  .drawer-items::-webkit-scrollbar-thumb {
+  .drawer-list::-webkit-scrollbar-thumb {
     background: var(--blog-color-border);
-    border-radius: 2px;
+    border-radius: var(--blog-radius-full);
   }
 
-  .drawer-items::-webkit-scrollbar-thumb:hover {
-    background: var(--blog-color-outline-variant);
-  }
-
+  /* M3 Small: playlist row items */
   .drawer-row {
     display: flex;
     align-items: center;
-    padding: 8px 14px;
-    gap: var(--blog-space-2);
+    padding: 6px 12px;
+    gap: 8px;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: background 0.12s;
+    margin: 0 4px;
+    border-radius: var(--blog-radius-sm); /* 8px */
   }
 
   .drawer-row:hover {
     background: var(--blog-color-surface-variant);
   }
 
-  .drawer-row.is-active {
-    background: color-mix(in srgb, var(--blog-color-primary) 8%, var(--blog-color-surface));
+  .drawer-row.active {
+    background: color-mix(in srgb, var(--blog-color-primary) 8%, transparent);
   }
 
-  .drawer-row-cover {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--blog-shape-small);
+  .drawer-cover {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--blog-radius-xs); /* 4px */
     object-fit: cover;
     flex-shrink: 0;
   }
 
-  .drawer-row-content {
+  .drawer-meta {
     flex: 1;
     min-width: 0;
     display: flex;
@@ -1365,57 +1508,59 @@
     gap: 1px;
   }
 
-  .drawer-row-title {
-    font-size: 0.75rem;
-    font-weight: 600;
+  .drawer-title {
+    font-size: 12px;
+    font-weight: 500;
     color: var(--blog-color-text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .drawer-row-artist {
-    font-size: 0.625rem;
+  .drawer-artist {
+    font-size: 10px;
     color: var(--blog-color-text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  /* 音频跳动跳线条特效 */
-  .sound-wave-bars {
+  /* Audio waveform indicator */
+  .wave-bars {
     display: flex;
     align-items: flex-end;
-    gap: 2.5px;
+    gap: 2px;
     height: 12px;
-    width: 14px;
+    width: 12px;
     flex-shrink: 0;
   }
 
-  .wave-bar {
-    width: 2.5px;
+  .wave {
+    width: 2px;
     background: var(--blog-color-primary);
     border-radius: 1px;
   }
 
-  .wave-bar-1 { height: 100%; animation: waveUp 0.8s infinite alternate ease-in-out; }
-  .wave-bar-2 { height: 60%; animation: waveUp 0.6s infinite alternate ease-in-out 0.2s; }
-  .wave-bar-3 { height: 80%; animation: waveUp 0.9s infinite alternate ease-in-out 0.1s; }
+  .wave-1 { height: 100%; animation: wave-up 0.8s infinite alternate ease-in-out; }
+  .wave-2 { height: 55%; animation: wave-up 0.6s infinite alternate ease-in-out 0.2s; }
+  .wave-3 { height: 78%; animation: wave-up 0.9s infinite alternate ease-in-out 0.1s; }
 
-  @keyframes waveUp {
-    0% { height: 15%; }
-    100% { height: 100%; }
+  @keyframes wave-up {
+    from { height: 15%; }
+    to   { height: 100%; }
   }
 
-  /* ════════════════════════════════════════════
-     Astro 加载条实现
-     ════════════════════════════════════════════ */
+
+  /* ══════════════════════════════════════════════════
+     LOADING PROGRESS BAR (Material Design Indeterminate)
+     ══════════════════════════════════════════════════ */
   .md-progress {
     position: relative;
     width: 100%;
     height: 3px;
     overflow: hidden;
     background: var(--blog-color-surface-variant);
+    border-radius: var(--blog-radius-full);
   }
 
   .md-progress__primary,
@@ -1450,6 +1595,7 @@
     width: 100%;
     height: 100%;
     background: var(--blog-color-primary);
+    border-radius: var(--blog-radius-full);
   }
 
   @keyframes md-primary-translate {
@@ -1469,7 +1615,7 @@
   @keyframes md-secondary-translate {
     0% { animation-timing-function: cubic-bezier(0.15, 0, 0.515058, 0.409685); transform: translateX(0); }
     25% { animation-timing-function: cubic-bezier(0.31033, 0.284058, 0.8, 0.733712); transform: translateX(37.651913%); }
-    48.35% { animation-timing-function: cubic-bezier(0.4, 0.627035, 0.6, 0.902026); transform: translateX(84.386165%); }
+    48.35% { animation-timing-function: cubic-bezier(0.4, 0, 0.627035, 0.6, 0.902026); transform: translateX(84.386165%); }
     100% { transform: translateX(160.277782%); }
   }
 
@@ -1478,5 +1624,55 @@
     19.15% { animation-timing-function: cubic-bezier(0.152313, 0.196432, 0.648374, 1.004315); transform: scaleX(0.457104); }
     44.15% { animation-timing-function: cubic-bezier(0.257759, -0.003163, 0.211762, 1.38179); transform: scaleX(0.72796); }
     100% { transform: scaleX(0.08); }
+  }
+
+
+  /* ══════════════════════════════════════════════════
+     DEGRADATION & ACCESSIBILITY
+     ══════════════════════════════════════════════════ */
+
+  /* Small screens: adaptive width for strip and card */
+  @media (max-width: 380px) {
+    .is-strip {
+      width: calc(100vw - var(--layout-edge-margin) * 2);
+    }
+    .is-card {
+      width: calc(100vw - var(--layout-edge-margin) * 2);
+    }
+  }
+
+  /* Fallback for browsers without clip-path: inset() round support */
+  @supports not (clip-path: inset(0 round 0px)) {
+    .player-container {
+      transition:
+        width var(--blog-motion-duration-slow) var(--blog-motion-spring-default),
+        height var(--blog-motion-duration-slow) var(--blog-motion-spring-default),
+        border-radius var(--blog-motion-duration-slow) var(--blog-motion-easing-emphasized),
+        background var(--blog-motion-duration-normal) var(--blog-motion-easing-standard),
+        box-shadow var(--blog-motion-duration-slow) var(--blog-motion-easing-standard);
+    }
+  }
+
+  /* Reduced motion: instant state switches, no animation */
+  @media (prefers-reduced-motion: reduce) {
+    .player-container {
+      transition: none !important;
+      clip-path: none !important;
+    }
+
+    .progress-ring circle,
+    .progress-fill,
+    .progress-buffer,
+    .progress-track::before {
+      transition: none !important;
+    }
+
+    .progress-scan {
+      animation: none !important;
+    }
+
+    .wave {
+      animation: none !important;
+    }
   }
 </style>

@@ -20,6 +20,9 @@ html {
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
+  /* 关键：html 背景必须与 body 保持一致，否则画布底色会出现断层 */
+  background-color: var(--blog-color-background);
+  color-scheme: light dark;
 }
 
 body {

@@ -161,9 +161,9 @@ const {
       /* Scroll to Top container styling */
       .scroll-to-top-container {
         position: fixed;
-        bottom: 24px;
-        right: 24px;
-        z-index: 1010; /* Guaranteed to be on top of other floating widgets */
+        bottom: var(--layout-bottom-gutter);
+        right: var(--layout-edge-margin);
+        z-index: var(--layout-z-fab); /* Guaranteed to be on top of other floating widgets */
         opacity: 0;
         transform: scale(0) translateY(12px);
         transition:
@@ -172,6 +172,7 @@ const {
           transform var(--blog-motion-duration-normal, 250ms)
             var(--blog-motion-easing-emphasized);
         pointer-events: none;
+        display: flex;
       }
 
       .scroll-to-top-container.visible {
@@ -180,31 +181,37 @@ const {
         pointer-events: auto;
       }
 
-      /* 音乐播放器容器 */
+      /* 音乐播放器容器 — 三态模型 (capsule → strip → card) */
       .music-player-container {
         position: fixed;
-        bottom: 24px;
-        left: 24px;
-        z-index: 90;
-        width: 320px;
-        max-width: calc(100vw - 48px);
+        bottom: var(--layout-bottom-gutter);
+        left: var(--layout-edge-margin);
+        z-index: var(--layout-z-player);
+        /* No fixed width: let the player determine its own width per mode */
+        max-width: calc(100vw - var(--layout-edge-margin) * 2);
         overflow: visible;
-        pointer-events: none; /* Let clicks pass through empty space around player capsule */
+        pointer-events: none; /* Let clicks pass through empty space around player */
         transition:
           transform var(--blog-motion-duration-normal)
             var(--blog-motion-easing-emphasized),
           opacity var(--blog-motion-duration-normal)
             var(--blog-motion-easing-standard);
+        display: flex;
       }
 
-      /* 当播放器处于胶囊状态时，让容器自动收缩，防止阻挡左下角点击 */
+      .music-player-container > :global(*) {
+        display: block;
+      }
+
+      /* Capsule mode: shrink container to auto width to avoid blocking bottom-left clicks */
       .music-player-container:has(.is-capsule) {
         width: auto;
       }
 
-      /* 当播放器处于展开状态时，提升层级确保完全覆盖底部导航和回到顶部按钮 */
-      .music-player-container:has(.is-expanded) {
-        z-index: 2000;
+      /* Strip & Card expanded modes: elevate z-index above nav and FAB */
+      .music-player-container:has(.is-strip),
+      .music-player-container:has(.is-card) {
+        z-index: var(--layout-z-player-expanded);
       }
 
       /* Re-enable pointer events on the actual player element */
@@ -212,25 +219,18 @@ const {
         pointer-events: auto;
       }
 
-      /* 移动端适配 */
+      /* Mobile adaptation */
       @media (max-width: 768px) {
         .music-player-container {
-          bottom: 16px;
-          right: auto; /* Shrink to content width on mobile when in capsule mode */
-          left: 16px;
+          right: auto;
           width: auto;
           max-width: none;
         }
 
-        /* Span fully across the bottom only when the player card is expanded */
-        .music-player-container:has(.is-expanded) {
-          right: 16px;
-        }
-
-        /* Adjust back-to-top container to align perfect horizontal centers (Center = 42px) with other bottom capsules */
-        .scroll-to-top-container {
-          bottom: 22px;
-          right: 16px;
+        /* Expanded modes span full bottom width on mobile */
+        .music-player-container:has(.is-strip),
+        .music-player-container:has(.is-card) {
+          right: var(--layout-edge-margin);
         }
       }
     </style>
