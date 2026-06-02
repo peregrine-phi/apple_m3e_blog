@@ -69,6 +69,7 @@ const hasToc = tocItems.length > 0;
     border: 1px solid var(--blog-color-border);
     border-radius: var(--blog-radius-md);
     background: var(--blog-color-surface);
+    transition: var(--blog-transition-color);
   }
 
   .toc-toggle {
@@ -207,6 +208,7 @@ const hasToc = tocItems.length > 0;
       border: var(--blog-space-px) solid var(--blog-glass-border);
       border-radius: var(--blog-radius-full);
       box-shadow: var(--blog-glass-shadow);
+      transition: var(--blog-transition-color);
       margin-bottom: 0;
     }
 
@@ -238,6 +240,7 @@ const hasToc = tocItems.length > 0;
       border-radius: var(--blog-radius-container, 16px);
       box-shadow: var(--blog-glass-shadow);
       padding: var(--blog-space-4) var(--blog-space-5);
+      transition: var(--blog-transition-color);
       z-index: 90;
       display: none; /* toggled via JS */
     }

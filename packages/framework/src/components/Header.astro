@@ -115,6 +115,7 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     -webkit-backdrop-filter: var(--blog-glass-backdrop);
     border: var(--blog-space-px) solid var(--blog-glass-border);
     box-shadow: var(--blog-glass-shadow);
+    transition: var(--blog-transition-color);
   }
 
   .glass-surface-interactive,
@@ -179,7 +180,9 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard);
+    transition: 
+      transform var(--blog-motion-duration-normal, 250ms) var(--blog-motion-easing-standard),
+      background-color var(--blog-motion-duration-fast, 150ms) var(--blog-motion-easing-standard);
   }
 
   .logo-sprout-svg {

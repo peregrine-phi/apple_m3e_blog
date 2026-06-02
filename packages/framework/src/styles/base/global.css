@@ -117,16 +117,19 @@
 .surface {
   background-color: var(--blog-color-surface);
   color: var(--blog-color-on-surface);
+  transition: var(--blog-transition-color);
 }
 
 .surface-variant {
   background-color: var(--blog-color-surface-variant);
   color: var(--blog-color-on-surface-variant);
+  transition: var(--blog-transition-color);
 }
 
 .surface-raised {
   background-color: var(--blog-color-surface-raised);
   color: var(--blog-color-on-surface);
+  transition: var(--blog-transition-color);
 }
 
 
@@ -163,6 +166,7 @@
   letter-spacing: var(--blog-typescale-label-small-tracking);
   background-color: var(--blog-color-primary-container);
   color: var(--blog-color-on-primary-container);
+  transition: var(--blog-transition-color);
 }
 
 /* ── Visually Hidden ── */

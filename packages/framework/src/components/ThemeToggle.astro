@@ -71,8 +71,19 @@ import Icon from "./Icon.astro";
       resolvedTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
     }
     
-    document.documentElement.setAttribute("data-theme", resolvedTheme);
-    document.documentElement.setAttribute("data-theme-mode", mode);
+    // Only flash when the theme actually changes (skip on initial load)
+    const currentTheme = document.documentElement.getAttribute("data-theme");
+    const themeWillChange = resolvedTheme !== currentTheme;
+
+    if (themeWillChange && (window as any).__flashTheme) {
+      (window as any).__flashTheme(resolvedTheme);
+    }
+
+    // Change theme on the next frame — flash is now covering the page
+    requestAnimationFrame(() => {
+      document.documentElement.setAttribute("data-theme", resolvedTheme);
+      document.documentElement.setAttribute("data-theme-mode", mode);
+    });
   }
 
   // Apply theme mode on load to prevent flash

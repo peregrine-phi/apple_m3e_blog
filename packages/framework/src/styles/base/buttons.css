@@ -23,7 +23,8 @@
   text-decoration: none;
   transition:
     box-shadow var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
-    transform var(--blog-motion-duration-normal) var(--blog-motion-easing-emphasized);
+    transform var(--blog-motion-duration-normal) var(--blog-motion-easing-emphasized),
+    var(--blog-transition-color);
   user-select: none;
   position: relative;
 }

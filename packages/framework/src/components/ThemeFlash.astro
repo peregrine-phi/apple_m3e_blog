@@ -1,0 +1,91 @@
+---
+// ThemeFlash.astro — Theme switch light-switch overlay
+// Dark→Light: black flash covers page, holds ~80ms, then dissolves to reveal
+// Light→Dark: white flash covers page, holds ~80ms, then dissolves to reveal
+// Exposes window.__flashTheme(target) for ThemeToggle.astro
+---
+
+<div id="theme-flash" aria-hidden="true"></div>
+
+<style is:global>
+  #theme-flash {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647; /* max safe z-index */
+    pointer-events: none;
+    opacity: 0;
+    will-change: opacity;
+  }
+
+  /* Phase 1: Instant cover — no transition, paint immediately */
+  #theme-flash.flash-enter {
+    opacity: 1;
+    transition: none;
+    pointer-events: auto; /* block clicks during flash */
+  }
+
+  /* Phase 2: Dissolve — smooth fade-out revealing new theme underneath */
+  #theme-flash.flash-exit {
+    opacity: 0;
+    transition: opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+</style>
+
+<script>
+  /**
+   * Triggers a full-screen flash overlay for theme transitions.
+   *
+   * Sequence:
+   *   1. Set overlay color (black for →light, white for →dark)
+   *   2. Show overlay instantly (flash-enter class)
+   *   3. Force browser to render the overlay (getBoundingClientRect)
+   *   4. Hold ~80ms so the user clearly perceives the flash
+   *   5. Dissolve overlay over 400ms (flash-exit class)
+   *   6. Clean up
+   */
+  function flashTheme(target: "light" | "dark") {
+    const flash = document.getElementById("theme-flash");
+    if (!flash) return;
+
+    // Guard: skip if already animating (prevents rapid-toggle glitches)
+    if (
+      flash.classList.contains("flash-enter") ||
+      flash.classList.contains("flash-exit")
+    ) {
+      return;
+    }
+
+    /* ── Overlay color logic ──
+       target === "dark"  → black overlay  (lights-off → go dark)
+       target === "light" → white overlay  (bright flash → go light)
+    */
+    flash.style.backgroundColor = target === "dark" ? "#000000" : "#ffffff";
+
+    /* ── Phase 1: Instant cover ── */
+    flash.classList.add("flash-enter");
+
+    /* Force the browser to paint this frame synchronously.
+       Without this, the browser may batch Phase 1 and Phase 2
+       into a single paint cycle and skip the transition entirely. */
+    void flash.getBoundingClientRect();
+
+    /* ── Phase 2: Dissolve after a perceptible hold ──
+       80ms is enough for the human eye to register the flash
+       before the dissolve begins. */
+    setTimeout(() => {
+      flash.classList.remove("flash-enter");
+      flash.classList.add("flash-exit");
+    }, 100);
+
+    /* ── Phase 3: Clean up after dissolve completes ──
+       400ms dissolve + 80ms hold = 480ms total, plus 20ms buffer */
+    setTimeout(() => {
+      flash.classList.remove("flash-exit");
+      flash.style.backgroundColor = "";
+      flash.style.pointerEvents = "";
+    }, 540);
+  }
+
+  /* Expose globally so ThemeToggle.astro can call it */
+  (window as any).__flashTheme = flashTheme;
+</script>
