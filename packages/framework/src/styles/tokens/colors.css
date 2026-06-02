@@ -6,17 +6,18 @@
 
 :root {
   /* ── Source / Reference Colors ── */
-  --blog-ref-primary-h: 230;
-  --blog-ref-primary-s: 82%;
-  --blog-ref-primary-l: 48%; /* Adjusted from 58% to achieve 4.5:1+ contrast on white text */
+  /* Aligned with Monet default preset "monet" (seed #6750A4, tonalSpot variant) */
+  --blog-ref-primary-h: 257;
+  --blog-ref-primary-s: 25%;
+  --blog-ref-primary-l: 45%;
 
-  --blog-ref-secondary-h: 260;
-  --blog-ref-secondary-s: 55%; /* Adjusted from 60% */
-  --blog-ref-secondary-l: 42%; /* Adjusted from 55% to achieve 4.5:1+ contrast on white text */
+  --blog-ref-secondary-h: 267;
+  --blog-ref-secondary-s: 12%;
+  --blog-ref-secondary-l: 41%;
 
-  --blog-ref-tertiary-h: 340;
-  --blog-ref-tertiary-s: 80%;
-  --blog-ref-tertiary-l: 52%;
+  --blog-ref-tertiary-h: 346;
+  --blog-ref-tertiary-s: 25%;
+  --blog-ref-tertiary-l: 41%;
 
   --blog-ref-success-h: 150;
   --blog-ref-success-s: 70%;

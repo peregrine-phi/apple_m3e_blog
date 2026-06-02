@@ -2,8 +2,8 @@
 // 被 src/utils/monet.ts 和 scripts/generate-monet.mjs 共同引用
 
 export const monetConfig = {
-  /** 默认种子色，同时也是主题色 meta 标签 of the default value */
-  defaultSeed: "#3B5CF6",
+  /** 默认种子色，与 presets[0] 保持一致 */
+  defaultSeed: "#6750A4",
 
   presets: [
     { name: "monet", seed: "#6750A4", secondary: "#9575CD" },

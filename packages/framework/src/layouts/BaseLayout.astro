@@ -10,7 +10,6 @@ import ThemeFlash from "../components/ThemeFlash.astro";
 import { ClientRouter } from "astro:transitions";
 import Icon from "../components/Icon.astro";
 import "../styles/main.css";
-import { monetConfig } from "../config/monet.config.js";
 
 import type { NavItem } from "../types";
 
@@ -44,8 +43,24 @@ const {
 ---
 
 <!doctype html>
-<html lang="en" data-theme>
+<html lang="en" data-theme="light" data-monet="monet--tonalSpot">
   <head>
+    <!-- DNS prefetch + preconnect for Google Fonts (eliminates TLS handshake delay) -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Google Fonts loaded non-render-blocking via media-swap trick.
+         font-display=swap in URL handles FOUT: fallback fonts render immediately,
+         web fonts swap in once loaded. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..900&family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+JP:wght@100..900&family=Noto+Serif+SC:wght@100..900&family=Noto+Serif+TC:wght@100..900&display=swap"
+      media="print"
+      onload="this.media='all';this.onload=null"
+    />
+
     <!-- Restore saved Lang before first paint to prevent FOUC -->
     <script is:inline>
       (function () {
@@ -80,7 +95,7 @@ const {
     {image && <meta name="twitter:image" content={image} />}
 
     <!-- Theme color -->
-    <meta name="theme-color" content={monetConfig.defaultSeed} />
+    <meta name="theme-color" content="#65558f" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 

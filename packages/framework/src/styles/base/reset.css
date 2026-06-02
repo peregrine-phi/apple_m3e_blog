@@ -33,6 +33,9 @@ body {
   letter-spacing: var(--blog-typescale-body-medium-tracking);
   color: var(--blog-color-text-primary);
   background-color: var(--blog-color-background);
+  /* Minimize layout shift when web fonts swap in (Google Sans Flex x-height ≈ 0.535).
+     Fallback fonts (Segoe UI, etc.) will be scaled to match this x-height. */
+  font-size-adjust: 0.535;
   transition:
     background-color var(--blog-motion-duration-normal)
       var(--blog-motion-easing-standard),
