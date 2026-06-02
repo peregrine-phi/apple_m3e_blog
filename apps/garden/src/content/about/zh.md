@@ -1,27 +1,38 @@
 ---
 title: "关于作者"
 ---
-你好，我是 M3E 的创作者 —— 这是一个关于设计与技术交汇点的个人文章空间。
+你好，我是 M3E 的创作者 —— 一个关于设计系统理论与前端技艺交汇点的个人博客。
 
-在这个空间里，我探索构建数字体验的手艺。我写关于设计系统、前端架构以及让界面显得生动有趣的细微细节。
-
-“M3E” 这个名字反映了该空间的设计理念 —— 融合了苹果的 Human Interface Guidelines (HIG) 与谷歌的 Material 3 Expressive 设计语言。简洁、克制而又充满个性。
+「M3E」即 **Material 3 Expressive × Apple HIG** 的融合设计语言 — 将 HIG 的克制精准与 Material 3 的表现活力融为一体。这个博客本身就是这种融合成形的实验场。
 
 ## 设计哲学
 
-- **Token 胜过硬编码值。** 每一个颜色、间距和排版决策都存在于语义化的 CSS 自定义属性中。
-- **渐进增强。** 文章默认在无 JavaScript 的情况下正常工作，并在有 JS 时提供更好的体验。
-- **尊重读者。** 干净的排版、易读的行宽以及合适的对比度。
-- **有目的性的动效。** 动画应该引导读者的注意力，而不是令人分心。
+- **Token 优先，始终如此。** 每一个视觉决策 — 颜色、字体、间距、动效 — 都存在于 CSS 自定义属性中，无一例外。
+- **渐进增强。** 页面在无 JavaScript 时完全可用，交互性按需以隔离「岛屿」叠加。
+- **无障碍内建。** WCAG 2.1 AA 对比度、键盘导航和屏幕阅读器语义是内建的，而非事后附加。
+- **有目的的动效。** 动画引导注意力、强化空间关系 — 绝非装饰。
 
 ## 结构记事
 
-- 基于 [Astro](https://astro.build) 构建
-- 使用 [Tailwind CSS v4](https://tailwindcss.com) + [daisyUI v5](https://daisyui.com) 样式
-- 设计 Token：Apple HIG x Material 3 Expressive
-- 字体排版：系统字体栈，优先使用 [SF Pro](https://developer.apple.com/fonts/)
-- 托管在边缘计算节点
+| 层级 | 工具 |
+|------|-------|
+| 框架 | [Astro 5](https://astro.build) — 内容优先，默认零 JS |
+| 交互 | [Svelte 5](https://svelte.dev) — 响应式岛屿（主题切换、Monet 取色器、音乐播放器） |
+| 样式 | [Tailwind CSS v4](https://tailwindcss.com) + [daisyUI v5](https://daisyui.com) — 工具层 + 组件原语 |
+| 设计 Token | `@m3e/framework`（工作区包）— 三层 Token 架构：Reference → System → Component |
+| 色彩系统 | `@material/material-color-utilities` — Material 3 色调调色板 + 动态 Monet 提取 |
+| 代码高亮 | [Prism](https://prismjs.com) — 服务端分词，零客户端 JS |
+| 字体排版 | Google Sans Flex + Noto Sans/Serif（JP / SC / TC）— 可变字体栈 |
+| 部署 | 边缘优先的静态部署 |
 
-## 设计系统
+## M3E 设计系统
 
-这是一个展示 M3E 设计系统 Token 和组件的活动橱窗，由 Material Design 3 驱动。
+`@m3e/framework` 包是本项目的共享设计系统工作区。它发布按层级组织的语义化 CSS 自定义属性：
+
+- **Reference Token** — 原始 hex、px、rem 值（如 `--ref-blue-500: #3B5CF6`）
+- **System Token** — 语义角色映射（如 `--sys-color-primary: var(--ref-blue-500)`）
+- **Component Token** — 作用域限定至各 UI 元素（如 `--btn-bg: var(--sys-color-primary)`）
+- **Layout Token** — `--layout-base-unit: 11`（44px）作为唯一缩放铰链
+- **Pill Token** — `--pill-*` 比例尺（sm/md/lg），配对胶囊高度、字号与水平内边距
+
+视觉识别将 HIG 的液态玻璃表面和弹簧曲线动效，与 Material 3 的色调调色板系统和圆角 Token 形状融为一体。结果：界面同时感觉精准而生动。

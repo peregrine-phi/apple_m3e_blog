@@ -1,0 +1,29 @@
+/* ==========================================================================
+   Design Tokens — Navigation Pill Capsule Framework
+   ==========================================================================
+   Defines a reusable inner-spacing system for pill/capsule navigation bars.
+   The framework ensures: tab_height = container_height - 2×(border + inner_gap)
+   
+   Usage:
+     .nav-pill {
+       height: var(--nav-pill-height);
+       padding: var(--nav-pill-inner-gap);
+       gap: var(--nav-pill-inner-gap);
+     }
+     .nav-pill > a {
+       height: var(--nav-pill-tab-height);
+     }
+*/
+
+:root {
+  /* ── Nav Pill Scale (derived from pill-h-md = 40px) ──
+     40px container → 32px tab → 3px inner gap
+     tab = container - 2×(1px border + 3px gap) = 40 - 8 = 32
+  */
+  --nav-pill-height:     var(--pill-h-md);   /* 40px */
+  --nav-pill-tab-height: var(--blog-space-8); /* 32px */
+  --nav-pill-inner-gap:  calc(var(--blog-space-1) - var(--blog-space-px)); /* 3px */
+
+  /* Nav tab line-height: vertically center text inside tab */
+  --nav-pill-tab-leading: 1; /* single-line, no extra leading */
+}

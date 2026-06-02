@@ -1,27 +1,38 @@
 ---
 title: "About the author"
 ---
-Hi, I'm the creator of M3E — a blog at the intersection of design and technology.
+Hi, I'm the creator of M3E — a personal blog where design systems theory meets frontend craft.
 
-This space is where I explore the craft of building digital experiences. I write about design systems, frontend architecture, and the subtle details that make interfaces feel alive.
-
-The name "M3E" reflects the blog's design philosophy — a fusion of Apple's Human Interface Guidelines and Material 3 Expressive design language. Clean, deliberate, and full of character.
+M3E stands for **Material 3 Expressive × Apple HIG** — a design language that fuses HIG's restrained precision with Material 3's expressive vitality. The blog itself is the sandbox where this fusion takes shape.
 
 ## Design Philosophy
 
-- **Tokens over hardcoded values.** Every color, spacing, and typographic decision lives in semantic CSS custom properties.
-- **Progressive enhancement.** The blog works without JavaScript, then gets better with it.
-- **Respect the reader.** Clean typography, readable measure, appropriate contrast.
-- **Motion with purpose.** Animation should guide attention, not distract.
+- **Tokens first, always.** Every visual decision — color, type, spacing, motion — lives in CSS custom properties. No exceptions.
+- **Progressive enhancement.** Pages are fully functional without JavaScript. Interactivity is layered on as isolated "islands" where needed.
+- **Accessibility by default.** WCAG 2.1 AA contrast, keyboard navigation, and screen-reader semantics are built in, not bolted on.
+- **Motion with purpose.** Animation guides attention and reinforces spatial relationships — never decorative.
 
 ## Colophon
 
-- Built with [Astro](https://astro.build)
-- Styled with [Tailwind CSS v4](https://tailwindcss.com) + [daisyUI v5](https://daisyui.com)
-- Design tokens: Apple HIG x Material 3 Expressive
-- Typography: System font stack with [SF Pro](https://developer.apple.com/fonts/) priority
-- Hosted on the edge
+| Layer | Tooling |
+|-------|---------|
+| Framework | [Astro 5](https://astro.build) — content-first, zero-JS-by-default |
+| Interactivity | [Svelte 5](https://svelte.dev) — reactive islands (theme toggle, Monet switcher, music player) |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com) + [daisyUI v5](https://daisyui.com) — utility layer + component primitives |
+| Design Tokens | `@m3e/framework` (workspace package) — 3-layer token architecture: Reference → System → Component |
+| Color System | `@material/material-color-utilities` — Material 3 tonal palettes + dynamic Monet extraction |
+| Code Highlighting | [Prism](https://prismjs.com) — server-side tokenization, zero client JS |
+| Typography | Google Sans Flex + Noto Sans/Serif (JP / SC / TC) — variable font stacks |
+| Hosting | Edge-first static deployment |
 
-## Design System
+## The M3E Design System
 
-A living showcase of the M3E token and component system, powered by Material Design 3.
+The `@m3e/framework` package is the project's shared design-system workspace. It publishes semantic CSS custom properties organized into layered token families:
+
+- **Reference tokens** — raw hex, px, rem values (e.g. `--ref-blue-500: #3B5CF6`)
+- **System tokens** — semantic role mapping (e.g. `--sys-color-primary: var(--ref-blue-500)`)
+- **Component tokens** — scoped to each UI element (e.g. `--btn-bg: var(--sys-color-primary)`)
+- **Layout tokens** — `--layout-base-unit: 11` (44px) as the single scaling hinge
+- **Pill tokens** — `--pill-*` scale (sm/md/lg) pairing capsule height, font-size, and horizontal padding
+
+The visual identity merges HIG's liquid-glass surfaces and spring-curve motion with Material 3's tonal palette system and corner-token shapes. The result: interfaces that feel simultaneously precise and alive.

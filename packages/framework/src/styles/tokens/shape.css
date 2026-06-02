@@ -28,7 +28,7 @@
      Three-state model: capsule (pill) → strip (pill) → card (rounded rect)
      Capsule & strip use pill shape (radius = height/2),
      card uses --blog-radius-lg for a softer rectangular form. */
-  --player-capsule-radius: calc(var(--layout-capsule-height) / 2);   /* 20px */
+  --player-capsule-radius: calc(var(--pill-h-md) / 2);   /* 20px */
   --player-strip-radius:   calc(var(--layout-bar-height) / 2);       /* 22px */
   --player-card-radius:    var(--blog-radius-lg);                     /* 16px */
   --player-strip-width:    300px;

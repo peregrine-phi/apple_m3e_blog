@@ -855,7 +855,7 @@
   .is-capsule {
     --player-radius: var(--player-capsule-radius); /* 20px */
     width: 88px;
-    height: var(--layout-capsule-height); /* 40px */
+    height: var(--pill-h-md); /* 40px */
     padding: var(--blog-space-1); /* 4px */
     cursor: pointer;
     clip-path: inset(0 round var(--player-radius));

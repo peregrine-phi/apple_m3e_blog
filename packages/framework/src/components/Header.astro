@@ -5,6 +5,7 @@ import MonetSwitcher from "./MonetSwitcher.astro";
 import LanguageToggle from "./LanguageToggle.astro";
 import I18n from "./I18n.astro";
 import Icon from "./Icon.astro";
+import navigation from "../config/navigation";
 import type { NavItem } from "../types";
 
 interface Props {
@@ -13,10 +14,7 @@ interface Props {
   siteName?: string;
 }
 
-const defaultNavItems: NavItem[] = [
-  { href: "/blog", labelKey: "nav.blog" },
-  { href: "/about", labelKey: "nav.about" },
-];
+const defaultNavItems: NavItem[] = navigation;
 
 const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro.props;
 ---
@@ -164,17 +162,17 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     justify-self: start;
     display: inline-flex;
     align-items: center;
-    height: var(--layout-capsule-height);
+    height: var(--pill-h-md);
     border-radius: var(--blog-radius-full);
-    padding: var(--blog-space-1) var(--blog-space-4) var(--blog-space-1) var(--blog-space-1);
+    padding: var(--blog-space-1) var(--blog-space-4) var(--blog-space-1) var(--nav-pill-inner-gap);
     text-decoration: none;
     gap: var(--blog-space-2);
   }
 
   /* Solid circular wrapper inside logo */
   .logo-dot {
-    width: var(--blog-space-9); /* 36px circular wrapper */
-    height: var(--blog-space-9);
+    width: var(--nav-pill-tab-height); /* 32px — matches nav tab, 3px gap to capsule */
+    height: var(--nav-pill-tab-height);
     border-radius: var(--blog-radius-full);
     background: var(--blog-color-primary-container);
     display: flex;
@@ -200,17 +198,17 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     justify-self: center;
     display: flex;
     align-items: center;
-    height: var(--layout-capsule-height);
+    height: var(--nav-pill-height);
     border-radius: var(--blog-radius-full);
-    padding: var(--blog-space-1);
-    gap: var(--blog-space-1);
+    padding: var(--nav-pill-inner-gap);
+    gap: var(--nav-pill-inner-gap);
   }
 
   .nav-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: var(--blog-space-9); /* 36px tab height */
+    height: var(--nav-pill-tab-height); /* 32px — from nav-pill framework */
     padding: var(--blog-space-0) var(--blog-space-4);
     font-family: var(--blog-font-sans, 'Inter', sans-serif);
     font-size: var(--blog-typescale-label-large-size, 12px);
@@ -248,7 +246,7 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: var(--layout-capsule-height);
+    height: var(--pill-h-md);
     border-radius: var(--blog-radius-full);
     cursor: pointer;
     overflow: visible;
@@ -257,18 +255,18 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
   /* Specific overrides for buttons widths & paddings utilizing ID specificity */
   .header-actions :global(#theme-toggle),
   .header-actions :global(.monet-toggle) {
-    width: var(--layout-capsule-height); /* Strict circle */
+    width: var(--pill-h-md); /* Strict circle */
     padding: var(--blog-space-0);
   }
 
   .header-actions :global(#lang-toggle) {
-    min-width: var(--layout-capsule-height);
+    min-width: var(--pill-h-md);
     width: auto;
     padding-inline: var(--blog-space-3); /* Dynamic padding */
   }
 
   #mobile-menu-btn {
-    width: var(--layout-capsule-height); /* Mobile menu circle */
+    width: var(--pill-h-md); /* Mobile menu circle */
     padding: var(--blog-space-0);
   }
 
@@ -345,8 +343,8 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
       transform: none;
       justify-self: auto;
       white-space: nowrap;
-      height: var(--layout-capsule-height); /* Matching floating element heights */
-      padding: var(--blog-space-1) var(--blog-space-4) var(--blog-space-1) var(--blog-space-2);
+      height: var(--pill-h-lg); /* 44px — matches ToC capsule */
+      padding: var(--blog-space-1) var(--blog-space-4) var(--blog-space-1) var(--nav-pill-inner-gap);
       font-size: var(--blog-typescale-title-medium-size) !important;
     }
 
@@ -414,19 +412,19 @@ const { transparent = false, navItems = defaultNavItems, siteName = "" } = Astro
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      height: var(--blog-space-10); /* 40px mobile capsule height */
+      height: var(--pill-h-md); /* 40px mobile capsule height */
       border-radius: var(--blog-radius-full);
       cursor: pointer;
     }
 
     .mobile-menu-actions :global(#theme-toggle),
     .mobile-menu-actions :global(.monet-toggle) {
-      width: var(--blog-space-10); /* 40px circle */
+      width: var(--pill-h-md); /* 40px circle */
       padding: var(--blog-space-0);
     }
 
     .mobile-menu-actions :global(#lang-toggle) {
-      min-width: var(--blog-space-10);
+      min-width: var(--pill-h-md);
       width: auto;
       padding-inline: var(--blog-space-3);
     }
