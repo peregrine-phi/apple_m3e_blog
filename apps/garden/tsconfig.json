@@ -3,7 +3,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@m3e/*": ["../../packages/framework/src/*"]
+      "@m3e/*": ["../../packages/framework/src/*"],
+      "@m3e/shared/*": ["../../packages/framework/src/shared/*"],
+      "@m3e/widgets/*": ["../../packages/framework/src/widgets/*"],
+      "@m3e/entities/*": ["../../packages/framework/src/entities/*"],
+      "@m3e/pages/*": ["../../packages/framework/src/pages/*"],
+      "@m3e/layouts/*": ["../../packages/framework/src/layouts/*"]
     }
   },
   "include": [

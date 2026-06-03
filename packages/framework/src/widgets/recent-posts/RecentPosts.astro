@@ -1,0 +1,77 @@
+---
+// RecentPosts.astro — 首页最近文章网格区块
+// Layer: widgets/recent-posts
+import BlogCard from "../../entities/post/BlogCard.astro";
+import MDButton from "../../shared/components/MDButton.astro";
+import I18n from "../../shared/components/I18n.astro";
+import Icon from "../../shared/components/Icon.astro";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  posts: CollectionEntry<"blog">[];
+}
+
+const { posts } = Astro.props;
+---
+
+<section class="section-recent">
+  <div class="container-wide">
+    <div class="section-header">
+      <div>
+        <p class="text-kicker" style="display: flex; align-items: center; gap: var(--blog-space-2);">
+          <span class="kicker-dot" aria-hidden="true"></span>
+          <I18n tKey="home.latest" />
+        </p>
+        <h2 class="text-headline-large"><I18n tKey="home.recent" /></h2>
+      </div>
+      <MDButton href="/blog" variant="text">
+        <I18n tKey="home.viewAll" />
+        <Icon slot="icon-trailing" name="arrow-right" size={16} />
+      </MDButton>
+    </div>
+    <div class="blog-grid">
+      {posts.map((post) => <BlogCard post={post} />)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .section-recent {
+    padding-block: var(--blog-space-section-gap);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: var(--blog-space-8);
+    flex-wrap: wrap;
+    gap: var(--blog-space-4);
+  }
+
+  .section-header .text-headline-large {
+    margin: var(--blog-space-1) 0 0 0;
+  }
+
+  .kicker-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: var(--blog-radius-full);
+    background: var(--blog-color-primary);
+    flex-shrink: 0;
+  }
+
+  /* Blog grid */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--blog-space-6);
+  }
+
+  @media (max-width: 600px) {
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

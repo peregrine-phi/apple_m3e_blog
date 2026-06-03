@@ -1,7 +1,8 @@
 ---
 // Footer.astro — Site footer
-import I18n from "./I18n.astro";
-import type { NavItem } from "../types";
+// Layer: widgets/footer
+import I18n from "../../shared/components/I18n.astro";
+import type { NavItem } from "../../shared/types";
 
 interface Props {
   navItems?: NavItem[];
@@ -74,6 +75,10 @@ const finalConnectItems = connectItems || defaultConnectItems;
 </footer>
 
 <style>
+  :root {
+    --footer-brand-max-width: 280px;
+  }
+
   .site-footer {
     margin-top: var(--blog-space-section-gap);
     padding-top: var(--blog-space-16);
@@ -98,7 +103,7 @@ const finalConnectItems = connectItems || defaultConnectItems;
   }
 
   .footer-brand p {
-    min-height: 4.5em; /* Reserve vertical space for up to 3 lines of description text to prevent layout height shift on language toggle */
+    min-height: 4.5em;
   }
 
   .site-logo {
@@ -130,7 +135,7 @@ const finalConnectItems = connectItems || defaultConnectItems;
     display: flex;
     flex-direction: column;
     gap: var(--blog-space-2);
-    min-width: 100px; /* Prevent horizontal layout shift by reserving column width */
+    min-width: 100px;
   }
 
   .footer-link {

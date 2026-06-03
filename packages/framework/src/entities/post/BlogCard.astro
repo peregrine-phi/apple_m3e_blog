@@ -2,10 +2,10 @@
 // BlogCard.astro — Blog post card component
 // Variants: "default" (clean Apple card) | "brutal" (thick border + offset shadow)
 import type { CollectionEntry } from "astro:content";
-import Chip from "./Chip.astro";
-import I18n from "./I18n.astro";
+import Chip from "../../shared/components/Chip.astro";
+import I18n from "../../shared/components/I18n.astro";
 
-import { stageConfig } from "../config/filter-config";
+import { stageConfig } from "../../shared/config/filter-config";
  
 interface Props {
   post: CollectionEntry<"blog">;

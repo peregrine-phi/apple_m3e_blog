@@ -1,17 +1,17 @@
 ---
 // BaseLayout.astro — Root layout for all pages
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import Music from "../components/Music.astro";
-import MonetCSS from "../components/MonetCSS.astro";
-import MDButton from "../components/MDButton.astro";
-import MDSnackbar from "../components/MDSnackbar.astro";
-import ThemeFlash from "../components/ThemeFlash.astro";
+import Header from "../widgets/header/Header.astro";
+import Footer from "../widgets/footer/Footer.astro";
+import Music from "../shared/components/Music.astro";
+import MonetCSS from "../shared/components/MonetCSS.astro";
+import MDButton from "../shared/components/MDButton.astro";
+import MDSnackbar from "../shared/components/MDSnackbar.astro";
+import ThemeFlash from "../shared/components/ThemeFlash.astro";
 import { ClientRouter } from "astro:transitions";
-import Icon from "../components/Icon.astro";
-import "../styles/main.css";
+import Icon from "../shared/components/Icon.astro";
+import "../shared/styles/main.css";
 
-import type { NavItem } from "../types";
+import type { NavItem } from "../shared/types";
 
 interface Props {
   title: string;

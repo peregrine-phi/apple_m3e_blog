@@ -1,12 +1,12 @@
 ---
 // blog/index.astro — Blog post listing with dynamic tag & search filtering
 import BlogListLayout from "@m3e/layouts/BlogListLayout.astro";
-import BlogCard from "@m3e/components/BlogCard.astro";
-import SearchBar from "@m3e/components/SearchBar.astro";
-import I18n from "@m3e/components/I18n.astro";
-import FilterGroup from "@m3e/components/FilterGroup.astro";
-import MDSwitch from "@m3e/components/MDSwitch.astro";
-import { tagConfig, stageConfig } from "@m3e/config/filter-config";
+import BlogCard from "@m3e/entities/post/BlogCard.astro";
+import SearchBar from "@m3e/shared/components/SearchBar.astro";
+import I18n from "@m3e/shared/components/I18n.astro";
+import FilterGroup from "@m3e/shared/components/FilterGroup.astro";
+import MDSwitch from "@m3e/shared/components/MDSwitch.astro";
+import { tagConfig, stageConfig } from "@m3e/shared/config/filter-config";
 import { getCollection } from "astro:content";
 import { siteConfig, getMusicApiEndpoint } from "../../config/site";
 

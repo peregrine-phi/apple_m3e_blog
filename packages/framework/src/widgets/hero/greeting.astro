@@ -1,0 +1,22 @@
+---
+// HeroGreeting.astro — 首页 Hero 问候语区块（可扩展）
+// Layer: widgets/hero (page-level namespace)
+import I18n from "../../shared/components/I18n.astro";
+
+interface Props {
+  siteName: string;
+}
+
+const { siteName } = Astro.props;
+---
+
+<!-- Greeting: 可扩展区域，以后可加入时间问候/动态文案 -->
+<p class="hero-greeting text-headline-small">
+  <I18n tKey="home.welcome" vars={{ siteName }} />
+</p>
+<style>
+  .hero-greeting {
+    color: var(--blog-color-text-secondary);
+    margin-bottom: var(--blog-space-4);
+  }
+</style>
