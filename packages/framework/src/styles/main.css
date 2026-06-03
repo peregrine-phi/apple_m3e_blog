@@ -29,4 +29,7 @@
 @import "./base/filters.css";
 @import "./base/layouts.css";
 @import "./base/editorial.css";
+@import "./base/post-header.css";
+@import "./base/prose.css";
+@import "./base/tables.css";
 

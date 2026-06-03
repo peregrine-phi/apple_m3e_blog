@@ -20,6 +20,10 @@
   --blog-state-press-opacity: 0.12;
   --blog-state-drag-opacity: 0.16;
 
+  /* ── Focus Ring ── */
+  --blog-state-focus-ring-offset: 2px;
+  --blog-state-focus-ring-width: 4px;
+
   /* ── Semantic State Tokens ── */
   /* Apply as: background-image or box-shadow overlay */
   --blog-state-hover: rgba(

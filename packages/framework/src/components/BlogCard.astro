@@ -124,8 +124,8 @@ const displayTags = tags;
 
   .blog-card-link:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--blog-color-background),
-      0 0 0 4px var(--blog-color-primary);
+    box-shadow: 0 0 0 var(--blog-state-focus-ring-offset) var(--blog-color-background),
+      0 0 0 var(--blog-state-focus-ring-width) var(--blog-color-primary);
   }
 
   /* ── Cover image ── */
@@ -206,7 +206,7 @@ const displayTags = tags;
     padding: var(--blog-space-0-5) var(--blog-space-2);
     border-radius: var(--blog-radius-badge);
     font-size: var(--blog-typescale-label-small-size);
-    font-weight: 700;
+    font-weight: var(--blog-font-weight-bold);
     letter-spacing: var(--blog-typescale-label-small-tracking);
     text-transform: uppercase;
     box-sizing: border-box;

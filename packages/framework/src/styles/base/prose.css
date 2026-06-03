@@ -1,0 +1,132 @@
+/* ============================================
+   Prose Content Typography
+   Applies to all prose containers across pages:
+   .post-content (blog) and .about-text (about).
+   Use :is() to keep rules DRY.
+   ============================================ */
+
+:is(.post-content, .about-text) {
+  font: var(--blog-typescale-body-large);
+  color: var(--blog-color-text-primary);
+}
+
+/* ── Headings ── */
+:is(.post-content, .about-text) h2 {
+  font: var(--blog-typescale-headline-medium);
+  letter-spacing: var(--blog-typescale-headline-medium-tracking);
+  color: var(--blog-color-text-primary);
+  margin-top: var(--blog-space-10);
+  margin-bottom: var(--blog-space-4);
+}
+
+:is(.post-content, .about-text) h3 {
+  font: var(--blog-typescale-headline-small);
+  letter-spacing: var(--blog-typescale-headline-small-tracking);
+  color: var(--blog-color-text-primary);
+  margin-top: var(--blog-space-8);
+  margin-bottom: var(--blog-space-3);
+}
+
+/* ── Paragraphs & Lists ── */
+:is(.post-content, .about-text) p {
+  margin-bottom: var(--blog-prose-gap-paragraph);
+}
+
+:is(.post-content, .about-text) ul,
+:is(.post-content, .about-text) ol {
+  padding-left: var(--blog-space-6);
+  margin-bottom: var(--blog-prose-gap-paragraph);
+}
+
+:is(.post-content, .about-text) li {
+  margin-bottom: var(--blog-space-2);
+}
+
+/* ── Links ── */
+:is(.post-content, .about-text) a {
+  color: var(--blog-color-text-link);
+  text-decoration: underline;
+  text-underline-offset: var(--blog-typescale-link-underline-offset);
+  text-decoration-thickness: var(--blog-typescale-link-decoration-thickness);
+}
+
+:is(.post-content, .about-text) a:hover {
+  color: var(--blog-color-text-link-hover);
+}
+
+/* ── Blockquote ── */
+:is(.post-content, .about-text) blockquote {
+  border-left: 3px solid var(--blog-color-primary);
+  padding-left: var(--blog-space-5);
+  margin-block: var(--blog-prose-gap-block);
+  color: var(--blog-color-text-secondary);
+  font-style: italic;
+}
+
+/* ── Images ── */
+:is(.post-content, .about-text) img {
+  border-radius: var(--blog-radius-md);
+  margin-block: var(--blog-prose-gap-block);
+}
+
+/* ── Code Blocks ── */
+:is(.post-content, .about-text) pre {
+  position: relative;
+  margin-block: var(--blog-prose-gap-block);
+  padding: var(--blog-space-5);
+  padding-top: calc(var(--blog-space-5) + 16px);
+  background-color: var(--blog-color-surface-variant);
+  border: 1px solid var(--blog-color-border);
+  border-radius: var(--blog-radius-md);
+}
+
+:is(.post-content, .about-text) code {
+  font: var(--blog-typescale-code);
+}
+
+:is(.post-content, .about-text) :not(pre) > code {
+  background-color: var(--blog-color-surface-variant);
+  padding: 0.1em 0.3em;
+  border-radius: var(--blog-radius-xs);
+  border: 1px solid var(--blog-color-border);
+  transition: var(--blog-transition-color);
+}
+
+/* ── Horizontal Rule ── */
+:is(.post-content, .about-text) hr {
+  border: none;
+  border-top: 1px solid var(--blog-color-divider);
+  margin-block: var(--blog-space-8);
+}
+
+/* ── Floating Copy Code Button ── */
+:is(.post-content, .about-text) .copy-code-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  height: 28px;
+  padding: 0 10px;
+  font-size: var(--blog-typescale-label-small-size);
+  font-weight: var(--blog-font-weight-medium);
+  text-transform: uppercase;
+  border-radius: var(--blog-radius-sm);
+  background-color: var(--blog-color-surface);
+  color: var(--blog-color-primary);
+  border: 1px solid var(--blog-color-outline-variant);
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0;
+  transition:
+    opacity var(--blog-motion-duration-fast) var(--blog-motion-easing-standard),
+    background-color var(--blog-motion-duration-fast) var(--blog-motion-easing-standard);
+}
+
+:is(.post-content, .about-text) pre:hover .copy-code-btn,
+:is(.post-content, .about-text) .copy-code-btn:focus-visible {
+  opacity: 1;
+}
+
+:is(.post-content, .about-text) .copy-code-btn:hover {
+  background-color: var(--blog-color-primary-container);
+  color: var(--blog-color-on-primary-container);
+}

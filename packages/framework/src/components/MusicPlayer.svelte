@@ -993,18 +993,18 @@
   }
 
   .info-text {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--mp-info-size);
+    font-weight: var(--mp-info-weight);
     color: var(--blog-color-text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
-    letter-spacing: -0.01em;
+    letter-spacing: var(--mp-info-tracking);
   }
 
   .info-sep {
-    font-weight: 400;
+    font-weight: var(--mp-info-sep-weight);
     opacity: 0.5;
   }
 
@@ -1116,10 +1116,10 @@
   .card-title {
     display: inline-block;
     white-space: nowrap;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: var(--mp-card-title-size);
+    font-weight: var(--mp-card-title-weight);
     color: var(--blog-color-text-primary);
-    letter-spacing: -0.01em;
+    letter-spacing: var(--mp-card-title-tracking);
     transition: transform 0.08s linear;
   }
 
@@ -1127,9 +1127,9 @@
   .card-artist {
     grid-column: 2;
     grid-row: 2;
-    font-size: 12px;
+    font-size: var(--mp-artist-size);
     color: var(--blog-color-text-secondary);
-    font-weight: 400;
+    font-weight: var(--mp-artist-weight);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1145,7 +1145,7 @@
     color: var(--blog-color-on-error-container);
     padding: 6px 10px;
     border-radius: var(--blog-radius-sm); /* 8px */
-    font-size: 11px;
+    font-size: var(--blog-typescale-label-small-size);
     animation: shake 0.4s ease;
   }
 
@@ -1269,10 +1269,10 @@
   .time-row {
     display: flex;
     justify-content: space-between;
-    font-size: 10px;
+    font-size: var(--mp-time-size);
     color: var(--blog-color-text-tertiary);
     font-variant-numeric: tabular-nums;
-    font-weight: 500;
+    font-weight: var(--mp-time-weight);
   }
 
   /* ── M3 Full: Transport Controls ── spans full width */
@@ -1431,9 +1431,9 @@
   }
 
   .drawer-head span {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-size: var(--mp-drawer-head-size);
+    font-weight: var(--blog-font-weight-bold);
+    letter-spacing: var(--mp-drawer-head-tracking);
     color: var(--blog-color-text-secondary);
     text-transform: uppercase;
   }
@@ -1441,7 +1441,7 @@
   .drawer-close {
     background: none;
     border: none;
-    font-size: 13px;
+    font-size: var(--mp-info-size);
     color: var(--blog-color-text-tertiary);
     cursor: pointer;
     padding: 2px 6px;
@@ -1510,8 +1510,8 @@
   }
 
   .drawer-title {
-    font-size: 12px;
-    font-weight: 500;
+    font-size: var(--mp-drawer-title-size);
+    font-weight: var(--mp-drawer-title-weight);
     color: var(--blog-color-text-primary);
     white-space: nowrap;
     overflow: hidden;
@@ -1519,7 +1519,7 @@
   }
 
   .drawer-artist {
-    font-size: 10px;
+    font-size: var(--mp-drawer-artist-size);
     color: var(--blog-color-text-secondary);
     white-space: nowrap;
     overflow: hidden;

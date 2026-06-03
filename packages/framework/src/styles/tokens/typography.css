@@ -149,4 +149,16 @@
   --blog-measure-narrow: 45ch;
   --blog-measure-normal: 65ch;
   --blog-measure-wide: 80ch;
+
+  /* ── Link Decoration ── */
+  --blog-typescale-link-underline-offset: 4px;
+  --blog-typescale-link-decoration-thickness: 1px;
+
+  /* ── Prose Spacing ──
+     paragraph-gap = 段距（段落间垂直间距）
+     block-gap     = 块级元素间距（pre, img, blockquote 等）
+     与行距（body-large leading 1.7 → ~12.6px visual gap）
+     保持 ≥1.9× 的比值，确保视觉层级分明。 */
+  --blog-prose-gap-paragraph: var(--blog-space-6);  /* 24px */
+  --blog-prose-gap-block: var(--blog-space-6);      /* 24px */
 }

@@ -1,0 +1,30 @@
+/* MusicPlayer — 音乐播放器排版 Token */
+/* 命名空间: --mp- */
+/* 独立于全局排版主题，允许播放器保持自己的视觉语言 */
+/* 值定义在 :root，用户可通过排版主题覆盖 */
+
+:root {
+  /* ── Track Info (Strip 模式) ── */
+  --mp-info-size: 13px;
+  --mp-info-weight: var(--blog-font-weight-semibold);
+  --mp-info-tracking: -0.01em;
+  --mp-info-sep-weight: 400;
+
+  /* ── Card Expanded ── */
+  --mp-card-title-size: 14px;
+  --mp-card-title-weight: var(--blog-font-weight-semibold);
+  --mp-card-title-tracking: -0.01em;
+  --mp-artist-size: 12px;
+  --mp-artist-weight: 400;
+
+  /* ── Time Row ── */
+  --mp-time-size: 10px;
+  --mp-time-weight: var(--blog-font-weight-medium);
+
+  /* ── Playlist Drawer ── */
+  --mp-drawer-head-size: 10px;
+  --mp-drawer-head-tracking: 1px;
+  --mp-drawer-title-size: 12px;
+  --mp-drawer-title-weight: var(--blog-font-weight-medium);
+  --mp-drawer-artist-size: 10px;
+}

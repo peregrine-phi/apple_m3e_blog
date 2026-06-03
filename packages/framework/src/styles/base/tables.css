@@ -1,0 +1,104 @@
+/* ============================================
+   Table Styles — M3 Data Tables
+   Clean horizontal dividers, no zebra striping,
+   subtle hover state via primary color state layer.
+   ============================================ */
+
+/* ── Table Spacing Tokens ──
+   M3 data-table convention: wider inline padding
+   for column breathing, tighter block padding for
+   compact row density.
+   block = 行距 (row tightness)
+   inline = 段距 (column spacing) */
+:root {
+  --blog-table-cell-padding-block: var(--blog-space-2-5);   /* 10px */
+  --blog-table-cell-padding-inline: var(--blog-space-4);   /* 16px */
+}
+
+/* ── Base Table ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--blog-typescale-body-medium);
+  color: var(--blog-color-text-primary);
+  margin-block: var(--blog-space-6);
+}
+
+/* ── Table Header ──
+   Surface-variant background distinguishes header
+   from body rows. Bottom border uses the stronger
+   outline-variant instead of divider for clear
+   visual separation between header and data. */
+thead {
+  background-color: var(--blog-color-surface-variant);
+  transition: var(--blog-transition-color);
+}
+
+th {
+  font: var(--blog-typescale-label-large);
+  color: var(--blog-color-on-surface-variant);
+  text-align: start;
+  padding: var(--blog-table-cell-padding-block) var(--blog-table-cell-padding-inline);
+  border-bottom: 1px solid var(--blog-color-outline-variant);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ── Table Body ──
+   Cells use divider (lighter than outline-variant)
+   for gentle horizontal rules between rows.
+   No vertical borders — keeps the M3 clean look. */
+td {
+  padding: var(--blog-table-cell-padding-block) var(--blog-table-cell-padding-inline);
+  border-bottom: 1px solid var(--blog-color-divider);
+  vertical-align: middle;
+}
+
+/* ── Row Hover ──
+   Subtle primary-color state layer at 8% opacity.
+   No background transition on first paint. */
+tbody tr {
+  transition: background-color var(--blog-motion-duration-fast)
+    var(--blog-motion-easing-standard);
+}
+
+tbody tr:hover {
+  background-color: color-mix(in srgb, var(--blog-color-primary) 8%, transparent);
+}
+
+/* ── Last Row ──
+   Remove bottom border so there's no double border
+   with the parent container edge. */
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Caption ──
+   Placed below the table (caption-side: bottom).
+   Uses label-large style with secondary color. */
+caption {
+  font: var(--blog-typescale-label-large);
+  color: var(--blog-color-text-secondary);
+  padding: var(--blog-space-3) var(--blog-space-4);
+  text-align: start;
+  caption-side: bottom;
+}
+
+/* ── Responsive Wrapper ──
+   For tables that exceed the container width,
+   wrap in .table-responsive to enable horizontal
+   scroll without breaking the layout.
+   Usage:
+   <div class="table-responsive">
+     <table>...</table>
+   </div> */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-block: var(--blog-space-6);
+}
+
+.table-responsive table {
+  margin-block: 0;
+  min-width: max-content;
+}

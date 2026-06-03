@@ -5,5 +5,5 @@
   --badge-dot-size: 6px;
   --badge-font-size: var(--blog-typescale-label-small-size);
   --badge-letter-spacing: var(--blog-typescale-label-small-tracking);
-  --badge-line-height: 1;
+  --badge-line-height: var(--blog-typescale-label-small-leading);
 }

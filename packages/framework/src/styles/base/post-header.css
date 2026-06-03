@@ -1,0 +1,37 @@
+/* ============================================
+   Post Header Block
+   Internal layout and styling for the article
+   header: meta, title, subtitle, tags.
+   ============================================ */
+
+.post-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--blog-space-4);
+}
+
+/* ── Meta Row ── */
+.post-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--blog-space-2);
+  flex-wrap: wrap;
+}
+
+/* ── Title ── */
+.post-title {
+  color: var(--blog-color-text-primary);
+}
+
+/* ── Subtitle / Deck ── */
+.post-subtitle {
+  margin-top: var(--blog-space-2);
+}
+
+/* ── Tags ── */
+.post-tags {
+  display: flex;
+  gap: var(--blog-space-2);
+  flex-wrap: wrap;
+  margin-top: var(--blog-space-2);
+}

@@ -34,6 +34,9 @@
   /* Row spacing */
   --layout-element-row-gap: var(--layout-gap-sm);        /* 16px */
 
+  /* Showcase */
+  --layout-showcase-max-width: 400px;
+
   /* ── Pill / Capsule Size Scale ──
      Each tier pairs capsule height + font size, following a ~30–35% text-to-height ratio
      for visual comfort in single-line labels.
